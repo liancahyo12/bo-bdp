@@ -17,11 +17,11 @@ class CreateSuratkeluarsTable extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('user_id');
-            $table->string('no_urut');
+            $table->string('no_urut')->nullable();
             $table->unsignedInteger('jenis_surat_id');
             $table->unsignedInteger('departemen_id');
             $table->date('tgl_surat');
-            $table->string('no_surat');
+            $table->string('no_surat')->nullable();
             $table->string('perihal');
             $table->string('isi_surat');
             $table->string('lampiran')->nullable();

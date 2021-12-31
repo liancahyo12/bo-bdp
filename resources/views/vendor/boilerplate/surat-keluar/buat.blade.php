@@ -12,6 +12,8 @@
             &nbsp; &nbsp;
             {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}
             &nbsp;
+            {{ Form::submit('Preview Surat', array('class' => 'btn btn-warning', 'name' => 'submitbutton')) }}
+            &nbsp;
             {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
         </div>
     <br>
@@ -47,18 +49,18 @@
         
         {{-- <div style='display:none;' id='card-form'><br/>
             <x-boilerplate::card> --}}
-                @foreach ($jenis_surat as $position)
-                <div style='display:none;' id={{ $position->id }}>
-                    <x-boilerplate::card>
-                        <h3><b>FORM {{ $position->jenis_surat }}</b></h3> 
-                        @include('boilerplate::surat-keluar.form.form'. $position->id )
+                <div id='def-form'>
+                    <x-boilerplate::card id="formcard">
+                        <div id="forma">
+                        </div>
                     </x-boilerplate::card>
                 </div>
-                @endforeach
                 
             <div class="row" style='display:none;' id='button1'>
                 &nbsp; &nbsp;
                 {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}
+                &nbsp;
+                {{ Form::submit('Preview Surat', array('class' => 'btn btn-warning', 'name' => 'submitbutton')) }}
                 &nbsp;
                 {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
             </div>

@@ -22,10 +22,34 @@
     <script>
         $(document).ready(function(){
             var ok = "ok";
-            if ( ok == "{{ (request()->is('surat-keluar-saya/*')) ? 'ok' : '' }}"){
-                document.getElementById("head-form").innerHTML = "{{ (request()->is('surat-keluar-saya/*')) ? 'ok' : '' }}";
-            }
             $('#jenis_surat').on('change', function() {
+            
+            if ( this.value == "{{ $surat->jenis_surat_id }}"){
+                $("#button1").show();
+                $("#def-form").show();
+                document.getElementById("head-form").innerHTML = "{{ $surat->jenis_surat }}";
+                document.getElementById("item1").value = "{{ $surat->item1 }}";
+                document.getElementById("item2").value = "{{ $surat->item2 }}";
+                document.getElementById("item3").value = "{{ $surat->item3 }}";
+                document.getElementById("item4").value = "{{ $surat->item4 }}";
+                document.getElementById("item5").value = "{{ $surat->item5 }}";
+                document.getElementById("item6").value = "{{ $surat->item6 }}";
+                document.getElementById("item7").value = "{{ $surat->item7 }}";
+                document.getElementById("item8").value = "{{ $surat->item8 }}";
+                document.getElementById("item9").value = "{{ $surat->item9 }}";
+                document.getElementById("item10").value = "{{ $surat->item10 }}";
+                document.getElementById("item11").value = "{{ $surat->item11 }}";
+                document.getElementById("item12").value = "{{ $surat->item12 }}";
+                document.getElementById("item13").value = "{{ $surat->item13 }}";
+                document.getElementById("item14").value = "{{ $surat->item14 }}";
+                document.getElementById("item15").value = "{{ $surat->item15 }}";
+                document.getElementById("item16").value = "{{ $surat->item16 }}";
+                document.getElementById("item17").value = "{{ $surat->item17 }}";
+                document.getElementById("item18").value = "{{ $surat->item18 }}";
+                document.getElementById("item19").value = "{{ $surat->item19 }}";
+                document.getElementById("item20").value = "{{ $surat->item20 }}";
+            }
+            else{
                 if ( this.value == '1')
                 //.....................^.......
                 {
@@ -283,7 +307,7 @@
                     // $("#10").hide();
                     // $("#11").hide();
                     // $("#12").hide();
-                
+                }
             }
             
             });

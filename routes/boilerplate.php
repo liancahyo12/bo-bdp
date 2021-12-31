@@ -104,10 +104,17 @@ Route::group([
         Route::post('/surat-keluar-buat', [SuratkeluarController::class, 'store'])
             ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
             ->name('surat-keluar-buat');
+        // Route::post('/surat-keluar-saya', [SuratkeluarController::class, 'index'])
+        //     ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
+        //     ->name('surat-keluar-buat');
         Route::group(['middleware' => ['ability:admin,backend_access']], function () {
             Route::resource('surat-keluar-saya', SuratkeluarController::class)->except('show');
+            Route::any('surat-keluar-saya/dt', [SuratkeluarController::class, 'datatable'])->name('surat-keluar-saya');
         });
-        Route::get('/surat-keluar-edit/{id}', [SuratkeluarController::class, 'index'])
+        Route::get('/surat-keluar-edit', [SuratkeluarController::class, 'edit'])
+            ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
+            ->name('surat-keluar-edit');
+        Route::put('/surat-keluar-edit/{id}', [SuratkeluarController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
             ->name('surat-keluar-edit');
         Route::get('/surat-keluar-review', [SuratkeluarController::class, 'review'])

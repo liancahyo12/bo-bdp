@@ -20,7 +20,7 @@ class SuratKeluar
         ]);
         $item->add('Surat Saya', [
             'route' => 'boilerplate.surat-keluar-saya.index',
-            'active' => 'boilerplate.surat-keluar-saya.index',
+            'active' => 'boilerplate.surat-keluar-saya.index,boilerplate.surat-keluar-saya.edit',
             'permission' => 'backend_access',
             'order' => 101,
         ]);

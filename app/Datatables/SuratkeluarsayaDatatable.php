@@ -20,7 +20,9 @@ class SuratkeluarsayaDatatable extends Datatable
         
         return Auth::user()->suratkeluar()->get(['id',
         'perihal',
-        'no_surat',
+        'tgl_surat',
+        'review_status',
+        'approve_status',
         'send_status',]);
         // return DB::table('suratkeluars')->select([
         // 'id',
@@ -56,16 +58,28 @@ class SuratkeluarsayaDatatable extends Datatable
 
                     return sprintf($badge, 'info', __('Draft'));
                 })
-                ->filterOptions([__('boilerplate::users.inactive'), __('boilerplate::users.active')]),
+                ->notSortable(),
             Column::add('Id')
                 ->data('id'),
 
             Column::add('Perihal Surat')
                 ->data('perihal'),
 
-            Column::add('No Surat')
-                ->data('no_surat'),
+            Column::add('Tgl Surat')
+                ->data('tgl_surat'),
 
+            Column::add('Status')
+                ->width('40px')
+                ->data('custom_status', function (Suratkeluar $suratkeluar) {
+                    $badge1 = '<span class="badge badge-pill badge-%s">%s</span>';
+                    $badge2 = '<span class="badge badge-pill badge-%s">%s</span><br><span class="badge badge-pill badge-%s">%s</span>';
+                    if ($suratkeluar->review_status == null &&  $suratkeluar->approve_status == null) {
+                        return sprintf($badge1, 'secondary', __(''),'a','a');
+                    }
+
+                    return sprintf($badge2, 'info', __('Draft'),'a','a');
+                })
+                ->notSortable(),
             // Column::add('Status Pengajuan')
             //     ->data(''),
                 
@@ -73,12 +87,12 @@ class SuratkeluarsayaDatatable extends Datatable
                 ->actions(function(Suratkeluar $suratkeluar) {
                     if ($suratkeluar->send_status == 1) {
                         return join([
-                        Button::show('boilerplate.surat-keluar-edit', $suratkeluar),           
+                        // Button::show('boilerplate.surat-keluar-saya.detail', $suratkeluar->id),           
                     ]);   
                     }
                     return join([
-                        Button::edit('boilerplate.surat-keluar-edit', $suratkeluar),    
-                        Button::delete('boilerplate.surat-keluar-edit', $suratkeluar),           
+                        Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),    
+                        Button::delete('boilerplate.surat-keluar-saya.destroy', $suratkeluar->id),           
                     ]);
                     
                 }),
