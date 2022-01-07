@@ -17,5 +17,8 @@ class Reviewsuratkeluar extends Model
     protected $fillable = [
         'komentar',
         'review_status',
+        'surat_keluar_id',
+        'user_id',
+        'reviewer_id',
     ];
 }

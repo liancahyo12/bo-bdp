@@ -1,15 +1,15 @@
 @extends('boilerplate::layout.index', [
     'title' => __('Surat Keluar'),
-    'subtitle' => 'Approve Surat Keluar',
-    'breadcrumb' => ['Approve Surat Keluar']]
+    'subtitle' => 'Permintaan Surat Keluar Saya',
+    'breadcrumb' => ['Permintaan Surat Keluar Saya']]
 )
 
 @section('content')
     <x-boilerplate::card>
         <x-slot name="header">
-            Daftar Surat Keluar
+            Daftar Permintaan Surat Keluar Saya
         </x-slot>
-            <x-boilerplate::datatable name="approvesuratkeluar" />
+            <x-boilerplate::datatable name="requestsuratkeluarsaya" />
         <x-slot name="footer">
         </x-slot>
     </x-boilerplate::card>

@@ -7,7 +7,7 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title }} | {{ 'BDPay E-Office' }}</title>
-    <link rel="shortcut icon" href="{{ config('boilerplate.theme.favicon') ?? mix('favicon.svg', '/assets/vendor/boilerplate') }}">
+    <link rel="shortcut icon" href="{{ config('boilerplate.theme.favicon') ?? mix('favicon.png', '/assets/vendor/boilerplate') }}">
 @stack('plugin-css')
     <link rel="stylesheet" href="{{ mix('/plugins/fontawesome/fontawesome.min.css', '/assets/vendor/boilerplate') }}">
     <link rel="stylesheet" href="{{ mix('/adminlte.min.css', '/assets/vendor/boilerplate') }}">
@@ -21,10 +21,10 @@
     {{-- logic view form --}}
     <script>
         $(document).ready(function(){
-            var ok = "ok";
-            if ( ok == "{{ (request()->is('surat-keluar-saya/*')) ? 'ok' : '' }}"){
-                document.getElementById("head-form").innerHTML = "{{ (request()->is('surat-keluar-saya/*')) ? 'ok' : '' }}";
-            }
+            // var ok = "ok";
+            // if ( ok == "{{ (request()->is('surat-keluar-saya/*')) ? 'ok' : '' }}"){
+            //     document.getElementById("head-form").innerHTML = "{{ (request()->is('surat-keluar-saya/*')) ? 'ok' : '' }}";
+            // }
             $('#jenis_surat').on('change', function() {
                 if ( this.value == '1')
                 //.....................^.......

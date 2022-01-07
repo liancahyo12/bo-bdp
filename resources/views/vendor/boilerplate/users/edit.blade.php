@@ -72,7 +72,9 @@
                     </div>
                     @component('boilerplate::select2', ['name' => 'departemen_id', 'label' => 'Pilih Departemen', 'minimum-results-for-search' => '-1'])
                         @foreach ($departemens as $position)
-                            <option value="{{ $position->id }}" {{ old('departemen_id') == $user->departemen_id ? 'selected' : ''}}>{{ $position->departemen }}</option>
+                            <option value="{{ $position->id }}" @if ( $user->departemen_id==$position->id)
+                                selected
+                            @endif}}>{{ $position->departemen }}</option>
                         @endforeach
                     @endcomponent
                 @endcomponent

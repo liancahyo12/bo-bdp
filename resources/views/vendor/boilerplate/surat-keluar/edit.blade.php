@@ -7,7 +7,7 @@
 ])
 
 @section('content')
-    <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->id]" method="put" files>
+    <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files>
         <div class="row">
             &nbsp; &nbsp;
             {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}

@@ -26,7 +26,7 @@ return [
         ],
         'brand'   => [
             'logo' => [
-                'icon'   => '<img src="assets/img/bdpl.png" alt="BDPay"  width="30" height="30">',
+                'icon'   => '<i class="fa fa-cubes"></i>',
                 'text'   => '<strong>BDPay</strong> | E-Office',
             ],
         ],

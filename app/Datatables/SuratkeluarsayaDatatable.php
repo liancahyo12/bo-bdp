@@ -18,9 +18,10 @@ class SuratkeluarsayaDatatable extends Datatable
     public function datasource()
     {
         
-        return Auth::user()->suratkeluar()->get(['id',
+        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->where([['user_id', '=', Auth::user()->id], ['status', '=', '1']])->get(['suratkeluars.id',
         'perihal',
         'tgl_surat',
+        'jenis_surat',
         'review_status',
         'approve_status',
         'send_status',]);
@@ -61,6 +62,9 @@ class SuratkeluarsayaDatatable extends Datatable
                 ->notSortable(),
             Column::add('Id')
                 ->data('id'),
+            
+            Column::add('Jens Surat')
+                ->data('jenis_surat'),
 
             Column::add('Perihal Surat')
                 ->data('perihal'),
@@ -68,16 +72,44 @@ class SuratkeluarsayaDatatable extends Datatable
             Column::add('Tgl Surat')
                 ->data('tgl_surat'),
 
-            Column::add('Status')
+            Column::add('Status Review')
                 ->width('40px')
-                ->data('custom_status', function (Suratkeluar $suratkeluar) {
+                ->data('review_status', function (Suratkeluar $suratkeluar) {
                     $badge1 = '<span class="badge badge-pill badge-%s">%s</span>';
-                    $badge2 = '<span class="badge badge-pill badge-%s">%s</span><br><span class="badge badge-pill badge-%s">%s</span>';
-                    if ($suratkeluar->review_status == null &&  $suratkeluar->approve_status == null) {
-                        return sprintf($badge1, 'secondary', __(''),'a','a');
+                    if ($suratkeluar->review_status == 0) {
+                        return sprintf($badge1, 'info', __('baru'));
+                    }else if($suratkeluar->review_status == 1){
+                        return sprintf($badge1, 'secondary', __('dilihat'));
+                    }else if($suratkeluar->review_status == 2){
+                        return sprintf($badge1, 'success', __('disetujui'));
+                    }else if($suratkeluar->review_status == 3){
+                        return sprintf($badge1, 'warning', __('revisi'));
+                    }else if($suratkeluar->review_status == 4){
+                        return sprintf($badge1, 'danger', __('ditolak'));
+                    }else if($suratkeluar->review_status == 5){
+                        return sprintf($badge1, 'info', __('telah direvisi'));
                     }
-
-                    return sprintf($badge2, 'info', __('Draft'),'a','a');
+                    return sprintf($badge1, 'secondary', __('draft'));
+                })
+                ->notSortable(),
+            Column::add('Status Approve')
+                ->width('40px')
+                ->data('approve_status', function (Suratkeluar $suratkeluar) {
+                    $badge1 = '<span class="badge badge-pill badge-%s">%s</span>';
+                    if ($suratkeluar->approve_status == 0) {
+                        return sprintf($badge1, 'info', __('baru'));
+                    }else if($suratkeluar->approve_status == 1){
+                        return sprintf($badge1, 'secondary', __('dilihat'));
+                    }else if($suratkeluar->approve_status == 2){
+                        return sprintf($badge1, 'success', __('disetujui'));
+                    }else if($suratkeluar->approve_status == 3){
+                        return sprintf($badge1, 'warning', __('revisi'));
+                    }else if($suratkeluar->approve_status == 4){
+                        return sprintf($badge1, 'danger', __('ditolak'));
+                    }else if($suratkeluar->approve_status == 5){
+                        return sprintf($badge1, 'info', __('telah direvisi'));
+                    }
+                    return sprintf($badge1, 'secondary', __('draft'));
                 })
                 ->notSortable(),
             // Column::add('Status Pengajuan')
@@ -85,10 +117,14 @@ class SuratkeluarsayaDatatable extends Datatable
                 
             Column::add()
                 ->actions(function(Suratkeluar $suratkeluar) {
-                    if ($suratkeluar->send_status == 1) {
+                    if ($suratkeluar->send_status == 1 && ($suratkeluar->review_status == 3 ||  $suratkeluar->approve_status == 3)) {
                         return join([
-                        // Button::show('boilerplate.surat-keluar-saya.detail', $suratkeluar->id),           
-                    ]);   
+                        Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),          
+                    ]);
+                    }else if($suratkeluar->send_status == 1){
+                        return join([
+                        Button::show('boilerplate.surat-keluar-detail', $suratkeluar->id),           
+                    ]);  
                     }
                     return join([
                         Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),    

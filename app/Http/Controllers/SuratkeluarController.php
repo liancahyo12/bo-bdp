@@ -13,13 +13,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Models\jenis_surat;
-use App\Models\Isi_surat;
 use Illuminate\Support\Facades\Input;
+use App\Models\jenis_surat;
 use App\Models\departemen;
+use App\Models\Isi_surat;
+use App\Models\Boilerplate\User;
 use Carbon\Carbon;
 use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
+use Illuminate\Mail\Mailable;
 use Auth;
 use DB;
 
@@ -30,7 +32,8 @@ class SuratkeluarController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-     public function __construct()
+    
+    public function __construct()
     {
         $this->jenis_surat = new Jenis_surat();
         $this->departemen = new Departemen();
@@ -95,8 +98,19 @@ class SuratkeluarController extends Controller
     {
         //
         return view('boilerplate::surat-keluar.buat', [
-            'approver' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
-            'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4'),
+            'approver' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4'),
+            'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
+            'jenis_surat' => jenis_surat::all(),
+            'departemens' => departemen::all(),
+        ]);
+    }
+
+    public function create_request($id)
+    {
+        //
+        return view('boilerplate::surat-keluar.buat', [
+            'approver' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4'),
+            'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
             'jenis_surat' => jenis_surat::all(),
             'departemens' => departemen::all(),
         ]);
@@ -126,6 +140,10 @@ class SuratkeluarController extends Controller
         $yy = substr($request->tgl_surat, 0, 4);
 
         $last_surat_keluar = DB::table('suratkeluars')->select('id')->orderBy('id', 'DESC')->limit(1)->value('id');
+        $ssr = $last_surat_keluar+1;
+        // if($last_surat_keluar == null){
+        //     $last_surat_keluar=0;
+        // }
         $tgl_surat_t = Carbon::createFromFormat('Y-m-d', $request->tgl_surat)->isoFormat('D MMMM Y');
         
 
@@ -172,11 +190,30 @@ class SuratkeluarController extends Controller
             $input['send_time'] = Carbon::now()->toDateTimeString();
             $input['review_status'] = 0;
             $input['approve_status'] = 0;
-
+            $perihal = $request->perihal;
             $suratkeluar = Suratkeluar::create($input);
             $isisuratkeluar = Isi_surat::create($isisurat);
 
-            return redirect()->route('boilerplate.surat-keluar-saya', $suratkeluar)
+            $mailto='';
+            if(Auth::user()->id == $request->reviewer){
+                $mailto = User::where('id', $request->approver)->value('email');
+                $details = [
+                    'title' => '',
+                    'body' => 'Surat Keluar '.$request->perihal,
+                    'body2' => 'Untuk mereview surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-review/'.$ssr,
+                ];
+            }else{
+                $mailto = User::where('id', $request->reviewer)->value('email');
+                $details = [
+                    'title' => '',
+                    'body' => 'Surat Keluar '.$request->perihal,
+                    'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-approve/'.$ssr,
+                ];
+            }
+            
+            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Surat berhasil dikirim'), 'success']);
 
             break;
@@ -184,13 +221,11 @@ class SuratkeluarController extends Controller
         case 'Simpan Draft':
             // save to draft
             $input['send_status'] = 0;
-            $input['review_status'] = 0;
-            $input['approve_status'] = 0;
 
             $suratkeluar = Suratkeluar::create($input);
             $isisuratkeluar = Isi_surat::create($isisurat);
 
-            return redirect()->route('boilerplate.surat-keluar-saya')
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Surat berhasil disimpan'), 'success']);
             break;
         case 'Preview Surat':
@@ -225,8 +260,8 @@ class SuratkeluarController extends Controller
             ]);
             header("Content-Disposition: attachment; filename=suratkuasa.docx");
 
-            $template->saveAs('output/suratkuasa.docx');
-            // $template->saveAs('php://output');
+            // $template->saveAs('output/suratkuasa.docx');
+            $template->saveAs('php://output');
             // $PDFWriter = \PhpOffice\PhpWord\IOFactory::createWriter($Content,'PDF');
             // $PDFWriter->save(public_path('new-result.pdf'));
             break;
@@ -253,16 +288,16 @@ class SuratkeluarController extends Controller
      */
     public function edit($id)
     {
-        $surat = Suratkeluar::leftJoin('isi_surats', 'surat_keluar_id', 'suratkeluars.id')->leftJoin('jenis_surats', 'jenis_surats.id', 'suratkeluars.jenis_surat_id')->select('isi_surats.*', 'suratkeluars.*', 'jenis_surats.*')->where('suratkeluars.id', $id)->first();
-        $approver = DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3');
-        $reviewer = DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4');
+        $surat = Suratkeluar::leftJoin('isi_surats', 'surat_keluar_id', 'suratkeluars.id')->leftJoin('jenis_surats', 'jenis_surats.id', 'suratkeluars.jenis_surat_id')->select('suratkeluars.id as ida', 'isi_surats.*', 'suratkeluars.*', 'jenis_surats.*')->where('suratkeluars.id', $id)->first();
+        $approver = DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4');
+        $reviewer = DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3');
         $jenis_surat = jenis_surat::all();
         $departemens = departemen::all();
         return view('boilerplate::surat-keluar.edit', compact('surat'), 
         // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
         [
-            'approver' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
-            'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4'),
+            'approver' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4'),
+            'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
             'jenis_surat' => jenis_surat::all(),
             'departemens' => departemen::all(),
         ]
@@ -294,20 +329,21 @@ class SuratkeluarController extends Controller
         $yy = substr($request->tgl_surat, 0, 4);
 
         $last_surat_keluar = DB::table('suratkeluars')->select('id')->orderBy('id', 'DESC')->limit(1)->value('id');
-        $tgl_surat_t = Carbon::createFromFormat('Y-m-d',  $request->tgl_surat)->isoFormat('D MMMM Y');
+        $tgl_surat_t = Carbon::createFromFormat('Y-m-d H:i:s', $request->tgl_surat)->isoFormat('D MMMM Y');
         
+        $input = Suratkeluar::where('id', $id)->first();
+        $isisurat = Isi_surat::where('surat_keluar_id', $id)->first();
 
-        $input['user_id'] = Auth::user()->id;
-        $input['jenis_surat_id'] = $request->jenis_surat;
-        $input['departemen_id'] = $request->departemen;
-        $input['reviewer_id'] = $request->reviewer;
-        $input['approver_id'] = $request->approver;
-        $input['tgl_surat'] = $request->tgl_surat;
-        $input['perihal'] = $request->perihal;
+        // $input['user_id'] = Auth::user()->id;
+        $input->jenis_surat_id = $request->jenis_surat;
+        $input->departemen_id = $request->departemen;
+        $input->reviewer_id = $request->reviewer;
+        $input->approver_id = $request->approver;
+        $input->tgl_surat = $request->tgl_surat;
+        $input->perihal = $request->perihal;
         // $input['no_urut'] = $nourut;
         // $input['no_surat'] = $nosurat;
 
-        $isisurat['surat_keluar_id'] = $last_surat_keluar+1;
         $isisurat['jenis_surat_id'] = $request->jenis_surat;
         $isisurat['item1'] = $request->item1;
         $isisurat['item2'] = $request->item2;
@@ -338,27 +374,54 @@ class SuratkeluarController extends Controller
             // send
             $input['send_status'] = 1;
             $input['send_time'] = Carbon::now()->toDateTimeString();
-            $input['review_status'] = 0;
-            $input['approve_status'] = 0;
+            
+            $mailto='';
+            if(Auth::user()->id == $request->reviewer){
+                if($input->review_status == 3 && $input->approve_status != 3){
+                    $input['review_status'] = 5;
+                }else if($input->review_status != 3 && $input->approve_status == 3){
+                    $input['review_status'] = 5;
+                    $input['approve_status'] = 5;
+                }else{
+                    $input['review_status'] = 0;
+                }
+                $mailto = User::where('id', $request->approver)->value('email');
+                $details = [
+                    'title' => '',
+                    'body' => 'Surat Keluar '.$request->perihal,
+                    'body2' => 'Untuk mereview surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-review/'.$id,
+                ];
+            }else{
+                if($input->approve_status != 3){
+                    $input['approve_status'] = 5;
+                }else{
+                    $input['approve_status'] = 0;
+                }
+                $mailto = User::where('id', $request->reviewer)->value('email');
+                $details = [
+                    'title' => '',
+                    'body' => 'Surat Keluar '.$request->perihal,
+                    'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-approve/'.$id,
+                ];
+            }
 
-            $suratkeluar = Suratkeluar::create($input);
-            $isisuratkeluar = Isi_surat::create($isisurat);
+            $suratkeluar = $input->save();
+            $isisuratkeluar = $isisurat->save();
 
-            return redirect()->route('boilerplate.surat-keluar-saya', $suratkeluar)
+            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Surat berhasil dikirim'), 'success']);
 
             break;
 
         case 'Simpan Draft':
             // save to draft
-            $input['send_status'] = 0;
-            $input['review_status'] = 0;
-            $input['approve_status'] = 0;
 
-            $suratkeluar = Suratkeluar::create($input);
-            $isisuratkeluar = Isi_surat::create($isisurat);
+            $suratkeluar = $input->save();
+            $isisuratkeluar = $isisurat->save();
 
-            return redirect()->route('boilerplate.surat-keluar-saya')
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Surat berhasil disimpan'), 'success']);
             break;
         case 'Preview Surat':
@@ -407,50 +470,15 @@ class SuratkeluarController extends Controller
      * @param  \App\Models\Suratkeluar  $suratkeluar
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Suratkeluar $suratkeluar)
+     public function destroy($id)
     {
         //
+        $suratkeluar = DB::update('update suratkeluars set status = 0 where id = ?', [$id]);
     }
 
-    public function detail(Suratkeluar $suratkeluar)
+    public function detail($id)
     {
         //
-    }
-
-    public function review(Suratkeluar $suratkeluar)
-    {
-        //
-    }
-
-    public function approve(Suratkeluar $suratkeluar)
-    {
-        //
-        // get date from request
-        $mmyy = substr($request->tgl_surat, 0, 7);
-        $mm = substr($request->tgl_surat, 5, 2);
-        $yy = substr($request->tgl_surat, 0, 4);
-
-        // cek no urut perbulan
-        $nourut = DB::table('suratkeluars')->select('no_urut')->whereRaw('DATE_FORMAT(tgl_surat,"%Y-%m") = ?' , [$mmyy])->orderBy('no_urut', 'DESC')->limit(1)->value('no_urut');
-
-        //buat no urut baru perbulan
-        if ($nourut <= 000) {
-            $nourut = 1;
-        } else {
-            $nourut = $nourut+1;
-        }
-
-        // buat romawi bulan
-        $romawi = $this->getRomawi($mm);
-        $departemen_kode = DB::table('departemens')->select('kode')->where('id', $request->departemen)->value('kode');
-        $surat_kode = DB::table('jenis_surats')->select('kode')->where('id', $request->jenis_surat)->value('kode');
-//buat no surat
-        $nosurat= '';
-        if ($request->jenis_surat == '12') {
-            $nosurat= sprintf("%03d", $nourut).'/BDP-'.$surat_kode.'/'.$departemen_kode.'/'.$romawi.'/'.$yy;
-        }else {
-            $nosurat= sprintf("%03d", $nourut).'/BDP-'.$surat_kode.'/'.$romawi.'/'.$yy;
-        }
     }
 
     public function arsip(Suratkeluar $suratkeluar)

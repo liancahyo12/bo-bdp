@@ -16,7 +16,8 @@ class IsiSurat extends Migration
         Schema::create('isi_surats', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('surat_keluar_id')->nullable();
+            $table->unsignedBigInteger('surat_keluar_id')->nullable();
+            $table->smallInteger('jenis_surat_id')->nullable();
             $table->string('item1')->nullable();
             $table->string('item2')->nullable();
             $table->string('item3')->nullable();
