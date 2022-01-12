@@ -13,7 +13,7 @@ class RequestsuratkeluarDatatable extends Datatable
 
     public function datasource()
     {
-        return Request_surat_keluar::leftJoin('jenis_surats', 'request_surat_keluars.jenis_surat_id', 'jenis_surats.id')->leftJoin('users', 'users.id', 'request_surat_keluars.user_id')->where([['status', '=', '1'], ['send_status', '=', '1']])->get(['request_surat_keluars.id',
+        return Request_surat_keluar::leftJoin('jenis_surats', 'request_surat_keluars.jenis_surat_id', 'jenis_surats.id')->leftJoin('users', 'users.id', 'request_surat_keluars.user_id')->where([['status', '=', '1'], ['send_status', '=', '1']])->orderByDesc('request_surat_keluars.send_time')->get(['request_surat_keluars.id',
         'perihal',
         'request_status',
         'request_time',

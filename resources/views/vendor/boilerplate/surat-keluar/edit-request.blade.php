@@ -8,15 +8,6 @@
 
 @section('content')
     <x-boilerplate::form :route="['boilerplate.surat-keluar-request-saya', $reqsurat->ida]" method="put" files onsubmit="return confirm('Are you sure?')">
-        <div class="row" @if ($reqsurat->request_status==4)
-            
-        @else
-            style='display:none;'
-        @endif>
-            &nbsp; &nbsp;
-            {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
-        </div>
-    <br>
         <x-boilerplate::card>
             <x-slot name="header">
                 <b>Komentar</b>
@@ -54,15 +45,36 @@
             </x-boilerplate::select2>
             <x-boilerplate::input name="perihal" label="Perihal" value="{{ $reqsurat->perihal }}" />
             <x-boilerplate::input name="keterangan" label="Keterangan" value="{{ $reqsurat->keterangan }}" />
-            <x-boilerplate::input type="file" name="files" label="Unggah untuk mengganti lampiran"  />
-            <div class="form-group">
+            <div @if ($reqsurat->request_status==4)
+            
+                @else
+                    style='display:none;'
+                @endif>
+                <x-boilerplate::input type="file" name="files" label="Unggah untuk mengganti lampiran"  />
+            </div>
+            <div class="form-group" @if ($reqsurat->lampiran!=null) @else style='display:none;' @endif>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><span class="fas fa-file"></span></span>
                     </div>
-                    <a target="_blank" href="/surat-keluar-request-review-lampiran/{{ $reqsurat->ida }}" ><button class="btn btn-secondary" form="a">Lihat lampiran lama</button></a>
+                    <a target="_blank" href="/surat-keluar-request-lampiran/{{ $reqsurat->ida }}" ><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
+                </div>
+            </div>
+            <div class="form-group" @if ($reqsurat->request_status==3) @else style='display:none;' @endif>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/surat-keluar-request-suratkeluar/{{ $reqsurat->ida }}" ><button class="btn btn-secondary" form="a">Lihat Surat Keluar</button></a>
                 </div>
             </div>
         </x-boilerplate::card>
+        <div class="row" @if ($reqsurat->request_status==4)
+        @else
+            style='display:none;'
+        @endif>
+            &nbsp; &nbsp;
+            {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
+        </div>
     </x-boilerplate::form>
 @endsection

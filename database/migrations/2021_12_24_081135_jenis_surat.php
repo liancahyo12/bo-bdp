@@ -19,6 +19,7 @@ class JenisSurat extends Migration
             $table->string('kode');
             $table->string('jenis_surat');
             $table->integer('total_item')->nullable();
+            $table->string('format')->nullable();
         });
     }
 

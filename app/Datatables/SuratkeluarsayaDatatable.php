@@ -18,12 +18,15 @@ class SuratkeluarsayaDatatable extends Datatable
     public function datasource()
     {
         
-        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->where([['user_id', '=', Auth::user()->id], ['status', '=', '1']])->get(['suratkeluars.id',
+        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->where([['user_id', '=', Auth::user()->id], ['status', '=', '1']])->orderByDesc('suratkeluars.updated_at')->get(['suratkeluars.id',
         'perihal',
         'tgl_surat',
         'jenis_surat',
         'review_status',
         'approve_status',
+        'approve_time',
+        'send_time',
+        'request_surat_keluar_id',
         'send_status',]);
         // return DB::table('suratkeluars')->select([
         // 'id',
@@ -60,10 +63,17 @@ class SuratkeluarsayaDatatable extends Datatable
                     return sprintf($badge, 'info', __('Draft'));
                 })
                 ->notSortable(),
+            
+            Column::add('Waktu Kirim')
+                ->data('send_time'),
+
             Column::add('Id')
                 ->data('id'),
+
+            Column::add('Id Permintaan')
+                ->data('request_surat_keluar_id'),
             
-            Column::add('Jens Surat')
+            Column::add('Jenis Surat')
                 ->data('jenis_surat'),
 
             Column::add('Perihal Surat')
@@ -72,26 +82,6 @@ class SuratkeluarsayaDatatable extends Datatable
             Column::add('Tgl Surat')
                 ->data('tgl_surat'),
 
-            Column::add('Status Review')
-                ->width('40px')
-                ->data('review_status', function (Suratkeluar $suratkeluar) {
-                    $badge1 = '<span class="badge badge-pill badge-%s">%s</span>';
-                    if ($suratkeluar->review_status == 0) {
-                        return sprintf($badge1, 'info', __('baru'));
-                    }else if($suratkeluar->review_status == 1){
-                        return sprintf($badge1, 'secondary', __('dilihat'));
-                    }else if($suratkeluar->review_status == 2){
-                        return sprintf($badge1, 'success', __('disetujui'));
-                    }else if($suratkeluar->review_status == 3){
-                        return sprintf($badge1, 'warning', __('revisi'));
-                    }else if($suratkeluar->review_status == 4){
-                        return sprintf($badge1, 'danger', __('ditolak'));
-                    }else if($suratkeluar->review_status == 5){
-                        return sprintf($badge1, 'info', __('telah direvisi'));
-                    }
-                    return sprintf($badge1, 'secondary', __('draft'));
-                })
-                ->notSortable(),
             Column::add('Status Approve')
                 ->width('40px')
                 ->data('approve_status', function (Suratkeluar $suratkeluar) {
@@ -112,6 +102,9 @@ class SuratkeluarsayaDatatable extends Datatable
                     return sprintf($badge1, 'secondary', __('draft'));
                 })
                 ->notSortable(),
+
+            Column::add('Waktu Approve')
+                ->data('approve_time'),
             // Column::add('Status Pengajuan')
             //     ->data(''),
                 
@@ -123,7 +116,7 @@ class SuratkeluarsayaDatatable extends Datatable
                     ]);
                     }else if($suratkeluar->send_status == 1){
                         return join([
-                        Button::show('boilerplate.surat-keluar-detail', $suratkeluar->id),           
+                        Button::show('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),           
                     ]);  
                     }
                     return join([

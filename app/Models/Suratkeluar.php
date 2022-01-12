@@ -46,5 +46,9 @@ class Suratkeluar extends Model
         'send_time',
         'approve_status',
         'review_status',
+        'surat_jadi',
+        'surat_scan',
+        'scan_time',
+        'request_surat_keluar_id',
     ];
 }

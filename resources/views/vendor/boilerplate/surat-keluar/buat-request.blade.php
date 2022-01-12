@@ -8,11 +8,6 @@
 
 @section('content')
     <x-boilerplate::form :route="['boilerplate.surat-keluar-request-buat']" method="post" files onsubmit="return confirm('Are you sure?')">
-        <div class="row">
-            &nbsp; &nbsp;
-            {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
-        </div>
-    <br>
         <x-boilerplate::card>
             <x-boilerplate::select2 name="jenis_surata" label="Pilih Jenis Surat">
                 @foreach ($jenis_surat as $position)
@@ -26,7 +21,7 @@
             </x-boilerplate::select2>
             <x-boilerplate::input name="perihal" label="Perihal" />
             <x-boilerplate::input name="keterangan" label="Keterangan" />
-            <x-boilerplate::input name="files" type="file" label="Unggah Lampiran" />
+            <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran" />
             {{-- @include('boilerplate::load.fileinput')
             @push('js')
                 <script>
@@ -35,6 +30,10 @@
             @endpush --}}                 
 
         </x-boilerplate::card>
+        <div class="row">
+            &nbsp; &nbsp;
+            {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
+        </div>
         
     </x-boilerplate::form>
 @endsection

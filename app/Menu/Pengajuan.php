@@ -8,26 +8,28 @@ class Pengajuan
 {
     public function make(Builder $menu)
     {
-        $menu->add('Pengajuan Saya', [
+        $item = $menu->add('Pengajuan', [
+            'icon' => 'tasks',
+            'order' => 1001,
+        ]);
+        $item->add('Pengajuan Saya', [
             'route' => 'boilerplate.pengajuan',
             'active' => 'boilerplate.pengajuan',
             'permission' => 'pengajuan',
-            'icon' => 'edit',
-            'order' => 1001,
+            'order' => 100,
         ]);
-        $menu->add('Approvement', [
+        $item->add('Approvement', [
             'route' => 'boilerplate.approve-pengajuan',
             'active' => 'boilerplate.approve-pengajuan',
             'permission' => 'approve_pengajuan',
-            'icon' => 'check-double',
-            'order' => 1003,
+            'order' => 101,
         ]);
-        $menu->add('Review Pengajuan', [
+        $item->add('Review Pengajuan', [
             'route' => 'boilerplate.review-pengajuan',
             'active' => 'boilerplate.review-pengajuan',
             'permission' => 'review_pengajuan',
             'icon' => 'clipboard-check',
-            'order' => 1002,
+            'order' => 102,
         ]);
     }
 }

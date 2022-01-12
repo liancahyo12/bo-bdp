@@ -56,7 +56,7 @@ class SuratKeluar
         ]);
         $item->add('Arsip Surat', [
             'route' => 'boilerplate.surat-keluar-arsip',
-            'active' => 'boilerplate.surat-keluar-arsip',
+            'active' => 'boilerplate.surat-keluar-arsip,boilerplate.surat-keluar-arsip-edit',
             'permission' => 'arsip_surat',
             'order' => 104,
         ]);

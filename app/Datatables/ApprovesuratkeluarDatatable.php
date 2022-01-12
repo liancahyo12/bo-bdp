@@ -16,13 +16,15 @@ class ApprovesuratkeluarDatatable extends Datatable
 
     public function datasource()
     {
-        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->leftJoin('users', 'users.id', 'suratkeluars.user_id')->where([['approver_id', '=', Auth::user()->id], ['send_status', '=', '1'], ['review_status', '=', '2']])->get(['suratkeluars.id',
+        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('send_status', '1')->orderByDesc('suratkeluars.send_time')->get(['suratkeluars.id',
         'perihal',
         'users.first_name',
         'tgl_surat',
         'jenis_surat',
         'review_status',
         'approve_status',
+        'approve_time',
+        'send_time',
         'send_status',]);
         
     }
@@ -54,6 +56,13 @@ class ApprovesuratkeluarDatatable extends Datatable
                     return sprintf($badge1, 'secondary', __('draft'));
                 })
                 ->notSortable(),
+
+            Column::add('Waktu Kirim')
+                ->data('send_time'),
+            
+            Column::add('Waktu Approve')
+                ->data('approve_time'),
+
             Column::add('Id')
                 ->data('id'),
                 

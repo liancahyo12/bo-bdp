@@ -16,11 +16,15 @@ use Illuminate\Validation\ValidationException;
 use App\Models\jenis_surat;
 use App\Models\Isi_surat;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Storage;
 use App\Models\departemen;
 use App\Models\Suratkeluar;
+use App\Models\Request_surat_keluar;
 use Carbon\Carbon;
 use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\Settings;
+use NcJoes\OfficeConverter\OfficeConverter;
 use Auth;
 use DB;
 
@@ -84,13 +88,20 @@ class ApprovesuratkeluarController extends Controller
      */
     public function create($id)
     {
-        if( Suratkeluar::where('id', $id)->value('approve_status') == 0 || Suratkeluar::where('id', $id)->value('approve_status') == 5){
-            $suratkeluar = DB::update('update suratkeluars set approve_status = 1 where id = ?', [$id]);
-        }
+        $suratapprove = Suratkeluar::where('id', $id)->first();
+        if ($suratapprove->send_status==1) {
+            if( $suratapprove->approve_status == 0 || $suratapprove->approve_status == 5){
+                $suratkeluar = DB::update('update suratkeluars set approve_status = 1 where id = ?', [$id]);
+            }
 
-        $surat = Suratkeluar::leftJoin('jenis_surats', 'jenis_surat_id', 'jenis_surats.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->leftJoin('isi_surats', 'isi_surats.surat_keluar_id', 'suratkeluars.id')->select('suratkeluars.id as ida', 'suratkeluars.*', 'jenis_surats.*', 'isi_surats.*', 'departemens.*')->where('suratkeluars.id', $id)->first();
+            $surat = Suratkeluar::leftJoin('jenis_surats', 'jenis_surat_id', 'jenis_surats.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->leftJoin('isi_surats', 'isi_surats.surat_keluar_id', 'suratkeluars.id')->select('suratkeluars.id as ida', 'suratkeluars.*', 'jenis_surats.*', 'isi_surats.*', 'departemens.*')->where('suratkeluars.id', $id)->first();
 
-        return view('boilerplate::surat-keluar.approvedetail', compact('surat'));    
+            return view('boilerplate::surat-keluar.approvedetail', compact('surat'), [
+                'approve' => Approvesuratkeluar::where('surat_keluar_id', $id)->get(),
+            ]); 
+        }  
+        return redirect()->route('boilerplate.surat-keluar-approve.index')
+            ->with('growl', [__('Surat tidak ada'), 'danger']);
     }
 
     /**
@@ -139,12 +150,10 @@ class ApprovesuratkeluarController extends Controller
         $mm = substr($request->tgl_surat, 5, 2);
         $yy = substr($request->tgl_surat, 0, 4);
 
-        $last_surat_keluar = DB::table('suratkeluars')->select('id')->orderBy('id', 'DESC')->limit(1)->value('id');
-        $tgl_surat_t = '';
-        
-        $approvestatus = Suratkeluar::where('id', $id)->value('approve_status');
-        // $input = Suratkeluar::where('id', $id)->first();
-        // $input->review_time = Carbon::now()->toDateTimeString();
+        $surat = Suratkeluar::where('id', $id)->first();
+        $surat['approver_id'] = Auth::user()->id;
+        $surat['approve_time'] = Carbon::now()->toDateTimeString();
+
         $approvesurat['surat_keluar_id'] = $id;
         $approvesurat['user_id'] = DB::table('suratkeluars')->select('user_id')->where('id', $id)->value('user_id');
         $approvesurat['approver_id'] = Auth::user()->id;
@@ -154,7 +163,7 @@ class ApprovesuratkeluarController extends Controller
         $romawi = $this->getRomawi($mm);
         $departemen_kode = DB::table('suratkeluars')->leftJoin('departemens', 'departemens.id', 'departemen_id')->select('kode')->where('suratkeluars.id', $id)->value('kode');
         $surat_kode = DB::table('suratkeluars')->leftJoin('jenis_surats', 'jenis_surats.id', 'jenis_surat_id')->select('kode')->where('suratkeluars.id', $id)->value('kode');
-        $nourut = DB::table('suratkeluars')->select('no_urut')->where('id', $id)->value('no_urut');
+        // $nourut = DB::table('suratkeluars')->select('no_urut')->where('id', $id)->value('no_urut');
 
         // cek no urut perbulan
         $nourut = DB::table('suratkeluars')->select('no_urut')->whereRaw('DATE_FORMAT(tgl_surat,"%Y-%m") = ? and jenis_surat_id = ? and departemen_id = ?' , [$mmyy, Suratkeluar::where('id', $id)->value('jenis_surat_id'), Suratkeluar::where('id', $id)->value('departemen_id')])->orderBy('no_urut', 'DESC')->limit(1)->value('no_urut');
@@ -166,7 +175,8 @@ class ApprovesuratkeluarController extends Controller
             $nourut = $nourut+1;
         }
 
-        
+        //tgl surat
+        $tgl_surat_t = Carbon::createFromFormat('Y-m-d', $surat->tgl_surat)->isoFormat('D MMMM Y');
 
         //buat no surat
         $nosurat= '';
@@ -178,67 +188,112 @@ class ApprovesuratkeluarController extends Controller
         
 
         // fungsi tombol
-        if($approvestatus == 2 || $approvestatus == 3 || $approvestatus == 4){
-            return redirect()->route('boilerplate.surat-keluar-approve.index')
-                            ->with('growl', [__('Surat telah disetujui atau revisi atau ditolak'), 'danger']);
-        }else{
+        
         switch ($request->submitbutton) {
         case 'Setujui':
+            if($surat->approve_status == 2){
+                return redirect()->route('boilerplate.surat-keluar-approve.index')
+                                ->with('growl', [__('Surat telah disetujui'), 'danger']);
+            }else{
             $this->validate($request, [
                 'komentar' => 'required',
             ]);
             // send
-            
+            $filename = $id.Str::random(16);
+            $saveDocPath = Storage::path('suratkeluarjadi/'.$filename.'.docx');
+
+            $template = new TemplateProcessor(Storage::path($surat->isi_surat.'.docx'));
+            $isisurat = Isi_surat::where('surat_keluar_id', $id)->first();
+            //set values template surat
+            $template->setValues([
+                'no_surat' => $nosurat,
+                'tgl_surat' => $tgl_surat_t,
+            ]);
+            $template->saveAs($saveDocPath);
+            $converter = new OfficeConverter($saveDocPath);
+            $converter->convertTo($filename.'.pdf'); 
+            Storage::delete('suratkeluarjadi/'.$filename.'.docx');
+
+            $surat['surat_jadi'] = 'suratkeluarjadi/'.$filename.'.pdf';
+            $surat['no_urut'] = $nourut;
+            $surat['no_surat'] = $nosurat;
+            $surat['approve_status'] = 2;
             $approvesurat['approve_status'] = 2;
 
-            $suratkeluar = DB::update('update suratkeluars set approve_status = 2, approve_time = ?, no_surat = ?, no_urut = ? where id = ?', [Carbon::now()->toDateTimeString(), $nosurat, $nourut, $id]);
+            if ($surat->request_surat_keluar_id!=null) {
+                $reqsurat = Request_surat_keluar::where('id', $surat->request_surat_keluar_id)->first();
+            }
+            $reqsurat['request_status'] = 3;
+            $reqsurat['request_time'] = Carbon::now()->toDateTimeString();
+            $reqsuratselesai = $reqsurat->save();
+            $suratkeluar = $surat->save();
             $approvesurata = Approvesuratkeluar::create($approvesurat);
 
             $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
             $details = [
                 'title' => '',
                 'body' => 'Surat Keluar '.$request->perihal,
-                'body2' => 'Untuk sudah diapprove untuk melihat detail silahkan klik link ini http://localhost:8000/surat-keluar-detail/'.$id,
+                'body2' => 'Surat keluar sudah diapprove untuk melihat detail silahkan klik link ini http://localhost:8000/surat-keluar-detail/'.$id,
+            ];
+            
+            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+
+            $mailto = Request_surat_keluar::leftJoin('users', 'users.id', 'request_surat_keluars.user_id')->where('request_surat_keluars.id', $surat->request_surat_keluar_id)->value('email');
+            $details = [
+                'title' => '',
+                'body' => 'Surat Keluar '.$request->perihal,
+                'body2' => 'Permintaan surat keluar sudah selesai untuk melihat detail silahkan klik link ini http://localhost:8000/surat-keluar-request-saya/'.$surat->request_surat_keluar_id.'/edit',
             ];
             
             \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
 
             return redirect()->route('boilerplate.surat-keluar-approve.index')
                             ->with('growl', [__('Surat berhasil disetujui'), 'success']);
-
+            }
             break;
 
         case 'Revisi':
+            if($surat->approve_status == 3){
+                return redirect()->route('boilerplate.surat-keluar-approve.index')
+                                ->with('growl', [__('Surat telah diminta revisi'), 'danger']);
+            }else{
             $this->validate($request, [
                 'komentar' => 'required',
             ]);
-            // save to draft
+            // revisi
+            $surat['approve_status'] = 3;
             $approvesurat['approve_status'] = 3;
 
-            $suratkeluar = DB::update('update suratkeluars set approve_status = 3, approve_time = ? where id = ?', [Carbon::now()->toDateTimeString(), $id]);
+            $suratkeluar = $surat->save();
             $approvesurata = Approvesuratkeluar::create($approvesurat);
 
             $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
             $details = [
                 'title' => '',
                 'body' => 'Surat Keluar '.$request->perihal,
-                'body2' => 'Untuk harus diervisi terlebih dahulu untuk revisi silahkan klik link ini http://localhost:8000/surat-keluar-saya/'.$id.'/edit',
+                'body2' => 'Untuk harus direvisi terlebih dahulu untuk revisi silahkan klik link ini http://localhost:8000/surat-keluar-saya/'.$id.'/edit',
             ];
             
             \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
 
             return redirect()->route('boilerplate.surat-keluar-approve.index')
                             ->with('growl', [__('Surat berhasil revisi'), 'success']);
+            }
             break;
         
         case 'Tolak':
+            if($surat->approve_status == 4){
+                return redirect()->route('boilerplate.surat-keluar-approve.index')
+                                ->with('growl', [__('Surat telah ditolak'), 'danger']);
+            }else{
             $this->validate($request, [
                 'komentar' => 'required',
             ]);
             // save to draft
+            $surat['approve_status'] = 4;
             $approvesurat['approve_status'] = 4;
 
-            $suratkeluar = DB::update('update suratkeluars set approve_status = 4, approve_time = ? where id = ?', [Carbon::now()->toDateTimeString(), $id]);
+            $suratkeluar = $surat->save();
             $approvesurata = Approvesuratkeluar::create($approvesurat);
 
             $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
@@ -252,46 +307,28 @@ class ApprovesuratkeluarController extends Controller
 
             return redirect()->route('boilerplate.surat-keluar-approve.index')
                             ->with('growl', [__('Surat berhasil revisi'), 'success']);
+            }
             break;
 
         case 'Preview Surat':
             # code...
+            if ($surat->no_surat!=null) {
+                $PdfDisk = Storage::disk('local')->get($surat->surat_jadi);
+                return (new Response($PdfDisk, 200))
+                    ->header('Content-Type', 'application/pdf');
+            }else {
+                $PdfDisk = Storage::disk('local')->get($surat->isi_surat.'.pdf');
+                return (new Response($PdfDisk, 200))
+                    ->header('Content-Type', 'application/pdf');
+            }
              //read template surat
-            $template = new TemplateProcessor('template/'.DB::table('suratkeluars')->select('jenis_surat_id')->where('id', $id)->value('jenis_surat_id').'.docx');
-            $isisurat = Isi_surat::where('surat_keluar_id', $id)->first();
-            //set values template surat
-            $template->setValues([
-                'no_surat' => $nosurat,
-                'tgl_surat' => $tgl_surat_t,
-                'item1' => $isisurat->item1,
-                'item2' => $isisurat->item2,
-                'item3' => $isisurat->item3,
-                'item4' => $isisurat->item4,
-                'item5' => $isisurat->item5,
-                'item6' => $isisurat->item6,
-                'item7' => $isisurat->item7,
-                'item8' => $isisurat->item8,
-                'item9' => $isisurat->item9,
-                'item10' => $isisurat->item10,
-                'item11' => $isisurat->item11,
-                'item12' => $isisurat->item12,
-                'item13' => $isisurat->item13,
-                'item14' => $isisurat->item14,
-                'item15' => $isisurat->item15,
-                'item16' => $isisurat->item16,
-                'item17' => $isisurat->item17,
-                'item18' => $isisurat->item18,
-                'item19' => $isisurat->item19,
-                'item20' => $isisurat->item20,
-            ]);
-            header("Content-Disposition: attachment; filename=suratkuasa.docx");
-
-            // $template->saveAs('output/suratkuasa.docx');
-            $template->saveAs('php://output');
+            
+            //generates pdf file in same directory as test-file.docx
+            
             // $PDFWriter = \PhpOffice\PhpWord\IOFactory::createWriter($Content,'PDF');
             // $PDFWriter->save(public_path('new-result.pdf'));
             break;
-        }}
+        }
     }
 
     /**
@@ -303,5 +340,12 @@ class ApprovesuratkeluarController extends Controller
     public function destroy(Approvesuratkeluar $approvesuratkeluar)
     {
         //
+    }
+
+    public function unduh_lampiran($id)
+    {
+        $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('lampiran'));
+        return (new Response($file, 200))
+            ->header('Content-Type', 'application/pdf');        
     }
 }

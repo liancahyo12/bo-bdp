@@ -16,6 +16,7 @@ use App\Http\Controllers\SuratkeluarController;
 use App\Http\Controllers\ReviewsuratkeluarController;
 use App\Http\Controllers\ApprovesuratkeluarController;
 use App\Http\Controllers\RequestSuratKeluarController;
+use App\Http\Controllers\ArsipSuratKeluarController;
 
 Route::group([
     'prefix'     => config('boilerplate.app.prefix', ''),
@@ -119,33 +120,42 @@ Route::group([
         Route::get('/surat-keluar-request-lampiran/{id}', [RequestSuratKeluarController::class, 'download'])
             ->middleware(['boilerplateauth', 'ability:admin,request_surat_keluar'])
             ->name('surat-keluar-request-lampiran');
+        Route::get('/surat-keluar-request-suratkeluar/{id}', [RequestSuratKeluarController::class, 'download_suratkeluar'])
+            ->middleware(['boilerplateauth', 'ability:admin,request_surat_keluar'])
+            ->name('surat-keluar-request-suratkeluar');
         Route::put('/surat-keluar-request-saya/{id}', [RequestSuratKeluarController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,request_surat_keluar'])
             ->name('surat-keluar-request-saya');
 
         //request surat keluar review
         Route::get('/surat-keluar-request-review', [RequestSuratKeluarController::class, 'show'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access,review_surat'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_surat'])
             ->name('surat-keluar-request-review');
         Route::get('/surat-keluar-request-review-lampiran/{id}', [RequestSuratKeluarController::class, 'download_review'])
             ->middleware(['boilerplateauth', 'ability:admin,review_surat'])
             ->name('surat-keluar-request-review-lampiran');
         Route::get('/surat-keluar-request-review/{id}', [RequestSuratKeluarController::class, 'review'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access,review_surat'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_surat'])
             ->name('surat-keluar-request-review.edit');
         Route::put('/surat-keluar-request-review/{id}', [RequestSuratKeluarController::class, 'update_review'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access,review_surat'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_surat'])
             ->name('surat-keluar-request-review.review');
 
         //surat keluar
         Route::get('/surat-keluar-buat', [SuratkeluarController::class, 'create'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-buat');
+        Route::get('/surat-keluar-buat-format/{id}', [SuratkeluarController::class, 'unduh_format'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
+            ->name('surat-keluar-buat-format');
         Route::get('/surat-keluar-buat/{id}', [SuratkeluarController::class, 'create_request'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-buat');
+        Route::put('/surat-keluar-buata/{id}', [SuratkeluarController::class, 'store_request'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
+            ->name('surat-keluar-buata');
         Route::post('/surat-keluar-buat', [SuratkeluarController::class, 'store'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-buat');
         
         // surat keluar saya
@@ -154,17 +164,23 @@ Route::group([
             Route::any('surat-keluar-saya/dt', [SuratkeluarController::class, 'datatable'])->name('surat-keluar-saya');
         });
         Route::get('/surat-keluar-edit', [SuratkeluarController::class, 'edit'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-edit');
         Route::get('/surat-keluar-detail/{id}', [SuratkeluarController::class, 'detail'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-detail');
+        Route::get('/surat-keluar-lampiran/{id}', [SuratkeluarController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
+            ->name('surat-keluar-lampiran');
+        Route::get('/surat-keluar-surat/{id}', [SuratkeluarController::class, 'unduh_surat_lama'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
+            ->name('surat-keluar-lampiran');
         Route::put('/surat-keluar-edit/{id}', [SuratkeluarController::class, 'update'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-edit');
 
         // surat keluar review
-        Route::group(['middleware' => ['ability:admin,backend_access,review_surat']], function () {
+        Route::group(['middleware' => ['ability:admin,review_surat']], function () {
             Route::resource('surat-keluar-review', ReviewsuratkeluarController::class)->except('show');
             Route::any('surat-keluar-review/dt', [ReviewsuratkeluarController::class, 'datatable'])->name('surat-keluar-review');
         });
@@ -172,14 +188,14 @@ Route::group([
         //     ->middleware(['boilerplateauth', 'ability:admin,backend_access,review_surat'])
         //     ->name('surat-keluar-review');
         Route::get('/surat-keluar-review/{id}', [ReviewsuratkeluarController::class, 'create'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access,review_surat'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_surat'])
             ->name('surat-keluar-review.edit');
         Route::put('/surat-keluar-review/{id}', [ReviewsuratkeluarController::class, 'update'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access,review_surat'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_surat'])
             ->name('surat-keluar-review.review');
 
         //surat keluar approve    
-        Route::group(['middleware' => ['ability:admin,backend_access,approve_surat']], function () {
+        Route::group(['middleware' => ['ability:admin,approve_surat']], function () {
             Route::resource('surat-keluar-approve', ApprovesuratkeluarController::class)->except('show');
             Route::any('surat-keluar-approve/dt', [ApprovesuratkeluarController::class, 'datatable'])->name('surat-keluar-approve');
         });
@@ -187,15 +203,33 @@ Route::group([
         //     ->middleware(['boilerplateauth', 'ability:admin,backend_access,approve_surat'])
         //     ->name('surat-keluar-approve');
         Route::get('/surat-keluar-approve/{id}', [ApprovesuratkeluarController::class, 'create'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access,approve_surat'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_surat'])
             ->name('surat-keluar-approve.edit');
+        Route::get('/surat-keluar-approve-lampiran/{id}', [ApprovesuratkeluarController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_surat'])
+            ->name('surat-keluar-approve-lampiran');
         Route::put('/surat-keluar-approve/{id}', [ApprovesuratkeluarController::class, 'update'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access,approve_surat'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_surat'])
             ->name('surat-keluar-approve.approve');
 
         
-        Route::get('/surat-keluar-arsip', [SuratkeluarController::class, 'arsip'])
-            ->middleware(['boilerplateauth', 'ability:admin,backend_access,arsip_surat'])
+        Route::get('/surat-keluar-arsip', [ArsipSuratKeluarController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,arsip_surat'])
             ->name('surat-keluar-arsip');
+        Route::get('/surat-keluar-arsip/{id}', [ArsipSuratKeluarController::class, 'show'])
+            ->middleware(['boilerplateauth', 'ability:admin,arsip_surat'])
+            ->name('surat-keluar-arsip-edit');
+        Route::put('/surat-keluar-arsip/{id}', [ArsipSuratKeluarController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,arsip_surat'])
+            ->name('surat-keluar-arsip-update');
+        Route::get('/surat-keluar-arsip-lampiran/{id}', [ArsipSuratKeluarController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,arsip_surat'])
+            ->name('surat-keluar-arsip-lampiran');
+        Route::get('/surat-keluar-surat/{id}', [ArsipSuratKeluarController::class, 'unduh_surat'])
+            ->middleware(['boilerplateauth', 'ability:admin,arsip_surat'])
+            ->name('surat-keluar-surat');
+        Route::get('/surat-keluar-surat-scan/{id}', [ArsipSuratKeluarController::class, 'unduh_surat_scan'])
+            ->middleware(['boilerplateauth', 'ability:admin,arsip_surat'])
+            ->name('surat-keluar-surat-scan');
     });
 });

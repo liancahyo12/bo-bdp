@@ -17,11 +17,15 @@ use Illuminate\Support\Facades\Input;
 use App\Models\jenis_surat;
 use App\Models\departemen;
 use App\Models\Isi_surat;
+use App\Models\Request_surat_keluar;
+use App\Models\Approvesuratkeluar;
 use App\Models\Boilerplate\User;
 use Carbon\Carbon;
 use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
+use NcJoes\OfficeConverter\OfficeConverter;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\Storage;
 use Auth;
 use DB;
 
@@ -47,53 +51,6 @@ class SuratkeluarController extends Controller
         return view('boilerplate::surat-keluar.surat-keluar');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-    public function getRomawi($bulan){
-        switch ($bulan){
-            case 1: 
-                return "I";
-            break;
-            case 2:
-                return "II";
-                break;
-            case 3:
-                return "III";
-                break;
-            case 4:
-                return "IV";
-                break;
-            case 5:
-                return "V";
-                break;
-            case 6:
-                return "VI";
-                break;
-            case 7:
-                return "VII";
-                break;
-            case 8:
-                return "VIII";
-                break;
-            case 9:
-                return "IX";
-                break;
-            case 10:
-                return "X";
-                break;
-            case 11:
-                return "XI";
-                break;
-            case 12:
-                return "XII";
-                break;
-        }
-    }
-
     public function create()
     {
         //
@@ -107,10 +64,8 @@ class SuratkeluarController extends Controller
 
     public function create_request($id)
     {
-        //
-        return view('boilerplate::surat-keluar.buat', [
-            'approver' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4'),
-            'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
+        $reqsurat = Request_surat_keluar::leftJoin('jenis_surats', 'jenis_surat_id', 'jenis_surats.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('request_surat_keluars.id as ida', 'request_surat_keluars.*', 'jenis_surats.*', 'departemens.*')->where('request_surat_keluars.id', $id)->first();
+        return view('boilerplate::surat-keluar.buat-dari-request', compact('reqsurat'),[
             'jenis_surat' => jenis_surat::all(),
             'departemens' => departemen::all(),
         ]);
@@ -122,94 +77,100 @@ class SuratkeluarController extends Controller
      * @param  \App\Http\Requests\StoreSuratkeluarRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+
+    public function store_request(Request $request, $id)
     {
         // validate request
         $this->validate($request, [
                 'jenis_surat' => 'required',
                 'departemen'  => 'required',
-                'reviewer'  => 'required',
-                'approver'  => 'required',
                 'tgl_surat'  => 'required',
                 'perihal' => 'required',
+                'lampiran_radio' => 'required',
+                'file_surat' => 'mimes:docx|max:20480',
+                'file_lampiran' => 'mimes:pdf|max:20480',
             ]);
 
-        // get date from request
-        $mmyy = substr($request->tgl_surat, 0, 7);
-        $mm = substr($request->tgl_surat, 5, 2);
-        $yy = substr($request->tgl_surat, 0, 4);
-
+        $input['user_id'] = Auth::user()->id;
         $last_surat_keluar = DB::table('suratkeluars')->select('id')->orderBy('id', 'DESC')->limit(1)->value('id');
         $ssr = $last_surat_keluar+1;
-        // if($last_surat_keluar == null){
-        //     $last_surat_keluar=0;
-        // }
-        $tgl_surat_t = Carbon::createFromFormat('Y-m-d', $request->tgl_surat)->isoFormat('D MMMM Y');
+        $filenameS = $ssr.Str::random(16);
+        $pathS ='';
+        $pathL ='';
+        if ($request->file_surat!=null) {
+            $pathS = $request->file('file_surat')->storeAs('suratkeluar', $filenameS.'.docx');
+            $converter = new OfficeConverter(Storage::path('suratkeluar/'.$filenameS.'.docx'));
+            $converter->convertTo($filenameS.'.pdf'); 
+            $input['isi_surat'] = 'suratkeluar/'.$filenameS;
+        }
+
+        if ($request->lampiran_radio == 1) {
+            $input['lampiran'] = Request_surat_keluar::select('lampiran')->where('id', $id)->value('lampiran');
+        }elseif ($request->lampiran_radio == 2){
+            $filenameL = $ssr.Str::random(16).'.pdf';
+            if ($request->file_lampiran!=null) {
+                $pathL = $request->file('file_lampiran')->storeAs('lampiran', $filenameL);
+                $input['lampiran'] = $pathL;
+            }
+        }
         
 
-        $input['user_id'] = Auth::user()->id;
+        $tgl_surat_t = Carbon::createFromFormat('Y-m-d', $request->tgl_surat)->isoFormat('D MMMM Y');
+        
+        
         $input['jenis_surat_id'] = $request->jenis_surat;
         $input['departemen_id'] = $request->departemen;
-        $input['reviewer_id'] = $request->reviewer;
-        $input['approver_id'] = $request->approver;
+        $input['request_surat_keluar_id'] = $id;
         $input['tgl_surat'] = $request->tgl_surat;
         $input['perihal'] = $request->perihal;
-        // $input['no_urut'] = $nourut;
-        // $input['no_surat'] = $nosurat;
+        // $input['lampiran'] = Request_surat_keluar::select('lampiran')->where('id', $id)->value('lampiran')
+        
 
-        $isisurat['surat_keluar_id'] = $last_surat_keluar+1;
-        $isisurat['jenis_surat_id'] = $request->jenis_surat;
-        $isisurat['item1'] = $request->item1;
-        $isisurat['item2'] = $request->item2;
-        $isisurat['item3'] = $request->item3;
-        $isisurat['item4'] = $request->item4;
-        $isisurat['item5'] = $request->item5;
-        $isisurat['item6'] = $request->item6;
-        $isisurat['item7'] = $request->item7;
-        $isisurat['item8'] = $request->item8;
-        $isisurat['item9'] = $request->item9;
-        $isisurat['item10'] = $request->item10;
-        $isisurat['item11'] = $request->item11;
-        $isisurat['item12'] = $request->item12;
-        $isisurat['item13'] = $request->item13;
-        $isisurat['item14'] = $request->item14;
-        $isisurat['item15'] = $request->item15;
-        $isisurat['item16'] = $request->item16;
-        $isisurat['item17'] = $request->item17;
-        $isisurat['item18'] = $request->item18;
-        $isisurat['item19'] = $request->item19;
-        $isisurat['item20'] = $request->item20;
+        // $isisurat['surat_keluar_id'] = $last_surat_keluar+1;
+        // $isisurat['jenis_surat_id'] = $request->jenis_surat;
+        // $isisurat['item1'] = $request->item1;
+        // $isisurat['item2'] = $request->item2;
+        // $isisurat['item3'] = $request->item3;
+        // $isisurat['item4'] = $request->item4;
+        // $isisurat['item5'] = $request->item5;
+        // $isisurat['item6'] = $request->item6;
+        // $isisurat['item7'] = $request->item7;
+        // $isisurat['item8'] = $request->item8;
+        // $isisurat['item9'] = $request->item9;
+        // $isisurat['item10'] = $request->item10;
+        // $isisurat['item11'] = $request->item11;
+        // $isisurat['item12'] = $request->item12;
+        // $isisurat['item13'] = $request->item13;
+        // $isisurat['item14'] = $request->item14;
+        // $isisurat['item15'] = $request->item15;
+        // $isisurat['item16'] = $request->item16;
+        // $isisurat['item17'] = $request->item17;
+        // $isisurat['item18'] = $request->item18;
+        // $isisurat['item19'] = $request->item19;
+        // $isisurat['item20'] = $request->item20;
 
        
 
         // fungsi tombol
         switch ($request->submitbutton) {
         case 'Kirim':
+            $this->validate($request, [
+                'file_surat' => 'required|mimes:docx|max:20480',
+            ]);
             // send
             $input['send_status'] = 1;
             $input['send_time'] = Carbon::now()->toDateTimeString();
-            $input['review_status'] = 0;
             $input['approve_status'] = 0;
             $perihal = $request->perihal;
             $suratkeluar = Suratkeluar::create($input);
-            $isisuratkeluar = Isi_surat::create($isisurat);
+            // $isisuratkeluar = Isi_surat::create($isisurat);
 
-            $mailto='';
-            if(Auth::user()->id == $request->reviewer){
-                $mailto = User::where('id', $request->approver)->value('email');
-                $details = [
-                    'title' => '',
-                    'body' => 'Surat Keluar '.$request->perihal,
-                    'body2' => 'Untuk mereview surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-review/'.$ssr,
-                ];
-            }else{
-                $mailto = User::where('id', $request->reviewer)->value('email');
-                $details = [
-                    'title' => '',
-                    'body' => 'Surat Keluar '.$request->perihal,
-                    'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-approve/'.$ssr,
-                ];
-            }
+            $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=4 limit 1');
+            $details = [
+                'title' => '',
+                'body' => 'Surat Keluar '.$request->perihal,
+                'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-review/'.$ssr,
+            ];
             
             \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
 
@@ -223,48 +184,189 @@ class SuratkeluarController extends Controller
             $input['send_status'] = 0;
 
             $suratkeluar = Suratkeluar::create($input);
-            $isisuratkeluar = Isi_surat::create($isisurat);
+            // $isisuratkeluar = Isi_surat::create($isisurat);
 
             return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Surat berhasil disimpan'), 'success']);
             break;
-        case 'Preview Surat':
-            # code...
-             //read template surat
-            $template = new TemplateProcessor('template/'.$request->jenis_surat.'.docx');
+        // case 'Preview Surat':
+        //     # code...
+        //      //read template surat
+        //     $template = new TemplateProcessor('template/'.$request->jenis_surat.'.docx');
 
-            //set values template surat
-            $template->setValues([
-                // 'no_surat' => $nosurat,
-                'tgl_surat' => $tgl_surat_t,
-                'item1' => $request->item1,
-                'item2' => $request->item2,
-                'item3' => $request->item3,
-                'item4' => $request->item4,
-                'item5' => $request->item5,
-                'item6' => $request->item6,
-                'item7' => $request->item7,
-                'item8' => $request->item8,
-                'item9' => $request->item9,
-                'item10' => $request->item10,
-                'item11' => $request->item11,
-                'item12' => $request->item12,
-                'item13' => $request->item13,
-                'item14' => $request->item14,
-                'item15' => $request->item15,
-                'item16' => $request->item16,
-                'item17' => $request->item17,
-                'item18' => $request->item18,
-                'item19' => $request->item19,
-                'item20' => $request->item20,
+        //     //set values template surat
+        //     $template->setValues([
+        //         // 'no_surat' => $nosurat,
+        //         'tgl_surat' => $tgl_surat_t,
+        //         'item1' => $request->item1,
+        //         'item2' => $request->item2,
+        //         'item3' => $request->item3,
+        //         'item4' => $request->item4,
+        //         'item5' => $request->item5,
+        //         'item6' => $request->item6,
+        //         'item7' => $request->item7,
+        //         'item8' => $request->item8,
+        //         'item9' => $request->item9,
+        //         'item10' => $request->item10,
+        //         'item11' => $request->item11,
+        //         'item12' => $request->item12,
+        //         'item13' => $request->item13,
+        //         'item14' => $request->item14,
+        //         'item15' => $request->item15,
+        //         'item16' => $request->item16,
+        //         'item17' => $request->item17,
+        //         'item18' => $request->item18,
+        //         'item19' => $request->item19,
+        //         'item20' => $request->item20,
+        //     ]);
+        //     header("Content-Disposition: attachment; filename=suratkuasa.docx");
+
+        //     // $template->saveAs('output/suratkuasa.docx');
+        //     $template->saveAs('php://output');
+        //     // $PDFWriter = \PhpOffice\PhpWord\IOFactory::createWriter($Content,'PDF');
+        //     // $PDFWriter->save(public_path('new-result.pdf'));
+        //     break;
+        }
+    }
+    
+    public function store(Request $request)
+    {
+        // validate request
+        $this->validate($request, [
+                'jenis_surat' => 'required',
+                'departemen'  => 'required',
+                'tgl_surat'  => 'required',
+                'perihal' => 'required',
+                'file_surat' => 'mimes:docx|max:20480',
+                'file_lampiran' => 'mimes:pdf|max:20480',
             ]);
-            header("Content-Disposition: attachment; filename=suratkuasa.docx");
 
-            // $template->saveAs('output/suratkuasa.docx');
-            $template->saveAs('php://output');
-            // $PDFWriter = \PhpOffice\PhpWord\IOFactory::createWriter($Content,'PDF');
-            // $PDFWriter->save(public_path('new-result.pdf'));
+        $input['user_id'] = Auth::user()->id;
+        $last_surat_keluar = DB::table('suratkeluars')->select('id')->orderBy('id', 'DESC')->limit(1)->value('id');
+        $ssr = $last_surat_keluar+1;
+        $filenameS = $ssr.Str::random(16);
+        $pathS ='';
+        if ($request->file_surat!=null) {
+            $pathS = $request->file('file_surat')->storeAs('suratkeluar', $filenameS.'.docx');
+            $converter = new OfficeConverter(Storage::path('suratkeluar/'.$filenameS.'.docx'));
+            $converter->convertTo($filenameS.'.pdf'); 
+            $input['isi_surat'] = 'suratkeluar/'.$filenameS;
+        }
+
+        $filenameL = $ssr.Str::random(16).'.pdf';
+        $pathL ='';
+        if ($request->file_lampiran!=null) {
+            $pathL = $request->file('file_lampiran')->storeAs('lampiran', $filenameL);
+        }
+
+        $tgl_surat_t = Carbon::createFromFormat('Y-m-d', $request->tgl_surat)->isoFormat('D MMMM Y');
+                
+        $input['jenis_surat_id'] = $request->jenis_surat;
+        $input['departemen_id'] = $request->departemen;
+        $input['tgl_surat'] = $request->tgl_surat;
+        $input['perihal'] = $request->perihal;
+        $input['lampiran'] = $pathL;
+
+        // $isisurat['surat_keluar_id'] = $last_surat_keluar+1;
+        // $isisurat['jenis_surat_id'] = $request->jenis_surat;
+        // $isisurat['item1'] = $request->item1;
+        // $isisurat['item2'] = $request->item2;
+        // $isisurat['item3'] = $request->item3;
+        // $isisurat['item4'] = $request->item4;
+        // $isisurat['item5'] = $request->item5;
+        // $isisurat['item6'] = $request->item6;
+        // $isisurat['item7'] = $request->item7;
+        // $isisurat['item8'] = $request->item8;
+        // $isisurat['item9'] = $request->item9;
+        // $isisurat['item10'] = $request->item10;
+        // $isisurat['item11'] = $request->item11;
+        // $isisurat['item12'] = $request->item12;
+        // $isisurat['item13'] = $request->item13;
+        // $isisurat['item14'] = $request->item14;
+        // $isisurat['item15'] = $request->item15;
+        // $isisurat['item16'] = $request->item16;
+        // $isisurat['item17'] = $request->item17;
+        // $isisurat['item18'] = $request->item18;
+        // $isisurat['item19'] = $request->item19;
+        // $isisurat['item20'] = $request->item20;
+
+       
+
+        // fungsi tombol
+        switch ($request->submitbutton) {
+        case 'Kirim':
+            $this->validate($request, [
+                'file_surat' => 'required|mimes:docx|max:20480',
+            ]);
+            // send
+            $input['send_status'] = 1;
+            $input['send_time'] = Carbon::now()->toDateTimeString();
+            $input['approve_status'] = 0;
+            $perihal = $request->perihal;
+            $suratkeluar = Suratkeluar::create($input);
+            // $isisuratkeluar = Isi_surat::create($isisurat);
+
+                $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=4 limit 1');
+                $details = [
+                    'title' => '',
+                    'body' => 'Surat Keluar '.$request->perihal,
+                    'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-review/'.$ssr,
+                ];
+            
+            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
+                            ->with('growl', [__('Surat berhasil dikirim'), 'success']);
+
             break;
+
+        case 'Simpan Draft':
+            // save to draft
+            $input['send_status'] = 0;
+
+            $suratkeluar = Suratkeluar::create($input);
+            // $isisuratkeluar = Isi_surat::create($isisurat);
+
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
+                            ->with('growl', [__('Surat berhasil disimpan'), 'success']);
+            break;
+        // case 'Preview Surat':
+        //     # code...
+        //      //read template surat
+        //     $template = new TemplateProcessor('template/'.$request->jenis_surat.'.docx');
+
+        //     //set values template surat
+        //     $template->setValues([
+        //         // 'no_surat' => $nosurat,
+        //         'tgl_surat' => $tgl_surat_t,
+        //         'item1' => $request->item1,
+        //         'item2' => $request->item2,
+        //         'item3' => $request->item3,
+        //         'item4' => $request->item4,
+        //         'item5' => $request->item5,
+        //         'item6' => $request->item6,
+        //         'item7' => $request->item7,
+        //         'item8' => $request->item8,
+        //         'item9' => $request->item9,
+        //         'item10' => $request->item10,
+        //         'item11' => $request->item11,
+        //         'item12' => $request->item12,
+        //         'item13' => $request->item13,
+        //         'item14' => $request->item14,
+        //         'item15' => $request->item15,
+        //         'item16' => $request->item16,
+        //         'item17' => $request->item17,
+        //         'item18' => $request->item18,
+        //         'item19' => $request->item19,
+        //         'item20' => $request->item20,
+        //     ]);
+        //     header("Content-Disposition: attachment; filename=suratkuasa.docx");
+
+        //     // $template->saveAs('output/suratkuasa.docx');
+        //     $template->saveAs('php://output');
+        //     // $PDFWriter = \PhpOffice\PhpWord\IOFactory::createWriter($Content,'PDF');
+        //     // $PDFWriter->save(public_path('new-result.pdf'));
+        //     break;
         }
     }
 
@@ -288,11 +390,7 @@ class SuratkeluarController extends Controller
      */
     public function edit($id)
     {
-        $surat = Suratkeluar::leftJoin('isi_surats', 'surat_keluar_id', 'suratkeluars.id')->leftJoin('jenis_surats', 'jenis_surats.id', 'suratkeluars.jenis_surat_id')->select('suratkeluars.id as ida', 'isi_surats.*', 'suratkeluars.*', 'jenis_surats.*')->where('suratkeluars.id', $id)->first();
-        $approver = DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4');
-        $reviewer = DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3');
-        $jenis_surat = jenis_surat::all();
-        $departemens = departemen::all();
+        $surat = Suratkeluar::leftJoin('isi_surats', 'surat_keluar_id', 'suratkeluars.id')->leftJoin('jenis_surats', 'jenis_surats.id', 'suratkeluars.jenis_surat_id')->leftJoin('request_surat_keluars', 'request_surat_keluar_id', 'request_surat_keluars.id')->select('suratkeluars.id as ida', 'isi_surats.*', 'suratkeluars.*', 'jenis_surats.*', 'request_surat_keluars.lampiran as lprq')->where('suratkeluars.id', $id)->first();
         return view('boilerplate::surat-keluar.edit', compact('surat'), 
         // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
         [
@@ -300,6 +398,7 @@ class SuratkeluarController extends Controller
             'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
             'jenis_surat' => jenis_surat::all(),
             'departemens' => departemen::all(),
+            'approve' => Approvesuratkeluar::where('surat_keluar_id', $id)->get(),
         ]
         );
     }
@@ -314,153 +413,124 @@ class SuratkeluarController extends Controller
     public function update(Request $request, $id)
     {
         // validate request
-        $this->validate($request, [
+        $input = Suratkeluar::where('id', $id)->first();
+        if ($input->send_status==0 || $input->review_status==3 || $input->approve_status==3) {
+            $this->validate($request, [
                 'jenis_surat' => 'required',
                 'departemen'  => 'required',
-                'reviewer'  => 'required',
-                'approver'  => 'required',
                 'tgl_surat'  => 'required',
                 'perihal' => 'required',
+                'file_surat' => 'mimes:docx|max:20480',
+                'file_lampiran' => 'mimes:pdf|max:20480',
+                'lampiran_radio' => 'required',
             ]);
-
-        // get date from request
-        $mmyy = substr($request->tgl_surat, 0, 7);
-        $mm = substr($request->tgl_surat, 5, 2);
-        $yy = substr($request->tgl_surat, 0, 4);
-
-        $last_surat_keluar = DB::table('suratkeluars')->select('id')->orderBy('id', 'DESC')->limit(1)->value('id');
-        $tgl_surat_t = Carbon::createFromFormat('Y-m-d H:i:s', $request->tgl_surat)->isoFormat('D MMMM Y');
-        
-        $input = Suratkeluar::where('id', $id)->first();
-        $isisurat = Isi_surat::where('surat_keluar_id', $id)->first();
-
-        // $input['user_id'] = Auth::user()->id;
-        $input->jenis_surat_id = $request->jenis_surat;
-        $input->departemen_id = $request->departemen;
-        $input->reviewer_id = $request->reviewer;
-        $input->approver_id = $request->approver;
-        $input->tgl_surat = $request->tgl_surat;
-        $input->perihal = $request->perihal;
-        // $input['no_urut'] = $nourut;
-        // $input['no_surat'] = $nosurat;
-
-        $isisurat['jenis_surat_id'] = $request->jenis_surat;
-        $isisurat['item1'] = $request->item1;
-        $isisurat['item2'] = $request->item2;
-        $isisurat['item3'] = $request->item3;
-        $isisurat['item4'] = $request->item4;
-        $isisurat['item5'] = $request->item5;
-        $isisurat['item6'] = $request->item6;
-        $isisurat['item7'] = $request->item7;
-        $isisurat['item8'] = $request->item8;
-        $isisurat['item9'] = $request->item9;
-        $isisurat['item10'] = $request->item10;
-        $isisurat['item11'] = $request->item11;
-        $isisurat['item12'] = $request->item12;
-        $isisurat['item13'] = $request->item13;
-        $isisurat['item14'] = $request->item14;
-        $isisurat['item15'] = $request->item15;
-        $isisurat['item16'] = $request->item16;
-        $isisurat['item17'] = $request->item17;
-        $isisurat['item18'] = $request->item18;
-        $isisurat['item19'] = $request->item19;
-        $isisurat['item20'] = $request->item20;
-
-       
-
-        // fungsi tombol
-        switch ($request->submitbutton) {
-        case 'Kirim':
-            // send
-            $input['send_status'] = 1;
-            $input['send_time'] = Carbon::now()->toDateTimeString();
             
-            $mailto='';
-            if(Auth::user()->id == $request->reviewer){
-                if($input->review_status == 3 && $input->approve_status != 3){
-                    $input['review_status'] = 5;
-                }else if($input->review_status != 3 && $input->approve_status == 3){
-                    $input['review_status'] = 5;
-                    $input['approve_status'] = 5;
-                }else{
-                    $input['review_status'] = 0;
+            $reqlampiran = Request_surat_keluar::select('lampiran')->where('id', $input->request_surat_keluar_id)->value('lampiran');
+
+            
+            if ($request->lampiran_radio == 1) {
+                $input['lampiran'] = $reqlampiran;
+            }elseif ($request->lampiran_radio == 2){
+                $filenameL = $id.Str::random(16).'.pdf';
+                $pathL = '';
+                if ($request->file_lampiran!=0) {
+                    if ($input->lampiran==$reqlampiran || $input->lampiran==null) {
+                        $pathL = $request->file('file_lampiran')->storeAs('lampiran', $filenameL);
+                    }else{
+                        $lpr = Str::substr($input->lampiran, 9);
+                        $pathL = $request->file('file_lampiran')->storeAs('lampiran', $lpr);
+                    }
+                    $input['lampiran'] = $pathL;
                 }
-                $mailto = User::where('id', $request->approver)->value('email');
-                $details = [
-                    'title' => '',
-                    'body' => 'Surat Keluar '.$request->perihal,
-                    'body2' => 'Untuk mereview surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-review/'.$id,
-                ];
-            }else{
-                if($input->approve_status != 3){
+            }else {
+                $input['lampiran'] = '';
+            }
+
+            // get date from request
+
+            $last_surat_keluar = DB::table('suratkeluars')->select('id')->orderBy('id', 'DESC')->limit(1)->value('id');
+            $tgl_surat_t = Carbon::createFromFormat('Y-m-d H:i:s', $request->tgl_surat)->isoFormat('D MMMM Y');
+            
+            // $isisurat = Isi_surat::where('surat_keluar_id', $id)->first();
+
+            $input->jenis_surat_id = $request->jenis_surat;
+            $input->departemen_id = $request->departemen;
+            $input->tgl_surat = $request->tgl_surat;
+            $input->perihal = $request->perihal;
+
+            // fungsi tombol
+            switch ($request->submitbutton) {
+            case 'Kirim':
+
+                $input['send_status'] = 1;
+                $input['send_time'] = Carbon::now()->toDateTimeString();
+
+                if ($input->isi_surat==null) {
+                    $this->validate($request, [
+                        'file_surat' => 'required|mimes:docx|max:20480',
+                    ]);
+                    if ($request->file_surat!=null) {
+                        $sr = Str::substr($input->isi_surat, 12);
+                        $pathS = $request->file('file_surat')->storeAs('suratkeluar', $sr.'.docx');
+                        $converter = new OfficeConverter(Storage::path('suratkeluar/'.$sr.'.docx'));
+                        $converter->convertTo($sr.'.pdf'); 
+                        $input['isi_surat'] = 'suratkeluar/'.$sr;
+                    }
+                }
+                
+                if($input->approve_status == 3){
                     $input['approve_status'] = 5;
                 }else{
                     $input['approve_status'] = 0;
                 }
-                $mailto = User::where('id', $request->reviewer)->value('email');
+                $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=4 limit 1');
                 $details = [
                     'title' => '',
                     'body' => 'Surat Keluar '.$request->perihal,
                     'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-approve/'.$id,
                 ];
+
+                $suratkeluar = $input->save();
+                // $isisuratkeluar = $isisurat->save();
+
+                \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+
+                return redirect()->route('boilerplate.surat-keluar-saya.index')
+                                ->with('growl', [__('Surat berhasil dikirim'), 'success']);
+
+                break;
+
+            case 'Simpan Draft':
+                // save to draft
+                if ($input->isi_surat==null) {
+                    if ($request->file_surat!=null) {
+                        $sr = Str::substr($input->isi_surat, 12);
+                        $pathS = $request->file('file_surat')->storeAs('suratkeluar', $sr.'.docx');
+                        $converter = new OfficeConverter(Storage::path('suratkeluar/'.$sr.'.docx'));
+                        $converter->convertTo($sr.'.pdf'); 
+                        $input['isi_surat'] = 'suratkeluar/'.$sr;
+                    }
+                }
+                $suratkeluar = $input->save();
+                // $isisuratkeluar = $isisurat->save();
+
+                return redirect()->route('boilerplate.surat-keluar-saya.index')
+                                ->with('growl', [__('Surat berhasil disimpan'), 'success']);
+                break;
+            case 'Preview Surat':
+                if ($input->isi_surat==null) {
+                    return redirect()->route('boilerplate.surat-keluar-saya.index')
+                                ->with('growl', [__('Belum ada lampiran'), 'danger']);
+                }else {
+                    $PdfDisk = Storage::disk('local')->get($input->isi_surat.'.pdf');
+                    return (new Response($PdfDisk, 200))
+                        ->header('Content-Type', 'application/pdf');
+                }
+                break;
             }
-
-            $suratkeluar = $input->save();
-            $isisuratkeluar = $isisurat->save();
-
-            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
-
+        }else {
             return redirect()->route('boilerplate.surat-keluar-saya.index')
-                            ->with('growl', [__('Surat berhasil dikirim'), 'success']);
-
-            break;
-
-        case 'Simpan Draft':
-            // save to draft
-
-            $suratkeluar = $input->save();
-            $isisuratkeluar = $isisurat->save();
-
-            return redirect()->route('boilerplate.surat-keluar-saya.index')
-                            ->with('growl', [__('Surat berhasil disimpan'), 'success']);
-            break;
-        case 'Preview Surat':
-            # code...
-             //read template surat
-            $template = new TemplateProcessor('template/'.$request->jenis_surat.'.docx');
-
-            //set values template surat
-            $template->setValues([
-                // 'no_surat' => $nosurat,
-                'tgl_surat' => $tgl_surat_t,
-                'item1' => $request->item1,
-                'item2' => $request->item2,
-                'item3' => $request->item3,
-                'item4' => $request->item4,
-                'item5' => $request->item5,
-                'item6' => $request->item6,
-                'item7' => $request->item7,
-                'item8' => $request->item8,
-                'item9' => $request->item9,
-                'item10' => $request->item10,
-                'item11' => $request->item11,
-                'item12' => $request->item12,
-                'item13' => $request->item13,
-                'item14' => $request->item14,
-                'item15' => $request->item15,
-                'item16' => $request->item16,
-                'item17' => $request->item17,
-                'item18' => $request->item18,
-                'item19' => $request->item19,
-                'item20' => $request->item20,
-            ]);
-            header("Content-Disposition: attachment; filename=suratkuasa.docx");
-
-            // $template->saveAs('output/suratkuasa.docx');
-            $template->saveAs('php://output');
-            // $PDFWriter = \PhpOffice\PhpWord\IOFactory::createWriter($Content,'PDF');
-            // $PDFWriter->save(public_path('new-result.pdf'));
-            break;
+                                ->with('growl', [__('Tidak dapat diedit'), 'danger']);
         }
     }
 
@@ -473,7 +543,14 @@ class SuratkeluarController extends Controller
      public function destroy($id)
     {
         //
-        $suratkeluar = DB::update('update suratkeluars set status = 0 where id = ?', [$id]);
+        $send = Suratkeluar::where('id', $id)->select('send_status')->value('send_status');
+        if ($send==0) {
+            $suratkeluar = DB::update('update suratkeluars set status = 0 where id = ?', [$id]);
+        }else {
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
+                            ->with('growl', [__('Tidak dapat dihapus'), 'danger']);
+        }
+        
     }
 
     public function detail($id)
@@ -481,8 +558,38 @@ class SuratkeluarController extends Controller
         //
     }
 
-    public function arsip(Suratkeluar $suratkeluar)
+    public function unduh_format($id)
     {
-        //
+        $file= Storage::disk('local')->get(Jenis_surat::where('id', $id)->value('format'));
+        return (new Response($file, 200))
+              ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     }
+
+    public function unduh_lampiran($id)
+    {
+        if(Suratkeluar::where('id', $id)->value('user_id') == Auth::user()->id){
+            $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('lampiran'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf');
+        }else {
+            return redirect()->route('boilerplate.surat-keluar-request-buat')
+                            ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
+        }
+        
+    }
+
+    public function unduh_surat_lama($id)
+    {
+        if(Suratkeluar::where('id', $id)->value('user_id') == Auth::user()->id){
+            $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('isi_surat'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        }else {
+            return redirect()->route('boilerplate.surat-keluar-request-buat')
+                            ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
+        }
+        
+    }
+
+    
 }

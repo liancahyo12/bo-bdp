@@ -31,13 +31,16 @@
         <div @if ($reqsurat->request_status==0 || $reqsurat->request_status==1 || $reqsurat->request_status==6)
         @else style='display:none;' @endif>
             <x-boilerplate::input name="komentar" autofocus/>
-            {{ Form::submit('Revisi', array('class' => 'btn btn-warning', 'name' => 'submitbutton')) }}
-            &nbsp;
-            {{ Form::submit('Tolak', array('class' => 'btn btn-danger', 'name' => 'submitbutton')) }}
-            &nbsp;
-            {{ Form::submit('Buat Surat', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
             
         </div>
+        <div>   
+            <input class="btn btn-warning" name="submitbutton" type="submit" value="Revisi" @if ($reqsurat->request_status==0 || $reqsurat->request_status==1 || $reqsurat->request_status==6) @else style='display:none;' @endif>
+            &nbsp;
+            <input class="btn btn-danger" name="submitbutton" type="submit" value="Tolak" @if ($reqsurat->request_status==0 || $reqsurat->request_status==1 || $reqsurat->request_status==6) @else style='display:none;' @endif>
+            &nbsp;
+            <input class="btn btn-primary" name="submitbutton" type="submit" value="Buat Surat" @if ($reqsurat->request_status==0 || $reqsurat->request_status==1 || $reqsurat->request_status==6 || $reqsurat->request_status==2) @else style='display:none;' @endif>
+        </div>
+        
     </x-boilerplate::card>
     </x-boilerplate::form>
     <x-boilerplate::card>

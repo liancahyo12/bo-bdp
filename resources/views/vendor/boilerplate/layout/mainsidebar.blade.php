@@ -1,7 +1,7 @@
 <aside class="main-sidebar sidebar-{{ config('boilerplate.theme.sidebar.type') }}-{{ config('boilerplate.theme.sidebar.links.bg') }} elevation-{{ config('boilerplate.theme.sidebar.shadow') }}">
     <a href="{{ route('boilerplate.dashboard') }}" class="brand-link {{ !empty(config('boilerplate.theme.sidebar.brand.bg')) ? 'bg-'.config('boilerplate.theme.sidebar.brand.bg') : ''}}">
         <span class="brand-logo bg-{{ config('boilerplate.theme.sidebar.brand.logo.bg') }} elevation-{{ config('boilerplate.theme.sidebar.brand.logo.shadow') }}">
-            <img src="{{ config('boilerplate.theme.favicon') ?? mix('favicon.png', '/assets/vendor/boilerplate') }}" alt="bdpay" width="30" height="30">
+            <img src="{{ mix('favicon.png', '/assets/vendor/boilerplate') }}" alt="bdpay" width="30" height="30">
         </span>
         <span class="brand-text">{!! config('boilerplate.theme.sidebar.brand.logo.text') !!}</span>
     </a>

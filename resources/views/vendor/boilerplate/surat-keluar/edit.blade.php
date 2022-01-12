@@ -1,4 +1,4 @@
-@extends('boilerplate::layout.indexedit', [
+@extends('boilerplate::layout.index', [
     'title' => __('Edit Surat Keluar'),
     'subtitle' => __('Edit Surat Keluar'),
     'breadcrumb' => [
@@ -7,16 +7,27 @@
 ])
 
 @section('content')
-    <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files>
-        <div class="row">
-            &nbsp; &nbsp;
-            {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}
-            &nbsp;
-            {{ Form::submit('Preview Surat', array('class' => 'btn btn-warning', 'name' => 'submitbutton')) }}
-            &nbsp;
-            {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
-        </div>
-    <br>
+<x-boilerplate::card>
+            <x-slot name="header">
+                <b>Komentar</b>
+            </x-slot>
+            @foreach ( $approve as $approve)
+                <div class="direct-chat-msg">
+                    <div class="direct-chat-infos clearfix">
+                        <span class="direct-chat-name float-left">{{ Auth::user()->first_name }}</span>
+                        <span class="direct-chat-timestamp float-right">{{ $approve->created_at }}</span>
+                    </div>
+                    <!-- /.direct-chat-infos -->
+                    <img src="{{ Auth::user()->avatar_url }}" class="direct-chat-img" alt="{{ Auth::user()->name }}" width="30" height="30">
+                    <!-- /.direct-chat-img -->
+                    <div class="direct-chat-text">
+                        {{ $approve->komentar }}
+                    </div>
+                    <!-- /.direct-chat-text -->
+                </div>
+            @endforeach            
+        </x-boilerplate::card>
+    <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files onsubmit="return confirm('Are you sure?')">
         <x-boilerplate::card>
             <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat" id='jenis_surat'>
                 @foreach ($jenis_surat as $position)
@@ -32,75 +43,98 @@
                     @endif>{{ $position->departemen }}</option>
                 @endforeach
             </x-boilerplate::select2>
-            <x-boilerplate::select2 name="reviewer" label="Pilih Reviewer">
-                @foreach ($reviewer as $position)
-                    <option value="{{ $position->id }}" @if ( $surat->reviewer_id==$position->id)
-                        selected
-                    @endif>{{ $position->first_name }}</option>
-                @endforeach
-            </x-boilerplate::select2>
-            <x-boilerplate::select2 name="approver" label="Pilih Approver">
-                @foreach ($approver as $position)
-                    <option value="{{ $position->id }}" @if ( $surat->approver_id==$position->id)
-                        selected
-                    @endif>{{ $position->first_name }}</option>
-                @endforeach
-            </x-boilerplate::select2>
             <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat'/>
             <x-boilerplate::input name="perihal" label="Perihal" value="{{ $surat->perihal }}" />
-            {{-- <div style='display:none;' id='form-surat1'>Form Surat<br/>&nbsp;
-                @include('boilerplate::surat-keluar.form1')
-            </div> --}}
+            <div class="form-group">
+                <div class="input-group" id="unduh-format">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/surat-keluar-buat-format/{{ $surat->jenis_surat_id }}"><button class="btn btn-secondary" form="a">Unduh Format Surat</button></a>
+                </div>
+            </div>
+            <x-boilerplate::input name="file_surat" type="file" label="Unggah Surat Keluar" />
+            <div class="form-group" @if ($surat->isi_surat!=null)
+                
+                @else
+                style='display:none;'
+                @endif>
+                <div class="input-group" id="unduh-format">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/surat-keluar-surat/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Unduh Surat Lama</button></a>
+                </div>
+            </div>
+            <label for="">Lampiran</label>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <div class="icheck-primary">
+                            <input type="radio" id="icheck_61dbe7e7b33b3" name="lampiran_radio" value="1" @if ($surat->lampiran==$surat->lprq)
+                                checked
+                            @endif
+                            @if($surat->request_surat_keluar_id==null)
+                                disabled
+                            @endif>
+                            <label for="icheck_61dbe7e7b33b3" class="font-weight-normal">Gunakan Lampiran Permintaan</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <div class="icheck-primary">
+                            <input type="radio" id="icheck_61dbe7e7b353e" name="lampiran_radio" value="2"  @if ($surat->lampiran!=$surat->lprq && $surat->request_surat_keluar_id!=null)
+                            checked
+                            @endif>
+                            <label for="icheck_61dbe7e7b353e" class="font-weight-normal">Unggah Lampiran Baru</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <div class="icheck-primary">
+                            <input type="radio" id="icheck_61dc0ffdcad8b" name="lampiran_radio" value="3" autocomplete="off" @if ($surat->request_surat_keluar_id==null)
+                            checked
+                            @endif>
+                            <label for="icheck_61dc0ffdcad8b" class="font-weight-normal">Tanpa Lampiran</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="lampiran-input" @if ($surat->lampiran!=$surat->lprq && $surat->request_surat_keluar_id!=null)
+                
+                @else
+                style='display:none;'
+                @endif >  
+                <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran" />
+                
+            </div>
+            <div class="form-group" @if ($surat->request_surat_keluar_id!=null)
+                
+                @else
+                style='display:none;'
+                @endif id="unduh-lamiran-lama">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/surat-keluar-lampiran/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Unduh Lampiran Lama</button></a>
+                </div>
+            </div>
                    
 
         </x-boilerplate::card>
-        
-        {{-- <div style='display:none;' id='card-form'><br/>
-            <x-boilerplate::card> --}}
-                {{-- @foreach ($jenis_surat as $position)
-                <div style='display:none;' id={{ $position->id }}>
-                    <x-boilerplate::card>
-                        <h3><b>FORM {{ $position->jenis_surat }}</b></h3> 
-                        @include('boilerplate::surat-keluar.form.form'. $position->id )
-                    </x-boilerplate::card>
-                </div>
-                @endforeach --}}
-                <div id='def-form'>
-                    <x-boilerplate::card id="formcard">
-                        <div id="forma">
-                            <h3><b id="head-form">FORM {{ $surat->jenis_surat }}</b></h3> 
-                            <x-boilerplate::input id='item1' name='item1' label="Nama pihak pertama"  value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item1 : '' }}" />
-                            <x-boilerplate::input id="item2" name="item2" label="Jabatan pihak pertama" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item2 : '' }}" />
-                            <x-boilerplate::input id="item3" name="item3" label="NIK pihak pertama" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item3 : '' }}" />
-                            <x-boilerplate::input id="item4" name="item4" label="Alamat pihak pertama" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item4 : '' }}" />
-                            <x-boilerplate::input id="item5" name="item5" label="No. HP pihak pertama" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item5 : '' }}"/>
-                            <x-boilerplate::input id="item6" name="item6" label="Bertindak untuk Atas Nama" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item6 : '' }}"/>
-                            <x-boilerplate::input id="item7" name="item7" label="Badan hukum" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item7 : '' }}"/>
-                            <x-boilerplate::input id="item8" name="item8" label="Alamat untuk Atas Nama" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item8 : '' }}"/>
-                            <x-boilerplate::input id="item9" name="item9" label="Nama pihak kedua" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item9 : '' }}"/>
-                            <x-boilerplate::input id="item10" name="item10" label="Jabatan pihak kedua" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item10 : '' }}"/>
-                            <x-boilerplate::input id="item11" name="item11" label="NIK pihak kedua" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item11 : '' }}"/>
-                            <x-boilerplate::input id="item12" name="item12" label="Alamat pihak kedua" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item12 : '' }}"/>
-                            <x-boilerplate::input id="item13" name="item13" label="No. HP pihak kedua" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item13 : '' }}"/>
-                            <x-boilerplate::input id="item14" name="item14" label="Tujuan" value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item14 : '' }}"/>
-                            <x-boilerplate::input id="item15" name="item15" style='visibility: hidden' value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item14 : '' }}"/>
-                            <x-boilerplate::input id="item16" name="item16" style='display:none;' value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item14 : '' }}"/>
-                            <x-boilerplate::input id="item17" name="item17" style='display:none;' value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item14 : '' }}"/>
-                            <x-boilerplate::input id="item18" name="item18" style='display:none;' value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item14 : '' }}"/>
-                            <x-boilerplate::input id="item19" name="item19" style='display:none;' value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item14 : '' }}"/>
-                            <x-boilerplate::input id="item20" name="item20" style='display:none;' value="{{ (request()->is('surat-keluar-saya/*')) ? $surat->item14 : '' }}"/>
-                        </div>
-                    </x-boilerplate::card>
-                </div>
-            <div class="row" id='button1'>
-                &nbsp; &nbsp;
-                {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}
-                &nbsp;
-                {{ Form::submit('Preview Surat', array('class' => 'btn btn-warning', 'name' => 'submitbutton')) }}
-                &nbsp;
-                {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
-            </div>
+        <div class="row" @if ($surat->send_status==0 || $surat->approve_status==3)\
+        @else
+            style='display:none;'
+        @endif>
+            &nbsp; 
+            {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}
+            &nbsp;
+            <input formtarget="_blank" class="btn btn-warning" name="submitbutton" type="submit" value="Preview Surat" >
+            &nbsp;
+            {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
         </div>
-        
     </x-boilerplate::form>
 @endsection
