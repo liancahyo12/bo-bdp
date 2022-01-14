@@ -94,6 +94,12 @@ Route::group([
         Route::get('/pengajuan', [PengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
             ->name('pengajuan');
+        Route::get('/buat-pengajuan', [PengajuanController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->name('buat-pengajuan');
+        Route::post('/buat-pengajuan', [PengajuanController::class, 'store'])
+            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->name('buat-pengajuan');
         Route::get('/review-pengajuan', [CekpengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('review-pengajuan');
@@ -172,9 +178,12 @@ Route::group([
         Route::get('/surat-keluar-lampiran/{id}', [SuratkeluarController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-lampiran');
-        Route::get('/surat-keluar-surat/{id}', [SuratkeluarController::class, 'unduh_surat_lama'])
+        Route::get('/surat-keluar-surat-lama/{id}', [SuratkeluarController::class, 'unduh_surat_lama'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-lampiran');
+        Route::get('/surat-keluar-surat-jadi/{id}', [SuratkeluarController::class, 'unduh_surat_jadi'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
+            ->name('surat-keluar-jadi');
         Route::put('/surat-keluar-edit/{id}', [SuratkeluarController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-edit');

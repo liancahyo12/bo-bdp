@@ -51,7 +51,7 @@ class SuratKeluar
         $item->add('Approve Surat', [
             'route' => 'boilerplate.surat-keluar-approve.index',
             'active' => 'boilerplate.surat-keluar-approve.index,boilerplate.surat-keluar-approve.edit',
-            'permission' => 'approve_surat, ',
+            'permission' => 'approve_surat',
             'order' => 103,
         ]);
         $item->add('Arsip Surat', [

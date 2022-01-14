@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\pengajuan;
+use App\Models\departemen;
+use App\Models\jenis_pengajuan;
 use App\Http\Requests\StorepengajuanRequest;
 use App\Http\Requests\UpdatepengajuanRequest;
 use Illuminate\Contracts\Foundation\Application;
@@ -34,7 +36,10 @@ class PengajuanController extends Controller
      */
     public function create()
     {
-        //
+        return view('boilerplate::pengajuan.buat', [
+            'jenis_pengajuan' => jenis_pengajuan::all(),
+            'departemens' => departemen::all(),
+        ]);
     }
 
     /**
@@ -45,7 +50,13 @@ class PengajuanController extends Controller
      */
     public function store(StorepengajuanRequest $request)
     {
-        //
+        $this->validate($request, [
+                'jenis_pengajuan' => 'required',
+                'departemen'  => 'required',
+                'tgl_pengajuan'  => 'required',
+                'perihal' => 'required',
+                'file_lampiran' => 'mimes:pdf|max:20480',
+        ]);
     }
 
     /**

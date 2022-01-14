@@ -222,10 +222,10 @@ class ApprovesuratkeluarController extends Controller
 
             if ($surat->request_surat_keluar_id!=null) {
                 $reqsurat = Request_surat_keluar::where('id', $surat->request_surat_keluar_id)->first();
+                $reqsurat['request_status'] = 3;
+                $reqsurat['request_time'] = Carbon::now()->toDateTimeString();
+                $reqsuratselesai = $reqsurat->save();
             }
-            $reqsurat['request_status'] = 3;
-            $reqsurat['request_time'] = Carbon::now()->toDateTimeString();
-            $reqsuratselesai = $reqsurat->save();
             $suratkeluar = $surat->save();
             $approvesurata = Approvesuratkeluar::create($approvesurat);
 

@@ -17,23 +17,8 @@
     <script src="{{ mix('/bootstrap.min.js', '/assets/vendor/boilerplate') }}"></script>
     <script src="{{ mix('/admin-lte.min.js', '/assets/vendor/boilerplate') }}"></script>
     <script src="{{ mix('/boilerplate.min.js', '/assets/vendor/boilerplate') }}"></script>
-    <script>
-        $(document).ready(function(){
-            $('#jenis_surat').on('change', function() {
-                document.getElementById("unduh-format").innerHTML = "<div class='input-group-prepend'> <span class='input-group-text'><span class='fas fa-file'></span></span> </div> <a target='_blank' href='/surat-keluar-buat-format/"+this.value+"' ><button class='btn btn-secondary' form='a'>Unduh Format Surat</button></a>"
-            });
-            $('input[type=radio][name="lampiran_radio"]').change(function() {
-                if ( this.value == '2')
-                {
-                    $("#lampiran-input").show();
-                }else{
-                    $("#lampiran-input").hide();
-                }
-                
-            });
-        });
-        
-    </script>
+    <script src="{{ mix('/unduhformat.js', '/assets/vendor/boilerplate') }}"></script>
+    
 @stack('plugin-js')
 </head>
 <body class="layout-fixed layout-navbar-fixed sidebar-mini{{ setting('darkmode', false) && config('boilerplate.theme.darkmode') ? ' dark-mode accent-light' : '' }}{{ setting('sidebar-collapsed', false) ? ' sidebar-collapse' : '' }}">

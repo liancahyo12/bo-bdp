@@ -17,10 +17,10 @@ class CreateApprovepengajuansTable extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('pengajuan_id');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('approver_id');
-            $table->string('komentar');
-            $table->tinyInteger('approve_status')->comment('0 = pending, 1 = dilihat, 2 = setuju, 3 = revisi, 4= tolak');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('approver_id')->nullable();
+            $table->string('komentar')->nullable();
+            $table->tinyInteger('approve_status')->comment('0 = pending, 1 = dilihat, 2 = setuju, 3 = revisi, 4= tolak')->nullable();
             $table->tinyInteger('status')->default(1)->comment('0 = not valid, 1= valid');
         });
     }

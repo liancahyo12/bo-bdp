@@ -1,5 +1,7 @@
 {
     "/bootstrap.min.js": "/bootstrap.min.js?id=cce8533cf40369153314",
+    "/unduhformat.js": "/unduhformat.js?id=cce8533cf40369159981",
+    "/form-pengajuan.js": "/form-pengajuan.js?id=cce8533cf40369159982",
     "/admin-lte.min.js": "/admin-lte.min.js?id=8577da301565841c328d",
     "/boilerplate.min.js": "/boilerplate.min.js?id=5a1ab73644638c78cc6a",
     "/avatar.min.js": "/avatar.min.js?id=1f23922f6ff30086de6e",
@@ -16,7 +18,6 @@
     "/plugins/codemirror/theme/storm.css": "/plugins/codemirror/theme/storm.css?id=5c8af50de527c1e87943",
     "/plugins/fileinput/bootstrap-fileinput.min.css": "/plugins/fileinput/bootstrap-fileinput.min.css?id=d535f6febac776aa1d8b",
     "/favicon.png": "/favicon.png?id=162f3a6f5b18511db000",
-    
     "/plugins/moment/moment-with-locales.min.js": "/plugins/moment/moment-with-locales.min.js?id=65a5016e8598f76b25ff",
     "/plugins/datatables/datatables.min.js": "/plugins/datatables/datatables.min.js?id=bb7216caf0d16c22a1cc",
     "/plugins/datatables/buttons.min.js": "/plugins/datatables/buttons.min.js?id=74a313729c949b375e3b",

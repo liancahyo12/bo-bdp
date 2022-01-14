@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
         $this->call(jenis_surat::class);
         $this->call(departemen::class);
+        $this->call(jenis_pengajuan::class);
     }
 }

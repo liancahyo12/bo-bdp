@@ -40,8 +40,8 @@ class ArsipsuratDatatable extends Datatable
             Column::add('Id')
                 ->data('id'),
 
-            Column::add('Id Permintaan')
-                ->data('request_surat_keluar_id'),
+            // Column::add('Id Permintaan')
+            //     ->data('request_surat_keluar_id'),
 
             Column::add('Waktu Approve')
                 ->data('approve_time'),

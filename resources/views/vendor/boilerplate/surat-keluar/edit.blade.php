@@ -45,16 +45,7 @@
             </x-boilerplate::select2>
             <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat'/>
             <x-boilerplate::input name="perihal" label="Perihal" value="{{ $surat->perihal }}" />
-            <div class="form-group">
-                <div class="input-group" id="unduh-format">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><span class="fas fa-file"></span></span>
-                    </div>
-                    <a target="_blank" href="/surat-keluar-buat-format/{{ $surat->jenis_surat_id }}"><button class="btn btn-secondary" form="a">Unduh Format Surat</button></a>
-                </div>
-            </div>
-            <x-boilerplate::input name="file_surat" type="file" label="Unggah Surat Keluar" />
-            <div class="form-group" @if ($surat->isi_surat!=null)
+            <div class="form-group" @if ($surat->approve_status!=2)
                 
                 @else
                 style='display:none;'
@@ -63,7 +54,45 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><span class="fas fa-file"></span></span>
                     </div>
-                    <a target="_blank" href="/surat-keluar-surat/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Unduh Surat Lama</button></a>
+                    <a target="_blank" href="/surat-keluar-buat-format/{{ $surat->jenis_surat_id }}"><button class="btn btn-secondary" form="a">Unduh Format Surat</button></a>
+                </div>
+            </div>
+            <div @if ($surat->send_status==0 || $surat->approve_status==3)\
+                @else
+                    style='display:none;'
+                @endif>
+                <label for="file_surat">Unggah Surat Keluar</label> <br>
+            <input type="file" name="file_surat"> <br>
+            <h3> </h3>
+            </div>
+            
+            <div class="form-group" @if ($surat->isi_surat!=null)
+                
+                @else
+                style='display:none;'
+                @endif
+                class="form-group" @if ($surat->approve_status!=2)
+                
+                @else
+                style='display:none;'
+                @endif>
+                <div class="input-group" id="unduh-format">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/surat-keluar-surat-lama/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Surat Lama</button></a>
+                </div>
+            </div>
+            <div class="form-group" @if ($surat->approve_status==2)
+                
+                @else
+                style='display:none;'
+                @endif>
+                <div class="input-group" id="unduh-format">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/surat-keluar-surat-jadi/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Surat Approved</button></a>
                 </div>
             </div>
             <label for="">Lampiran</label>
@@ -76,6 +105,10 @@
                             @endif
                             @if($surat->request_surat_keluar_id==null)
                                 disabled
+                            @endif @if ($surat->approve_status!=2)
+                
+                            @else
+                            disabled
                             @endif>
                             <label for="icheck_61dbe7e7b33b3" class="font-weight-normal">Gunakan Lampiran Permintaan</label>
                         </div>
@@ -86,6 +119,10 @@
                         <div class="icheck-primary">
                             <input type="radio" id="icheck_61dbe7e7b353e" name="lampiran_radio" value="2"  @if ($surat->lampiran!=$surat->lprq && $surat->request_surat_keluar_id!=null)
                             checked
+                            @endif @if ($surat->approve_status!=2)
+                
+                            @else
+                            disabled
                             @endif>
                             <label for="icheck_61dbe7e7b353e" class="font-weight-normal">Unggah Lampiran Baru</label>
                         </div>
@@ -96,6 +133,10 @@
                         <div class="icheck-primary">
                             <input type="radio" id="icheck_61dc0ffdcad8b" name="lampiran_radio" value="3" autocomplete="off" @if ($surat->request_surat_keluar_id==null)
                             checked
+                            @endif @if ($surat->approve_status!=2)
+                
+                            @else
+                            disabled
                             @endif>
                             <label for="icheck_61dc0ffdcad8b" class="font-weight-normal">Tanpa Lampiran</label>
                         </div>
@@ -119,7 +160,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><span class="fas fa-file"></span></span>
                     </div>
-                    <a target="_blank" href="/surat-keluar-lampiran/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Unduh Lampiran Lama</button></a>
+                    <a target="_blank" href="/surat-keluar-lampiran/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran Lama</button></a>
                 </div>
             </div>
                    

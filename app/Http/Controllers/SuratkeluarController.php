@@ -390,7 +390,12 @@ class SuratkeluarController extends Controller
      */
     public function edit($id)
     {
-        $surat = Suratkeluar::leftJoin('isi_surats', 'surat_keluar_id', 'suratkeluars.id')->leftJoin('jenis_surats', 'jenis_surats.id', 'suratkeluars.jenis_surat_id')->leftJoin('request_surat_keluars', 'request_surat_keluar_id', 'request_surat_keluars.id')->select('suratkeluars.id as ida', 'isi_surats.*', 'suratkeluars.*', 'jenis_surats.*', 'request_surat_keluars.lampiran as lprq')->where('suratkeluars.id', $id)->first();
+        
+        $surat = Suratkeluar::leftJoin('isi_surats', 'surat_keluar_id', 'suratkeluars.id')->leftJoin('jenis_surats', 'jenis_surats.id', 'suratkeluars.jenis_surat_id')->leftJoin('request_surat_keluars', 'request_surat_keluar_id', 'request_surat_keluars.id')->select('suratkeluars.id as ida', 'suratkeluars.user_id as suser_id', 'isi_surats.*', 'suratkeluars.*', 'jenis_surats.*', 'request_surat_keluars.lampiran as lprq')->where('suratkeluars.id', $id)->first();
+        if ($surat->suser_id != Auth::user()->id) {
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
+                            ->with('growl', [__('Surat keluar tidak ada'), 'danger']);
+        }
         return view('boilerplate::surat-keluar.edit', compact('surat'), 
         // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
         [
@@ -581,9 +586,21 @@ class SuratkeluarController extends Controller
     public function unduh_surat_lama($id)
     {
         if(Suratkeluar::where('id', $id)->value('user_id') == Auth::user()->id){
-            $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('isi_surat'));
+            $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('isi_surat').'.pdf');
             return (new Response($file, 200))
-                ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                ->header('Content-Type', 'application/pdf');
+        }else {
+            return redirect()->route('boilerplate.surat-keluar-request-buat')
+                            ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
+        }
+        
+    }
+    public function unduh_surat_jadi($id)
+    {
+        if(Suratkeluar::where('id', $id)->value('user_id') == Auth::user()->id){
+            $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('surat_jadi'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf');
         }else {
             return redirect()->route('boilerplate.surat-keluar-request-buat')
                             ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
