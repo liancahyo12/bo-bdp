@@ -28,25 +28,12 @@ class SuratkeluarsayaDatatable extends Datatable
         'send_time',
         'request_surat_keluar_id',
         'send_status',]);
-        // return DB::table('suratkeluars')->select([
-        // 'id',
-        // 'perihal',
-        // 'no_surat',
-        // ])->where('user_id', Auth::user()->id)->get()->toArray();
 
     }
 
     public function setUp()
     {
-        // $this->permissions('backend_access')
-        //     ->locale([
-        //         'deleteConfirm' => __('boilerplate::role.list.confirmdelete'),
-        //         'deleteSuccess' => __('boilerplate::role.list.deletesuccess'),
-        //     ])
-        //     ->buttons([])
-        //     ->noSearching()
-        //     ->noOrdering()
-        //     ->order('id', 'desc');
+        
     }
 
     public function columns(): array

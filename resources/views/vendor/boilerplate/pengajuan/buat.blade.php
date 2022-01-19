@@ -8,6 +8,7 @@
 
 @section('content')
     <x-boilerplate::form :route="['boilerplate.buat-pengajuan']" method="post" files>
+    @csrf
         <x-boilerplate::card>
             <x-boilerplate::select2 name="departemen" label="Pilih Departemen">
                 @foreach ($departemens as $position)
@@ -15,7 +16,7 @@
                 @endforeach
             </x-boilerplate::select2>
             <x-boilerplate::datetimepicker name="tgl_pengajuan" label='Tanggal Pengajuan'/>
-            <x-boilerplate::select2 name="jenis_pengjuan" label="Pilih Jenis Pengajuan" id='jenis_pengajuan'>
+            <x-boilerplate::select2 name="jenis_pengajuan" label="Pilih Jenis Pengajuan" id='jenis_pengajuan'>
                 @foreach ($jenis_pengajuan as $position)
                     <option value="{{ $position->id }}">{{ $position->jenis_pengajuan }}</option>
                 @endforeach

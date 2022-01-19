@@ -17,6 +17,8 @@ use App\Http\Controllers\ReviewsuratkeluarController;
 use App\Http\Controllers\ApprovesuratkeluarController;
 use App\Http\Controllers\RequestSuratKeluarController;
 use App\Http\Controllers\ArsipSuratKeluarController;
+use App\Http\Controllers\ReviewdeppengajuanController;
+use App\Http\Controllers\ReviewpengajuanController;
 
 Route::group([
     'prefix'     => config('boilerplate.app.prefix', ''),
@@ -90,22 +92,67 @@ Route::group([
                 });
             });
         });
-         // Approval
-        Route::get('/pengajuan', [PengajuanController::class, 'index'])
+         // Pengajuan
+        Route::get('/saya-pengajuan', [PengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
-            ->name('pengajuan');
+            ->name('saya-pengajuan');
         Route::get('/buat-pengajuan', [PengajuanController::class, 'create'])
             ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
             ->name('buat-pengajuan');
         Route::post('/buat-pengajuan', [PengajuanController::class, 'store'])
             ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
             ->name('buat-pengajuan');
-        Route::get('/review-pengajuan', [CekpengajuanController::class, 'index'])
+        Route::get('/edit-pengajuan/{id}', [PengajuanController::class, 'edit'])
+            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->name('edit-pengajuan');
+        Route::get('/edit-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->name('edit-pengajuan-lampiran');
+        Route::put('/edit-pengajuan/{id}', [PengajuanController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->name('update-pengajuan');
+        Route::delete('/edit-pengajuan-hapus/{id}', [PengajuanController::class, 'destroy'])
+            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->name('edit-pengajuan-hapus');
+
+        Route::get('/reviewdep-pengajuan', [ReviewdeppengajuanController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
+            ->name('reviewdep-pengajuan');
+        Route::get('/detail-reviewdep-pengajuan/{id}', [ReviewdeppengajuanController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
+            ->name('detail-reviewdep-pengajuan');
+        Route::put('/update-reviewdep-pengajuan/{id}', [ReviewdeppengajuanController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
+            ->name('update-reviewdep-pengajuan');
+        Route::get('/detail-reviewdep-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->name('detail-reviewdep-pengajuan-lampiran');
+
+        Route::get('/review-pengajuan', [ReviewpengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('review-pengajuan');
+        Route::get('/detail-review-pengajuan/{id}', [ReviewpengajuanController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
+            ->name('detail-review-pengajuan');
+        Route::put('/update-review-pengajuan/{id}', [ReviewpengajuanController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
+            ->name('update-review-pengajuan');
+        Route::get('/detail-review-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
+            ->name('detail-review-pengajuan-lampiran');
+            
         Route::get('/approve-pengajuan', [ApprovepengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
             ->name('approve-pengajuan');
+        Route::get('/detail-approve-pengajuan/{id}', [ApprovepengajuanController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
+            ->name('detail-approve-pengajuan');
+        Route::put('/update-approve-pengajuan/{id}', [ApprovepengajuanController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
+            ->name('update-approve-pengajuan');
+        Route::get('/detail-approve-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
+            ->name('detail-approve-pengajuan-lampiran');
 
         //request surat keluar
         Route::get('/surat-keluar-request-buat', [RequestSuratKeluarController::class, 'create'])
@@ -217,6 +264,9 @@ Route::group([
         Route::get('/surat-keluar-approve-lampiran/{id}', [ApprovesuratkeluarController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_surat'])
             ->name('surat-keluar-approve-lampiran');
+        Route::get('/surat-keluar-approve-preview/{id}', [ApprovesuratkeluarController::class, 'preview_surat'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_surat'])
+            ->name('surat-keluar-approve-preview');
         Route::put('/surat-keluar-approve/{id}', [ApprovesuratkeluarController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_surat'])
             ->name('surat-keluar-approve.approve');

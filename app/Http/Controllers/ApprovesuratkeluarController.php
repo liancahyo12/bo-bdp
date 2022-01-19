@@ -97,7 +97,7 @@ class ApprovesuratkeluarController extends Controller
             $surat = Suratkeluar::leftJoin('jenis_surats', 'jenis_surat_id', 'jenis_surats.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->leftJoin('isi_surats', 'isi_surats.surat_keluar_id', 'suratkeluars.id')->select('suratkeluars.id as ida', 'suratkeluars.*', 'jenis_surats.*', 'isi_surats.*', 'departemens.*')->where('suratkeluars.id', $id)->first();
 
             return view('boilerplate::surat-keluar.approvedetail', compact('surat'), [
-                'approve' => Approvesuratkeluar::where('surat_keluar_id', $id)->get(),
+                'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->select('approvesuratkeluars.*', 'first_name')->where('surat_keluar_id', $id)->get(),
             ]); 
         }  
         return redirect()->route('boilerplate.surat-keluar-approve.index')
@@ -345,6 +345,12 @@ class ApprovesuratkeluarController extends Controller
     public function unduh_lampiran($id)
     {
         $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('lampiran'));
+        return (new Response($file, 200))
+            ->header('Content-Type', 'application/pdf');        
+    }
+    public function preview_surat($id)
+    {
+        $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('isi_surat').'.pdf');
         return (new Response($file, 200))
             ->header('Content-Type', 'application/pdf');        
     }

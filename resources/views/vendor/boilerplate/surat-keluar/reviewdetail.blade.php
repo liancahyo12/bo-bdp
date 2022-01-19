@@ -8,6 +8,7 @@
 
 @section('content')
     <x-boilerplate::form :route="['boilerplate.surat-keluar-review.review', $surat->ida]" method="put" files>
+        @csrf
     <div class="row">
         <div class="col">
             <x-boilerplate::card>

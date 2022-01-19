@@ -8,6 +8,7 @@
 
 @section('content')
     <x-boilerplate::form :route="['boilerplate.surat-keluar-buat']" method="post" files>
+        @csrf
         <x-boilerplate::card>
             <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat" id='jenis_surat'>
                 @foreach ($jenis_surat as $position)

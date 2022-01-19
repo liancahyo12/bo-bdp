@@ -8,6 +8,7 @@
 
 @section('content')
     <x-boilerplate::form :route="['boilerplate.surat-keluar-arsip-update', $arsip->ida]" method="put" onsubmit="return confirm('Are you sure?')" files>
+        @csrf
         <x-boilerplate::card>
             <x-boilerplate::input name="jenis_surat" label="Jenis Surat" value="{{ $arsip->jenis_surat }}" disabled/>
             <x-boilerplate::input name="departemen" label="Departemen" value="{{ $arsip->departemen }}" disabled/>

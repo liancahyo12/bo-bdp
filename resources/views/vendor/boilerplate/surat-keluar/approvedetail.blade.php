@@ -8,6 +8,7 @@
 
 @section('content')
     <x-boilerplate::form :route="['boilerplate.surat-keluar-approve.approve', $surat->ida]" method="put" onsubmit="return confirm('Are you sure?')" files>
+        @csrf
         <x-boilerplate::card>
             <x-slot name="header">
                 <b>Komentar</b>
@@ -15,11 +16,11 @@
             @foreach ( $approve as $approve)
                 <div class="direct-chat-msg">
                     <div class="direct-chat-infos clearfix">
-                        <span class="direct-chat-name float-left">{{ Auth::user()->first_name }}</span>
+                        <span class="direct-chat-name float-left">{{ $approve->first_name }}</span>
                         <span class="direct-chat-timestamp float-right">{{ $approve->created_at }}</span>
                     </div>
                     <!-- /.direct-chat-infos -->
-                    <img src="{{ Auth::user()->avatar_url }}" class="direct-chat-img" alt="{{ Auth::user()->name }}" width="30" height="30">
+                    <img src="{{ mix('/images/user128.jpg', '/assets/vendor/boilerplate') }}" class="direct-chat-img" alt="{{ Auth::user()->name }}" width="30" height="30">
                     <!-- /.direct-chat-img -->
                     <div class="direct-chat-text">
                         {{ $approve->komentar }}
@@ -34,8 +35,8 @@
                 <x-boilerplate::input name="komentar" autofocus/>
                 
             </div>
-            <div>   
-                <input formtarget="_blank" class="btn btn-secondary" name="submitbutton" type="submit" value="Preview Surat" >
+            <div>
+                <a target="_blank" href="/surat-keluar-approve-preview/{{ $surat->ida }}" ><button class="btn btn-secondary" form="a">Preview Surat</button></a>
                 &nbsp;
                 <input class="btn btn-warning" name="submitbutton" type="submit" value="Revisi" @if ($surat->approve_status==2 || $surat->approve_status==3 || $surat->approve_status==4)
                 style='display:none;'

@@ -1,9 +1,14 @@
 @extends('boilerplate::layout.index', [
     'title' => __('Review Pengajuan'),
     'subtitle' => 'Daftar Pengajuan',
-    'breadcrumb' => ['Daftar Pengajuan']]
+    'breadcrumb' => ['Review Pengajuan']]
 )
 
 @section('content')
-    @include('boilerplate::plugins.demo')
+    <x-boilerplate::card>
+        <x-slot name="header">
+            Daftar Pengajuan
+        </x-slot>
+            <x-boilerplate::datatable name="reviewpengajuan" />
+    </x-boilerplate::card>
 @endsection

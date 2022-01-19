@@ -310,7 +310,7 @@ class SuratkeluarController extends Controller
                 $details = [
                     'title' => '',
                     'body' => 'Surat Keluar '.$request->perihal,
-                    'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-review/'.$ssr,
+                    'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-approve/'.$ssr,
                 ];
             
             \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
@@ -330,43 +330,6 @@ class SuratkeluarController extends Controller
             return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Surat berhasil disimpan'), 'success']);
             break;
-        // case 'Preview Surat':
-        //     # code...
-        //      //read template surat
-        //     $template = new TemplateProcessor('template/'.$request->jenis_surat.'.docx');
-
-        //     //set values template surat
-        //     $template->setValues([
-        //         // 'no_surat' => $nosurat,
-        //         'tgl_surat' => $tgl_surat_t,
-        //         'item1' => $request->item1,
-        //         'item2' => $request->item2,
-        //         'item3' => $request->item3,
-        //         'item4' => $request->item4,
-        //         'item5' => $request->item5,
-        //         'item6' => $request->item6,
-        //         'item7' => $request->item7,
-        //         'item8' => $request->item8,
-        //         'item9' => $request->item9,
-        //         'item10' => $request->item10,
-        //         'item11' => $request->item11,
-        //         'item12' => $request->item12,
-        //         'item13' => $request->item13,
-        //         'item14' => $request->item14,
-        //         'item15' => $request->item15,
-        //         'item16' => $request->item16,
-        //         'item17' => $request->item17,
-        //         'item18' => $request->item18,
-        //         'item19' => $request->item19,
-        //         'item20' => $request->item20,
-        //     ]);
-        //     header("Content-Disposition: attachment; filename=suratkuasa.docx");
-
-        //     // $template->saveAs('output/suratkuasa.docx');
-        //     $template->saveAs('php://output');
-        //     // $PDFWriter = \PhpOffice\PhpWord\IOFactory::createWriter($Content,'PDF');
-        //     // $PDFWriter->save(public_path('new-result.pdf'));
-        //     break;
         }
     }
 
@@ -403,7 +366,7 @@ class SuratkeluarController extends Controller
             'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
             'jenis_surat' => jenis_surat::all(),
             'departemens' => departemen::all(),
-            'approve' => Approvesuratkeluar::where('surat_keluar_id', $id)->get(),
+            'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->select('approvesuratkeluars.*', 'first_name')->where('surat_keluar_id', $id)->get(),
         ]
         );
     }

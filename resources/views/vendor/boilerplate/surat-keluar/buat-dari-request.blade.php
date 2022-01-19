@@ -8,6 +8,7 @@
 
 @section('content')
     <x-boilerplate::form name="form" :route="['boilerplate.surat-keluar-buata', $reqsurat->ida]" method="put" files>
+        @csrf
         <x-boilerplate::card>
             <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat" id='jenis_surat'>
                 @foreach ($jenis_surat as $position)
@@ -47,7 +48,7 @@
             <label for="">Lampiran</label>
             <div class="row">
                 <div class="col">
-                    <x-boilerplate::icheck label="Gunakan Lampiran Permintaan" type="radio" name="lampiran_radio"  value="1" checked />
+                    <x-boilerplate::icheck label="Gunakan Lampiran Permintaan" type="radio" name="lampiran_radio"  value="1" />
                 </div>
                 <div class="col">
                     <x-boilerplate::icheck label="Unggah Lampiran Baru" type="radio" name="lampiran_radio"  value="2" />

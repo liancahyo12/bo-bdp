@@ -19,13 +19,39 @@ class pengajuan extends Model
         return $this->hasMany(approvepengajuan::class);
     }
 
+    public function isi_pengajuan()
+    {
+        return $this->hasMany(Isi_pengajuan::class);
+    }
     protected $fillable = [
-        'jenis_pengajuan',
-        'judul',
-        'deskripsi',
-        'nominal',
+        'user_id',
+        'jenis_pengajuan_id',
+        'departemen_id',
+        'pengajuan',
+        'tgl_pengajuan',
+        'no_invoice',
+        'perusahaan',
+        'alamat',
+        'phone',
+        'kontak',
+        'email',
+        'bank',
+        'nama_rek',
+        'no_rek',
+        'catatan',
+        'total_nominal',
+        'jumlah_pc',
         'lampiran',
-        'check_status',
-        'approve_status'
+        'send_status',
+        'send_time',
+        'reviewer_id',
+        'review_status',
+        'review_time',
+        'reviewerdep_id',
+        'reviewdep_status',
+        'reviewdep_time',
+        'approver_id',
+        'approve_status',
+        'approve_time',
     ];
 }

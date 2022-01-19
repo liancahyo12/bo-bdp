@@ -16,6 +16,9 @@ class approvepengajuan extends Model
 
     protected $fillable = [
         'komentar',
-        'approve_status'
+        'approve_status',
+        'pengajuan_id',
+        'user_id',
+        'approver_id',
     ];
 }

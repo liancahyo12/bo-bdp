@@ -14,11 +14,11 @@
             @foreach ( $approve as $approve)
                 <div class="direct-chat-msg">
                     <div class="direct-chat-infos clearfix">
-                        <span class="direct-chat-name float-left">{{ Auth::user()->first_name }}</span>
+                        <span class="direct-chat-name float-left">{{ $approve->first_name }}</span>
                         <span class="direct-chat-timestamp float-right">{{ $approve->created_at }}</span>
                     </div>
                     <!-- /.direct-chat-infos -->
-                    <img src="{{ Auth::user()->avatar_url }}" class="direct-chat-img" alt="{{ Auth::user()->name }}" width="30" height="30">
+                    <img src="{{ mix('/images/user128.jpg', '/assets/vendor/boilerplate') }}" class="direct-chat-img" alt="{{ $approve->first_name }}" width="30" height="30">
                     <!-- /.direct-chat-img -->
                     <div class="direct-chat-text">
                         {{ $approve->komentar }}
@@ -28,6 +28,7 @@
             @endforeach            
         </x-boilerplate::card>
     <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files onsubmit="return confirm('Are you sure?')">
+        @csrf
         <x-boilerplate::card>
             <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat" id='jenis_surat'>
                 @foreach ($jenis_surat as $position)
@@ -166,7 +167,7 @@
                    
 
         </x-boilerplate::card>
-        <div class="row" @if ($surat->send_status==0 || $surat->approve_status==3)\
+        <div class="row" @if ($surat->send_status==0 || $surat->approve_status==3)
         @else
             style='display:none;'
         @endif>
