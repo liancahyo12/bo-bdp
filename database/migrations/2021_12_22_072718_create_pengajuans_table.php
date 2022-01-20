@@ -19,6 +19,8 @@ class CreatePengajuansTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('jenis_pengajuan_id');
             $table->string('departemen_id');
+            $table->string('no_urut')->nullable();
+            $table->string('no_pengajuan')->nullable();
             $table->string('pengajuan')->nullable();
             $table->date('tgl_pengajuan')->nullable();
             $table->string('no_invoice')->nullable();

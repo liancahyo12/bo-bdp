@@ -94,26 +94,30 @@ Route::group([
         });
          // Pengajuan
         Route::get('/saya-pengajuan', [PengajuanController::class, 'index'])
-            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('saya-pengajuan');
         Route::get('/buat-pengajuan', [PengajuanController::class, 'create'])
-            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('buat-pengajuan');
         Route::post('/buat-pengajuan', [PengajuanController::class, 'store'])
-            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('buat-pengajuan');
         Route::get('/edit-pengajuan/{id}', [PengajuanController::class, 'edit'])
-            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('edit-pengajuan');
         Route::get('/edit-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
-            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('edit-pengajuan-lampiran');
         Route::put('/edit-pengajuan/{id}', [PengajuanController::class, 'update'])
-            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('update-pengajuan');
         Route::delete('/edit-pengajuan-hapus/{id}', [PengajuanController::class, 'destroy'])
-            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('edit-pengajuan-hapus');
+
+        Route::get('/buat-closing-pengajuan', [PengajuanController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('buat-closing-pengajuan');
 
         Route::get('/reviewdep-pengajuan', [ReviewdeppengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
@@ -125,7 +129,7 @@ Route::group([
             ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
             ->name('update-reviewdep-pengajuan');
         Route::get('/detail-reviewdep-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
-            ->middleware(['boilerplateauth', 'ability:admin,pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
             ->name('detail-reviewdep-pengajuan-lampiran');
 
         Route::get('/review-pengajuan', [ReviewpengajuanController::class, 'index'])

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\pengajuan;
 use App\Models\Isi_pengajuan;
 use App\Models\cekpengajuan;
+use App\Models\cekdeppengajuan;
+use App\Models\approvepengajuan;
 use App\Http\Requests\StorepengajuanRequest;
 use App\Http\Requests\UpdatepengajuanRequest;
 use Illuminate\Contracts\Foundation\Application;
@@ -37,8 +39,11 @@ class ReviewpengajuanController extends Controller
             if( $pengajuan->review_status == 0 || $pengajuan->review_status == 5){
                 DB::update('update pengajuans set review_status = 1 where id = ?', [$id]);
             }
+            $reviewdeppengajuan = cekdeppengajuan::leftJoin('users', 'users.id', 'cekdeppengajuans.reviewerdep_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('cekdeppengajuans.created_at as waktu_komentar', 'reviewdep_status as statuss', 'komentar', 'first_name', 'kode')->where([['pengajuan_id', '=', $id], ['cekdeppengajuans.status', '=', 1]]);
+            $reviewpengajuan = cekpengajuan::leftJoin('users', 'users.id', 'cekpengajuans.reviewer_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('cekpengajuans.created_at as waktu_komentar', 'review_status as statuss', 'komentar', 'first_name', 'kode')->where([['pengajuan_id', '=', $id], ['cekpengajuans.status', '=', 1]]);
+            $approvepengajuan = approvepengajuan::leftJoin('users', 'users.id', 'approvepengajuans.approver_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('approvepengajuans.created_at as waktu_komentar',  'approve_status as statuss','komentar', 'first_name', 'kode')->where([['pengajuan_id', '=', $id], ['approvepengajuans.status', '=', 1]])->union($reviewdeppengajuan)->union($reviewpengajuan)->get();
             return view('boilerplate::pengajuan.detail-review', compact('pengajuan'), [
-                'reviewpengajuan' => cekpengajuan::leftJoin('users', 'users.id', 'cekpengajuans.reviewer_id')->select('cekpengajuans.*', 'users.first_name')->where([['pengajuan_id', '=', $id], ['cekpengajuans.status', '=', 1]])->get(),
+                'komentar' => $approvepengajuan,
                 'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $id], ['status', '=', 1]])->get(),
             ]); 
         }  
@@ -81,6 +86,17 @@ class ReviewpengajuanController extends Controller
                 'body' => 'Pengajuan '.$request->perihal,
                 'body2' => 'Pengajuan sudah direview untuk melihat detail silahkan klik link ini '.$link,
             ];
+            
+            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+
+            $link2 = route('boilerplate.detail-reviewdep-pengajuan', $id);
+
+            $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=7 limit 1');
+                $details = [
+                    'title' => '',
+                    'body' => 'Pengajuan '.$request->pengajuan,
+                    'body2' => 'Untuk approve pengajuan silahkan klik link ini '.$link2,
+                ];
             
             \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
 
@@ -142,7 +158,7 @@ class ReviewpengajuanController extends Controller
             
             \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
 
-            return redirect()->route('boilerplate.review-pengajuan.index')
+            return redirect()->route('boilerplate.review-pengajuan')
                             ->with('growl', [__('pengajuan berhasil ditolak'), 'success']);
             }
             break;

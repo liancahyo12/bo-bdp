@@ -27,7 +27,7 @@
                 </div>
             @endforeach            
         </x-boilerplate::card>
-    <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files onsubmit="return confirm('Are you sure?')">
+    <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files>
         @csrf
         <x-boilerplate::card>
             <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat" id='jenis_surat'>

@@ -7,14 +7,10 @@
 ])
 
 @section('content')
+
     <x-boilerplate::form :route="['boilerplate.buat-pengajuan']" method="post" files>
     @csrf
         <x-boilerplate::card>
-            <x-boilerplate::select2 name="departemen" label="Pilih Departemen">
-                @foreach ($departemens as $position)
-                    <option value="{{ $position->id }}">{{ $position->departemen }}</option>
-                @endforeach
-            </x-boilerplate::select2>
             <x-boilerplate::datetimepicker name="tgl_pengajuan" label='Tanggal Pengajuan'/>
             <x-boilerplate::select2 name="jenis_pengajuan" label="Pilih Jenis Pengajuan" id='jenis_pengajuan'>
                 @foreach ($jenis_pengajuan as $position)
@@ -27,10 +23,12 @@
         </x-boilerplate::card>
         <div class="row">
             &nbsp; &nbsp;
-            {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}
+            {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton', 'id' => 'submitbutton',)) }}
             &nbsp;
-            {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
+            {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton', 'id' => 'submitbutton')) }}
         </div>
     </x-boilerplate::form>
     <script src="{{ mix('/form-pengajuan.js', '/assets/vendor/boilerplate') }}"></script>
+    
+    
 @endsection

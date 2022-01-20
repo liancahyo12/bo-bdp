@@ -359,5 +359,16 @@
     </script>
     @endcomponent
 @stack('js')
+<script src="{{ mix('/loading.js', '/assets/vendor/boilerplate') }}"></script>
+    <div id="waitttAmazingLover" style="display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.75) url({{ mix('/images/Pulse-1s-200px.gif', '/assets/vendor/boilerplate') }}) no-repeat center center;
+    z-index: 10000;">
+    </div>
 </body>
 </html>

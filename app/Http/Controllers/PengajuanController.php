@@ -22,6 +22,7 @@ use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Database\Eloquent\Collection;
 use Validator;
 use Auth;
 use DB;
@@ -46,9 +47,14 @@ class PengajuanController extends Controller
      */
     public function create()
     {
+        $jenis_pengajuan = [];
+        if (Auth::user()->departemen_id==3 || Auth::user()->departemen_id==8) {
+            $jenis_pengajuan = jenis_pengajuan::all();
+        }else {
+            $jenis_pengajuan = jenis_pengajuan::whereRaw('id<=3')->get();
+        }
         return view('boilerplate::pengajuan.buat', [
-            'jenis_pengajuan' => jenis_pengajuan::all(),
-            'departemens' => departemen::all(),
+            'jenis_pengajuan' => $jenis_pengajuan,
         ]);
     }
 
@@ -65,15 +71,22 @@ class PengajuanController extends Controller
         $total = 0;
         $this->validate($request, [
                 'jenis_pengajuan' => 'required',
-                'departemen'  => 'required',
                 'tgl_pengajuan'  => 'required',
                 'pengajuan' => 'required',
-                'catatan' => 'required',
                 'file_lampiran' => 'mimes:pdf|max:20480',
         ]);
+        if (Auth::user()->departemen_id==3 || Auth::user()->departemen_id==8) {
+
+        }else {
+            if ($request->jenis_pengajuan>3) {
+                return redirect()->route('boilerplate.saya-pengajuan')
+                    ->with('growl', [__('Jenis pengajuan tidak diijinkan'), 'danger']);
+            }
+        }
+        
         $input['user_id'] = Auth::user()->id;
         $input['jenis_pengajuan_id'] = $request->jenis_pengajuan;
-        $input['departemen_id'] = $request->departemen;
+        $input['departemen_id'] = Auth::user()->departemen_id;
         $input['pengajuan'] = $request->pengajuan;
         $input['catatan'] = $request->catatan;
         $input['tgl_pengajuan'] = $request->tgl_pengajuan;
@@ -275,22 +288,39 @@ class PengajuanController extends Controller
      */
     public function edit($id)
     {
-        $pengajuan = pengajuan::leftJoin('isi_pengajuans', 'pengajuan_id', 'pengajuans.id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'pengajuans.jenis_pengajuan_id')->select('pengajuans.id as ida', 'pengajuans.user_id as suser_id', 'pengajuans.status as sstatus', 'isi_pengajuans.*', 'pengajuans.*', 'jenis_pengajuans.*')->where('pengajuans.id', $id)->first();
+        $pengajuan = pengajuan::leftJoin('isi_pengajuans', 'pengajuan_id', 'pengajuans.id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'pengajuans.jenis_pengajuan_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('pengajuans.id as ida', 'pengajuans.user_id as suser_id', 'pengajuans.status as sstatus', 'isi_pengajuans.*', 'pengajuans.*', 'jenis_pengajuans.*', 'departemen')->where('pengajuans.id', $id)->first();
         if ($pengajuan->suser_id != Auth::user()->id || $pengajuan->sstatus==0) {
             return redirect()->route('boilerplate.saya-pengajuan')
                             ->with('growl', [__('Pengajuan tidak ada'), 'danger']);
         }
-        return view('boilerplate::pengajuan.edit', compact('pengajuan'), 
-        // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
-        [
-            'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $id], ['status', '=', 1]])->get(),
-            'jenis_pengajuan' => jenis_pengajuan::all(),
-            'departemens' => departemen::all(),
-            'reviewdeppengajuan' => cekdeppengajuan::leftJoin('users', 'users.id', 'cekdeppengajuans.reviewerdep_id')->select('cekdeppengajuans.*', 'first_name')->where([['pengajuan_id', '=', $id], ['cekdeppengajuans.status', '=', 1]])->get(),
-            'reviewpengajuan' => cekpengajuan::leftJoin('users', 'users.id', 'cekpengajuans.reviewer_id')->select('cekpengajuans.*', 'first_name')->where([['pengajuan_id', '=', $id], ['cekpengajuans.status', '=', 1]])->get(),
-            'approvepengajuan' => approvepengajuan::leftJoin('users', 'users.id', 'approvepengajuans.approver_id')->select('approvepengajuans.*', 'first_name')->where([['pengajuan_id', '=', $id], ['approvepengajuans.status', '=', 1]])->get(),
-        ]
-        );
+        $reviewdeppengajuan = cekdeppengajuan::leftJoin('users', 'users.id', 'cekdeppengajuans.reviewerdep_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('cekdeppengajuans.created_at as waktu_komentar', 'reviewdep_status as statuss', 'komentar', 'first_name', 'kode')->where([['pengajuan_id', '=', $id], ['cekdeppengajuans.status', '=', 1]]);
+        $reviewpengajuan = cekpengajuan::leftJoin('users', 'users.id', 'cekpengajuans.reviewer_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('cekpengajuans.created_at as waktu_komentar', 'review_status as statuss', 'komentar', 'first_name', 'kode')->where([['pengajuan_id', '=', $id], ['cekpengajuans.status', '=', 1]]);
+        $approvepengajuan = approvepengajuan::leftJoin('users', 'users.id', 'approvepengajuans.approver_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('approvepengajuans.created_at as waktu_komentar',  'approve_status as statuss','komentar', 'first_name', 'kode')->where([['pengajuan_id', '=', $id], ['approvepengajuans.status', '=', 1]])->union($reviewdeppengajuan)->union($reviewpengajuan)->get();
+        
+        if ($pengajuan->send_status==0 || $pengajuan->approve_status==3 || $pengajuan->reviewdep_status==3 || $pengajuan->review_status==3) {
+            return view('boilerplate::pengajuan.edit', compact('pengajuan'), 
+            // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
+            [
+                'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $id], ['status', '=', 1]])->get(),
+                'jenis_pengajuan' => jenis_pengajuan::all(),
+                'departemens' => departemen::all(),
+                'komentar' => $approvepengajuan,
+                
+            ]
+            );
+        }else {
+            return view('boilerplate::pengajuan.detail', compact('pengajuan'), 
+            // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
+            [
+                'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $id], ['status', '=', 1]])->get(),
+                'jenis_pengajuan' => jenis_pengajuan::all(),
+                'departemens' => departemen::all(),
+                'komentar' => $approvepengajuan,
+                
+            ]
+            );
+        }
+        
     }
 
     /**
@@ -307,13 +337,11 @@ class PengajuanController extends Controller
             $inpengajuan = [];
             $total = 0;
             $this->validate($request, [
-                    'departemen'  => 'required',
                     'tgl_pengajuan'  => 'required',
                     'pengajuan' => 'required',
                     'catatan' => 'required',
                     'file_lampiran' => 'mimes:pdf|max:20480',
             ]);
-            $input['departemen_id'] = $request->departemen;
             $input['pengajuan'] = $request->pengajuan;
             $input['catatan'] = $request->catatan;
             $input['tgl_pengajuan'] = $request->tgl_pengajuan;
@@ -477,7 +505,7 @@ class PengajuanController extends Controller
                 $pengajuann = $input->save();
                 $link = route('boilerplate.detail-reviewdep-pengajuan', $id);
 
-                    $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=5 limit 1');
+                $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=5 limit 1');
                     $details = [
                         'title' => '',
                         'body' => 'Pengajuan '.$request->pengajuan,

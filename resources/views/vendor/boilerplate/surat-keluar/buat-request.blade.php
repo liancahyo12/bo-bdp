@@ -7,7 +7,7 @@
 ])
 
 @section('content')
-    <x-boilerplate::form :route="['boilerplate.surat-keluar-request-buat']" method="post" files onsubmit="return confirm('Are you sure?')">
+    <x-boilerplate::form :route="['boilerplate.surat-keluar-request-buat']" method="post" files>
         @csrf
         <x-boilerplate::card>
             <x-boilerplate::select2 name="jenis_surata" label="Pilih Jenis Surat">
@@ -23,12 +23,6 @@
             <x-boilerplate::input name="perihal" label="Perihal" />
             <x-boilerplate::input name="keterangan" label="Keterangan" />
             <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran" />
-            {{-- @include('boilerplate::load.fileinput')
-            @push('js')
-                <script>
-                    $('#files').fileinput()
-                </script>
-            @endpush --}}                 
 
         </x-boilerplate::card>
         <div class="row">

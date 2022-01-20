@@ -15,13 +15,13 @@ class Pengajuan
         $item->add('Buat Pengajuan', [
             'route' => 'boilerplate.buat-pengajuan',
             'active' => 'boilerplate.buat-pengajuan',
-            'permission' => 'pengajuan',
+            'permission' => 'buat_pengajuan',
             'order' => 100,
         ]);
         $item->add('Pengajuan Saya', [
             'route' => 'boilerplate.saya-pengajuan',
             'active' => 'boilerplate.saya-pengajuan,boilerplate.edit-pengajuan',
-            'permission' => 'pengajuan',
+            'permission' => 'buat_pengajuan',
             'order' => 101,
         ]);
         $item->add('Approvement', [

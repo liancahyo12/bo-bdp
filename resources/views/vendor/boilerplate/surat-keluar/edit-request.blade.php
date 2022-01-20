@@ -7,7 +7,7 @@
 ])
 
 @section('content')
-    <x-boilerplate::form :route="['boilerplate.surat-keluar-request-saya', $reqsurat->ida]" method="put" files onsubmit="return confirm('Are you sure?')">
+    <x-boilerplate::form :route="['boilerplate.surat-keluar-request-saya', $reqsurat->ida]" method="put" files>
         @csrf
         <x-boilerplate::card>
             <x-slot name="header">

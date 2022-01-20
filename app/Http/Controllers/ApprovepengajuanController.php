@@ -48,7 +48,7 @@ class ApprovepengajuanController extends Controller
                 DB::update('update pengajuans set approve_status = 1 where id = ?', [$id]);
             }
             return view('boilerplate::pengajuan.detail-approve', compact('pengajuan'), [
-                'approvepengajuan' => approvepengajuan::leftJoin('users', 'users.id', 'approvepengajuans.approver_id')->select('approvepengajuans.*', 'users.first_name')->where([['pengajuan_id', '=', $id], ['approvepengajuans.status', '=', 1]])->get(),
+                'approvepengajuan' => approvepengajuan::leftJoin('users', 'users.id', 'approvepengajuans.approver_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('approvepengajuans.*', 'users.first_name', 'approve_status as statuss', 'approvepengajuans.created_at as waktu_komentar', 'kode')->where([['pengajuan_id', '=', $id], ['approvepengajuans.status', '=', 1]])->get(),
                 'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $id], ['status', '=', 1]])->get(),
             ]); 
         }  
