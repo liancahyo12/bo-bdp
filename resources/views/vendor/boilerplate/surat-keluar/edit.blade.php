@@ -18,7 +18,7 @@
                         <span class="direct-chat-timestamp float-right">{{ $approve->created_at }}</span>
                     </div>
                     <!-- /.direct-chat-infos -->
-                    <img src="{{ mix('/images/user128.jpg', '/assets/vendor/boilerplate') }}" class="direct-chat-img" alt="{{ $approve->first_name }}" width="30" height="30">
+                    <img src="{{ App\Models\Boilerplate\User::where('id', $approve->uid)->first()->avatar_url }}" class="direct-chat-img" alt="{{ $approve->first_name }}" width="30" height="30">
                     <!-- /.direct-chat-img -->
                     <div class="direct-chat-text">
                         {{ $approve->komentar }}
@@ -30,22 +30,22 @@
     <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files>
         @csrf
         <x-boilerplate::card>
-            <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat" id='jenis_surat'>
+            <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat*" id='jenis_surat'>
                 @foreach ($jenis_surat as $position)
                     <option value="{{ $position->id }}" @if ( $surat->jenis_surat_id==$position->id)
                         selected
                     @endif>{{ $position->jenis_surat }}</option>
                 @endforeach
             </x-boilerplate::select2>
-            <x-boilerplate::select2 name="departemen" label="Pilih Departemen">
+            <x-boilerplate::select2 name="departemen" label="Pilih Departemen*">
                 @foreach ($departemens as $position)
                     <option value="{{ $position->id }}" @if ( $surat->departemen_id==$position->id)
                         selected
                     @endif>{{ $position->departemen }}</option>
                 @endforeach
             </x-boilerplate::select2>
-            <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat'/>
-            <x-boilerplate::input name="perihal" label="Perihal" value="{{ $surat->perihal }}" />
+            <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat*'/>
+            <x-boilerplate::input name="perihal" label="Perihal*" value="{{ $surat->perihal }}" />
             <div class="form-group" @if ($surat->approve_status!=2)
                 
                 @else
@@ -62,7 +62,7 @@
                 @else
                     style='display:none;'
                 @endif>
-                <label for="file_surat">Unggah Surat Keluar</label> <br>
+                <label for="file_surat">Unggah Surat Keluar* (Word DOCX Maks 20MB)</label> <br>
             <input type="file" name="file_surat"> <br>
             <h3> </h3>
             </div>
@@ -125,7 +125,7 @@
                             @else
                             disabled
                             @endif>
-                            <label for="icheck_61dbe7e7b353e" class="font-weight-normal">Unggah Lampiran Baru</label>
+                            <label for="icheck_61dbe7e7b353e" class="font-weight-normal">Unggah Lampiran Baru (PDF Maks 20MB)</label>
                         </div>
                     </div>
                 </div>

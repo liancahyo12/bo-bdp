@@ -10,24 +10,24 @@
     <x-boilerplate::form :route="['boilerplate.surat-keluar-buat']" method="post" files>
         @csrf
         <x-boilerplate::card>
-            <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat" id='jenis_surat'>
+            <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat*" id='jenis_surat'>
                 @foreach ($jenis_surat as $position)
                     <option value="{{ $position->id }}">{{ $position->jenis_surat }}</option>
                 @endforeach
             </x-boilerplate::select2>
-            <x-boilerplate::select2 name="departemen" label="Pilih Departemen">
+            <x-boilerplate::select2 name="departemen" label="Pilih Departemen*">
                 @foreach ($departemens as $position)
                     <option value="{{ $position->id }}">{{ $position->departemen }}</option>
                 @endforeach
             </x-boilerplate::select2>
-            <x-boilerplate::datetimepicker name="tgl_surat" label='Tanggal Surat'/>
-            <x-boilerplate::input name="perihal" label="Perihal" />
+            <x-boilerplate::datetimepicker name="tgl_surat" label='Tanggal Surat*'/>
+            <x-boilerplate::input name="perihal" label="Perihal*" />
             <div class="form-group">
                 <div class="input-group" id="unduh-format">
                 </div>
             </div>
-            <x-boilerplate::input name="file_surat" type="file" label="Unggah Surat Keluar" />
-            <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran" />
+            <x-boilerplate::input name="file_surat" type="file" label="Unggah Surat Keluar* (Word DOCX Maks 20MB)" />
+            <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran (PDF Maks 20MB)" />
         </x-boilerplate::card>
         <div class="row">
             &nbsp; &nbsp;

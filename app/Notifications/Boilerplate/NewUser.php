@@ -32,9 +32,10 @@ class NewUser extends Notification
         $currentUser = \Auth::user();
 
         return (new MailMessage())
+            ->from('it@bdpay.co.id', '[BDPay E-Office] No-reply')
             ->markdown('boilerplate::notifications.email')
             ->greeting(__('boilerplate::notifications.greeting', ['firstname' => $notifiable->first_name]))
-            ->subject(__('boilerplate::notifications.newuser.subject', ['name' => config('app.name')]))
+            ->subject(__('boilerplate::notifications.newuser.subject', ['name' => 'BDPay E-Office']))
             ->line(__('boilerplate::notifications.newuser.intro', [
                 'name' => $currentUser->first_name.' '.$currentUser->last_name,
             ]))

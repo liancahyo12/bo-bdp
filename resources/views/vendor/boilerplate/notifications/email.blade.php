@@ -45,7 +45,7 @@
 @if (! empty($salutation))
 {!! $salutation !!}
 @else
-{!! __('boilerplate::notifications.salutation', ['name' => config('app.name') ]) !!}
+{!! __('boilerplate::notifications.salutation', ['name' => 'BDPay' ]) !!}
 @endif
 
 <!-- Subcopy -->

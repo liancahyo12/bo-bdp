@@ -11,15 +11,15 @@
     <x-boilerplate::form :route="['boilerplate.buat-pengajuan']" method="post" files>
     @csrf
         <x-boilerplate::card>
-            <x-boilerplate::datetimepicker name="tgl_pengajuan" label='Tanggal Pengajuan'/>
-            <x-boilerplate::select2 name="jenis_pengajuan" label="Pilih Jenis Pengajuan" id='jenis_pengajuan'>
+            <x-boilerplate::datetimepicker name="tgl_pengajuan" label='Tanggal Pengajuan*'/>
+            <x-boilerplate::select2 name="jenis_pengajuan" label="Pilih Jenis Pengajuan*" id='jenis_pengajuan'>
                 @foreach ($jenis_pengajuan as $position)
                     <option value="{{ $position->id }}">{{ $position->jenis_pengajuan }}</option>
                 @endforeach
             </x-boilerplate::select2>
             <div id="form-pengajuan">
             </div>
-            <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran" />
+            <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran (PDF Maks 20MB)" />
         </x-boilerplate::card>
         <div class="row">
             &nbsp; &nbsp;

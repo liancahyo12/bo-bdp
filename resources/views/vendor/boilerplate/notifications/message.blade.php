@@ -2,7 +2,7 @@
     {{-- Header --}}
     @slot('header')
         @component('mail::header', ['url' => config('app.url')])
-            {{ config('app.name') }}
+            BDPay E-Office
         @endcomponent
     @endslot
 
@@ -21,7 +21,7 @@
     {{-- Footer --}}
     @slot('footer')
         @component('mail::footer')
-            {!! __('boilerplate::notifications.copyright', ['date' => date('Y'), 'name' => config('app.name')]) !!}
+            {!! __('boilerplate::notifications.copyright', ['date' => date('Y'), 'name' => 'BDPay']) !!}
         @endcomponent
     @endslot
 @endcomponent

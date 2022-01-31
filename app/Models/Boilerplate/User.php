@@ -11,8 +11,10 @@ use App\Events\Boilerplate\UserCreated;
 use App\Events\Boilerplate\UserDeleted;
 use App\Notifications\Boilerplate\NewUser;
 use App\Notifications\Boilerplate\ResetPassword;
+use App\Notifications\Boilerplate\RdepPengajuan;
 use Thomaswelton\LaravelGravatar\Facades\Gravatar;
 use App\Models\Suratkeluar;
+use App\Models\rek_user;
 
 class User extends Authenticatable
 {
@@ -41,6 +43,11 @@ class User extends Authenticatable
         return $this->hasMany(Suratkeluar::class);
     }
 
+    public function rek_user()
+    {
+        return $this->hasMany(rek_user::class);
+    }
+
     protected $dispatchesEvents = [
         'forceDeleted' => UserDeleted::class,
         'created'      => UserCreated::class,
@@ -66,7 +73,11 @@ class User extends Authenticatable
     {
         $this->notify(new NewUser($token, $this));
     }
-
+    
+    public function sendRdepPengajuanNotification($token)
+    {
+        $this->notify(new RdepPengajuan($token, $this));
+    }
     /**
      * Return last name in uppercase by default.
      *

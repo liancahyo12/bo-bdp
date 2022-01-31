@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Notifications\Boilerplate\ApprovedSuratkeluar;
+use App\Notifications\Boilerplate\RevisiSuratkeluar;
+use App\Notifications\Boilerplate\TolakSuratkeluar;
 use App\Models\jenis_surat;
 use App\Models\Isi_surat;
 use Illuminate\Support\Facades\Input;
@@ -20,6 +23,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\departemen;
 use App\Models\Suratkeluar;
 use App\Models\Request_surat_keluar;
+use App\Models\Boilerplate\User;
 use Carbon\Carbon;
 use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
@@ -97,7 +101,7 @@ class ApprovesuratkeluarController extends Controller
             $surat = Suratkeluar::leftJoin('jenis_surats', 'jenis_surat_id', 'jenis_surats.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->leftJoin('isi_surats', 'isi_surats.surat_keluar_id', 'suratkeluars.id')->select('suratkeluars.id as ida', 'suratkeluars.*', 'jenis_surats.*', 'isi_surats.*', 'departemens.*')->where('suratkeluars.id', $id)->first();
 
             return view('boilerplate::surat-keluar.approvedetail', compact('surat'), [
-                'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->select('approvesuratkeluars.*', 'first_name')->where('surat_keluar_id', $id)->get(),
+                'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->select('approvesuratkeluars.*', 'last_name', 'first_name', 'users.id as uid')->where('surat_keluar_id', $id)->get(),
             ]); 
         }  
         return redirect()->route('boilerplate.surat-keluar-approve.index')
@@ -228,24 +232,26 @@ class ApprovesuratkeluarController extends Controller
             }
             $suratkeluar = $surat->save();
             $approvesurata = Approvesuratkeluar::create($approvesurat);
-
-            $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
-            $details = [
-                'title' => '',
-                'body' => 'Surat Keluar '.$request->perihal,
-                'body2' => 'Surat keluar sudah diapprove untuk melihat detail silahkan klik link ini http://localhost:8000/surat-keluar-detail/'.$id,
-            ];
+            $link = route('boilerplate.surat-keluar-saya.edit', $id);
+            // $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
+            // $details = [
+            //     'title' => '',
+            //     'body' => 'Surat Keluar '.$request->perihal,
+            //     'body2' => 'Surat keluar sudah diapprove untuk melihat detail silahkan klik link ini '.$link,
+            // ];
             
-            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
 
-            $mailto = Request_surat_keluar::leftJoin('users', 'users.id', 'request_surat_keluars.user_id')->where('request_surat_keluars.id', $surat->request_surat_keluar_id)->value('email');
-            $details = [
-                'title' => '',
-                'body' => 'Surat Keluar '.$request->perihal,
-                'body2' => 'Permintaan surat keluar sudah selesai untuk melihat detail silahkan klik link ini http://localhost:8000/surat-keluar-request-saya/'.$surat->request_surat_keluar_id.'/edit',
-            ];
+            // $mailto = Request_surat_keluar::leftJoin('users', 'users.id', 'request_surat_keluars.user_id')->where('request_surat_keluars.id', $surat->request_surat_keluar_id)->value('email');
+            // $details = [
+            //     'title' => '',
+            //     'body' => 'Surat Keluar '.$request->perihal,
+            //     'body2' => 'Permintaan surat keluar sudah selesai untuk melihat detail silahkan klik link ini http://localhost:8000/surat-keluar-request-saya/'.$surat->request_surat_keluar_id.'/edit',
+            // ];
             
-            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            $user=User::leftJoin('suratkeluars', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->first();
+            $user->notify(new ApprovedSuratkeluar($id));
 
             return redirect()->route('boilerplate.surat-keluar-approve.index')
                             ->with('growl', [__('Surat berhasil disetujui'), 'success']);
@@ -267,14 +273,17 @@ class ApprovesuratkeluarController extends Controller
             $suratkeluar = $surat->save();
             $approvesurata = Approvesuratkeluar::create($approvesurat);
 
-            $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
-            $details = [
-                'title' => '',
-                'body' => 'Surat Keluar '.$request->perihal,
-                'body2' => 'Untuk harus direvisi terlebih dahulu untuk revisi silahkan klik link ini http://localhost:8000/surat-keluar-saya/'.$id.'/edit',
-            ];
+            // $link = route('boilerplate.surat-keluar-saya.edit', $id);
+            // $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
+            // $details = [
+            //     'title' => '',
+            //     'body' => 'Surat Keluar '.$request->perihal,
+            //     'body2' => 'Untuk harus direvisi terlebih dahulu untuk revisi silahkan klik link ini '.$link,
+            // ];
             
-            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            $user=User::leftJoin('suratkeluars', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->first();
+            $user->notify(new RevisiSuratkeluar($id));
 
             return redirect()->route('boilerplate.surat-keluar-approve.index')
                             ->with('growl', [__('Surat berhasil revisi'), 'success']);
@@ -295,15 +304,17 @@ class ApprovesuratkeluarController extends Controller
 
             $suratkeluar = $surat->save();
             $approvesurata = Approvesuratkeluar::create($approvesurat);
-
-            $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
-            $details = [
-                'title' => '',
-                'body' => 'Surat Keluar '.$request->perihal,
-                'body2' => 'Untuk ditolak untuk melihat detail silahkan klik link ini http://localhost:8000/surat-keluar-detail/'.$id,
-            ];
+            // $link = route('boilerplate.surat-keluar-saya.edit', $id);
+            // $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
+            // $details = [
+            //     'title' => '',
+            //     'body' => 'Surat Keluar '.$request->perihal,
+            //     'body2' => 'Untuk ditolak untuk melihat detail silahkan klik link ini '.$link,
+            // ];
             
-            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            $user=User::leftJoin('suratkeluars', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->first();
+            $user->notify(new TolakSuratkeluar($id));
 
             return redirect()->route('boilerplate.surat-keluar-approve.index')
                             ->with('growl', [__('Surat berhasil revisi'), 'success']);
