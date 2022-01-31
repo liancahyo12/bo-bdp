@@ -16,7 +16,7 @@ class ApprovesuratkeluarDatatable extends Datatable
 
     public function datasource()
     {
-        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('send_status', '1')->orderByDesc('suratkeluars.send_time')->get(['suratkeluars.id',
+        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->leftJoin('users', 'users.id', 'suratkeluars.user_id')->where([['send_status', '=', '1'],['status', '=', '1']])->orderByDesc('suratkeluars.send_time')->get(['suratkeluars.id',
         'perihal',
         'users.first_name',
         'tgl_surat',
