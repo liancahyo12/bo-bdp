@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\pengajuan;
 use App\Models\departemen;
+use App\Models\Boilerplate\User;
 use App\Models\jenis_pengajuan;
 use App\Models\Isi_pengajuan;
 use App\Models\cekdeppengajuan;
@@ -23,12 +24,17 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Notifications\Notifiable;
+use Laratrust;
+use App\Notifications\Boilerplate\RdepPengajuan;
 use Validator;
+use Notification;
 use Auth;
 use DB;
 
 class PengajuanController extends Controller
 {
+    use Notifiable;
     /**
      * Display a listing of the resource.
      *
@@ -48,7 +54,7 @@ class PengajuanController extends Controller
     public function create()
     {
         $jenis_pengajuan = [];
-        if (Auth::user()->departemen_id==3 || Auth::user()->departemen_id==8) {
+        if (Laratrust::isAbleTo('pengajuan_fags')==true) {
             $jenis_pengajuan = jenis_pengajuan::all();
         }else {
             $jenis_pengajuan = jenis_pengajuan::whereRaw('id<=3')->get();
@@ -75,7 +81,7 @@ class PengajuanController extends Controller
                 'pengajuan' => 'required',
                 'file_lampiran' => 'mimes:pdf|max:20480',
         ]);
-        if (Auth::user()->departemen_id==3 || Auth::user()->departemen_id==8) {
+        if (Laratrust::isAbleTo('pengajuan_fags')==true) {
 
         }else {
             if ($request->jenis_pengajuan>3) {
@@ -209,6 +215,8 @@ class PengajuanController extends Controller
                 'notelepon' => 'required',
                 'kontak' => 'required',
                 'email' => 'required',
+                'ppn' => 'required',
+                'dpp' => 'required',
             ]);
             foreach($request->input('pembelian') as $key => $value) {
                 $inpengajuan["pembelian.{$key}"] = 'required';
@@ -230,6 +238,8 @@ class PengajuanController extends Controller
                 $input['phone'] = $request->notelepon;
                 $input['kontak'] = $request->kontak;
                 $input['email'] = $request->email;
+                $input['ppn'] = $request->ppn;
+                $input['dpp'] = $request->dpp;
             }
         }
 
@@ -240,17 +250,19 @@ class PengajuanController extends Controller
             $input['send_time'] = Carbon::now()->toDateTimeString();
             $input['reviewdep_status'] = 0;
             $pengajuann = pengajuan::create($input);
-            $link = route('boilerplate.detail-reviewdep-pengajuan', $idf);
+            // $link = route('boilerplate.detail-reviewdep-pengajuan', $idf);
             // $isisuratkeluar = Isi_surat::create($isisurat);
 
-                $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=5 limit 1');
-                $details = [
-                    'title' => '',
-                    'body' => 'Pengajuan '.$request->pengajuan,
-                    'body2' => 'Untuk review pengajuan silahkan klik link ini '.$link,
-                ];
+            // $mailto = DB::select('select email from permission_role left join role_user  on permission_role.role_id=role_user.role_id left join users on role_user.user_id=users.id where permission_id=12');
+            //     $details = [
+            //         'title' => '',
+            //         'body' => 'Pengajuan '.$request->pengajuan,
+            //         'body2' => 'Untuk review pengajuan silahkan klik link ini '.$link,
+            //     ];
             
-            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->first();
+            $user->notify(new RdepPengajuan($idf));
 
             return redirect()->route('boilerplate.saya-pengajuan')
                             ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);
@@ -293,11 +305,11 @@ class PengajuanController extends Controller
             return redirect()->route('boilerplate.saya-pengajuan')
                             ->with('growl', [__('Pengajuan tidak ada'), 'danger']);
         }
-        $reviewdeppengajuan = cekdeppengajuan::leftJoin('users', 'users.id', 'cekdeppengajuans.reviewerdep_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('cekdeppengajuans.created_at as waktu_komentar', 'reviewdep_status as statuss', 'komentar', 'first_name', 'kode')->where([['pengajuan_id', '=', $id], ['cekdeppengajuans.status', '=', 1]]);
-        $reviewpengajuan = cekpengajuan::leftJoin('users', 'users.id', 'cekpengajuans.reviewer_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('cekpengajuans.created_at as waktu_komentar', 'review_status as statuss', 'komentar', 'first_name', 'kode')->where([['pengajuan_id', '=', $id], ['cekpengajuans.status', '=', 1]]);
-        $approvepengajuan = approvepengajuan::leftJoin('users', 'users.id', 'approvepengajuans.approver_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('approvepengajuans.created_at as waktu_komentar',  'approve_status as statuss','komentar', 'first_name', 'kode')->where([['pengajuan_id', '=', $id], ['approvepengajuans.status', '=', 1]])->union($reviewdeppengajuan)->union($reviewpengajuan)->get();
+        $reviewdeppengajuan = cekdeppengajuan::leftJoin('users', 'users.id', 'cekdeppengajuans.reviewerdep_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('cekdeppengajuans.created_at as waktu_komentar', 'reviewdep_status as statuss', 'komentar', 'first_name', 'last_name', 'kode', 'users.id as uid')->where([['pengajuan_id', '=', $id], ['cekdeppengajuans.status', '=', 1]]);
+        $reviewpengajuan = cekpengajuan::leftJoin('users', 'users.id', 'cekpengajuans.reviewer_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('cekpengajuans.created_at as waktu_komentar', 'review_status as statuss', 'komentar', 'first_name', 'last_name', 'kode', 'users.id as uid')->where([['pengajuan_id', '=', $id], ['cekpengajuans.status', '=', 1]]);
+        $approvepengajuan = approvepengajuan::leftJoin('users', 'users.id', 'approvepengajuans.approver_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('approvepengajuans.created_at as waktu_komentar',  'approve_status as statuss','komentar', 'first_name', 'last_name', 'kode', 'users.id as uid')->where([['pengajuan_id', '=', $id], ['approvepengajuans.status', '=', 1]])->union($reviewdeppengajuan)->union($reviewpengajuan)->get();
         
-        if ($pengajuan->send_status==0 || $pengajuan->approve_status==3 || $pengajuan->reviewdep_status==3 || $pengajuan->review_status==3) {
+        if ($pengajuan->revisi_status == 1 || $pengajuan->send_status == 0) {
             return view('boilerplate::pengajuan.edit', compact('pengajuan'), 
             // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
             [
@@ -333,7 +345,7 @@ class PengajuanController extends Controller
     public function update(Request $request, $id)
     {
         $input = pengajuan::where([['id', '=', $id], ['user_id', '=', Auth::user()->id]])->first();
-        if ($input->status==1 && ( $input->reviewdep_status==3 || $input->review_status==3 || $input->approve_status==3) ) {
+        if ($input->status==1 && ( $input->reviewdep_status==3 || $input->review_status==3 || $input->approve_status==3  || $input->send_status == 0) ) {
             $inpengajuan = [];
             $total = 0;
             $this->validate($request, [
@@ -346,11 +358,23 @@ class PengajuanController extends Controller
             $input['catatan'] = $request->catatan;
             $input['tgl_pengajuan'] = $request->tgl_pengajuan;
 
-            $filename = Str::substr($input->lampiran, 19);
-            $path ='';
-            if ($request->file_lampiran!=null) {
-                $path = $request->file('file_lampiran')->storeAs('lampiran-pengajuan', $filename);
+            if ($input->lampiran==null) {
+                $filename = $id.Str::random(16).'.pdf';
+                $path ='';
+                if ($request->file_lampiran!=null) {
+                    $path = $request->file('file_lampiran')->storeAs('lampiran-pengajuan', $filename);
+                    $input['lampiran'] = $path;
+                }
+            }else {
+                $filename = Str::substr($input->lampiran, 19);
+                $path ='';
+                if ($request->file_lampiran!=null) {
+                    $path = $request->file('file_lampiran')->storeAs('lampiran-pengajuan', $filename);
+                }
             }
+
+            
+            
 
             if ( $request->jenis_pengajuan <= 3) {
                 $this->validate($request, [
@@ -464,6 +488,8 @@ class PengajuanController extends Controller
                     'notelepon' => 'required',
                     'kontak' => 'required',
                     'email' => 'required',
+                    'ppn' => 'required',
+                    'dpp' => 'required',
                 ]);
                 foreach($request->input('pembelian') as $key => $value) {
                     $inpengajuan["pembelian.{$key}"] = 'required';
@@ -486,33 +512,40 @@ class PengajuanController extends Controller
                     $input['phone'] = $request->notelepon;
                     $input['kontak'] = $request->kontak;
                     $input['email'] = $request->email;
+                    $input['ppn'] = $request->ppn;
+                    $input['dpp'] = $request->dpp;
                 }
             }
 
             switch ($request->submitbutton) {
             case 'Kirim':
                 // send
-                if ($input->send_status == 1 && ( $input->reviewdep_status==3 || $input->review_status==3 || $input->approve_status==3)) {
+                if ($input->send_status == 1 && $input->revisi_status==1) {
                     $input['reviewdep_status'] = 5;
+                    $input['revisi_status'] = 2;
                 }elseif ($input->send_status == 0) {
                     $input['send_status'] = 1;
                 }else {
                     return redirect()->route('boilerplate.saya-pengajuan')
-                        ->with('growl', [__('Pengajuan berhasil tidak perlu update'), 'danger']);
+                        ->with('growl', [__('Pengajuan tidak perlu update'), 'danger']);
                 }
                 
                 $input['send_time'] = Carbon::now()->toDateTimeString();
                 $pengajuann = $input->save();
-                $link = route('boilerplate.detail-reviewdep-pengajuan', $id);
+                // $link = route('boilerplate.detail-reviewdep-pengajuan', $id);
 
-                $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=5 limit 1');
-                    $details = [
-                        'title' => '',
-                        'body' => 'Pengajuan '.$request->pengajuan,
-                        'body2' => 'Untuk review pengajuan silahkan klik link ini '.$link,
-                    ];
+                // $mailto = DB::select('select email from permission_role left join role_user  on permission_role.role_id=role_user.role_id left join users on role_user.user_id=users.id where permission_id=12');
+                //     $details = [
+                //         'title' => '',
+                //         'body' => 'Pengajuan '.$request->pengajuan,
+                //         'body2' => 'Untuk review pengajuan silahkan klik link ini '.$link,
+                //     ];
                 
-                \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+                // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+                // $data = pengajuan::where('id', $id)->first();
+                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->first();
+                $user->notify(new RdepPengajuan($id));
+                // Notification::send($user, new RdepPengajuan($data));
 
                 return redirect()->route('boilerplate.saya-pengajuan')
                                 ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);
@@ -554,6 +587,30 @@ class PengajuanController extends Controller
     {
         if(pengajuan::where('id', $id)->value('user_id') == Auth::user()->id){
             $file= Storage::disk('local')->get(pengajuan::where('id', $id)->value('lampiran'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf');
+        }else {
+            return redirect()->route('boilerplate.buat-pengajuan')
+                            ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
+        }
+        
+    }
+    public function unduh_bukti($id)
+    {
+        if(pengajuan::where('id', $id)->value('user_id') == Auth::user()->id){
+            $file= Storage::disk('local')->get(pengajuan::where('id', $id)->value('bukti_bayar'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf');
+        }else {
+            return redirect()->route('boilerplate.buat-pengajuan')
+                            ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
+        }
+        
+    }
+    public function unduh_pengajuan($id)
+    {
+        if(pengajuan::where('id', $id)->value('user_id') == Auth::user()->id){
+            $file= Storage::disk('local')->get(pengajuan::where('id', $id)->value('pengajuan_jadi'));
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {

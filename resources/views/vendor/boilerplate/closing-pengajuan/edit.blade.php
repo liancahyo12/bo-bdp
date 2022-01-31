@@ -1,0 +1,203 @@
+@extends('boilerplate::layout.index', [
+    'title' => __('Closing Pengajuan'),
+    'subtitle' => __('Closing Pengajuan'),
+    'breadcrumb' => [
+        __('Closing Pengajuan') 
+    ]
+])
+
+@section('content')
+<x-boilerplate::card>
+                <x-slot name="header">
+                    <b>Komentar</b>
+                </x-slot>
+                @foreach ( $komentar as $komentar)
+                    <div class="direct-chat-msg">
+                        <div class="direct-chat-infos clearfix">
+                            <span class="direct-chat-name float-left">{{ $komentar->first_name }}&nbsp;</span>
+                            <span class="badge badge-pill badge-secondary float-left">{{ $komentar->kode }}</span>
+                            @if ($komentar->statuss == 2)
+                                <span class="badge badge-pill badge-success float-right">disetujui</span>
+                            @endif
+                            @if ($komentar->statuss == 3)
+                                <span class="badge badge-pill badge-warning float-right">revisi</span>
+                            @endif
+                            @if ($komentar->statuss == 4)
+                                <span class="badge badge-pill badge-danger float-right">ditolak</span>
+                            @endif
+                            <span class="direct-chat-timestamp float-right">{{ $komentar->waktu_komentar }}&nbsp;</span>
+                        </div>
+                        <!-- /.direct-chat-infos -->
+                        <img src="{{ App\Models\Boilerplate\User::where('id', $komentar->uid)->first()->avatar_url }}" class="direct-chat-img" alt="{{ $komentar->first_name }}" width="30" height="30">
+                        <!-- /.direct-chat-img -->
+                        <div class="direct-chat-text">
+                            {{ $komentar->komentar }}
+                        </div>
+                        <!-- /.direct-chat-text -->
+                    </div>
+                @endforeach
+            </x-boilerplate::card>
+<div class="row">
+    <div class="col-md-6">
+        <x-boilerplate::form :route="['boilerplate.update-closing-pengajuan', $closing->ida]" method="put" files>
+        @csrf
+            <x-boilerplate::card>
+                <x-slot name="header">
+                    <h4><b>Form Closing</b></h4>
+                </x-slot>
+                <x-boilerplate::datetimepicker name="tgl_closing" label='Tanggal Closing' value="{{ $closing->tgl_closing}}"/>
+                <div>
+                        <label for='closing'>Closing</label>
+                        <input class='form-control' name='closing' value='Closing {{$closing->closing}}' type='text' id='closing' disabled>    
+                        <table class='table' id='dynamic'>@foreach ($isi_closing as $key => $position) <tr id='ro{{ $position->id }}'>
+                            <td>@if ($loop->first) 
+                                <label for='transaksia'>Keterangan</label> @else @endif
+                                <input class='form-control' type='text' name='transaksia[]' value='{{ $position->transaksi }}' id='transaksia'>
+                            </td>
+                            <td> @if ($loop->first)
+                                <label for='nominala'>Nominal</label> @else @endif
+                                <input class='form-control' type='number' name='nominala[]' value='{{ $position->nominal }}' id='nominala'>
+                            </td> @if ($loop->first) 
+                            <td>
+                                <br><button type='button' id='tambah' class='btn btn-success'>Tambah</button>
+                            </td>@else 
+                            <td>
+                                <button type='button' id='ro{{ $position->id }}' class='btn btn-danger btn_removea'>Hapus</button>
+                            </td>@endif
+                        </tr>@endforeach
+                        
+                    </table>
+                    <a>*klik apapun untuk hitung</a>
+                    <table class='table'>
+                        <tr>
+                            <td>
+                                <label for='totalclosing'>Total</label> 
+                            </td>
+                            <td> 
+                                <input class='form-control' type='text' name='totalclosing' id='totalclosing' disabled>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for='selisih'>Selisih dengan pengajuan</label>
+                                <div id="icselisih"></div>
+                            </td>
+                            <td> 
+                                <input class='form-control' type='text' name='selisih' id='selisih' disabled>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <x-boilerplate::input name="catatana" type="text" label="Catatan" value="{{$closing->catatan}}" />
+                </div>
+                <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran" />
+                <div class="form-group" @if ($closing->lampiran!=null)
+                
+                    @else
+                    style='display:none;'
+                    @endif id="unduh-lamiran-lama">
+                    <br>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><span class="fas fa-file"></span></span>
+                        </div>
+                        <a target="_blank" href="/edit-closing-pengajuan-lampiran/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran Lama</button></a>
+                    </div>
+                </div>
+                <div class="row">
+                    &nbsp; &nbsp;
+                    {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
+                </div>
+            </x-boilerplate::card>
+        </x-boilerplate::form>            
+                
+    </div>
+    <div class="col-md-6">
+        <x-boilerplate::card>
+            <x-slot name="header">
+                <h4><b>Pengajuan</b></h4>
+            </x-slot>
+            <x-boilerplate::datetimepicker name="tgl_pengajuan" label='Tanggal Pengajuan' value="{{ $pengajuan->tgl_pengajuan}}" disabled/>
+            <x-boilerplate::select2 name="jenis_pengajuan" label="Pilih Jenis Pengajuan" id='jenis_pengajuan' disabled>
+                    <option value="{{ $pengajuan->jenis_pengajuan_id }}" selected>{{ $pengajuan->jenis_pengajuan }}</option>
+            </x-boilerplate::select2>
+            <div id="form-pengajuan">
+            </div>
+            <br>
+            <div class="form-group" @if ($pengajuan->lampiran!=null)
+                
+                @else
+                style='display:none;'
+                @endif id="unduh-lamiran">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/detail-review-pengajuan-lampiran/{{ $pengajuan->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
+                </div>
+            </div>
+        </x-boilerplate::card>
+    </div>
+</div>
+    <script>        
+        $(document).ready(function(){
+            var pengajuann = "{{ $pengajuan->pengajuan }}";
+            var catatan = "{{ $pengajuan->catatan }}";
+            var bank = "{{ $pengajuan->bank }}";
+            var norek = "{{ $pengajuan->no_rek }}";
+            var namarek = "{{ $pengajuan->nama_rek }}";
+            var total = "{{ $pengajuan->total_nominal }}";
+            var nom = document.getElementsByName('nominala[]');
+            var tot=0;
+            for(var i=0;i<nom.length;i++){
+                if(parseFloat(nom[i].value))
+                    tot += parseFloat(nom[i].value);
+            }
+            document.getElementById("totalclosing").value = tot;
+            document.getElementById("selisih").value = total-tot;
+            if (total>tot) {
+                document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari pengajuan</span>';
+            }else if (total<tot) {
+                document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi pengajuan</span>';
+            }else {
+                document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai pengajuan</span>';
+            }
+            if ( "{{ $closing->jenis_pengajuan_id }}" == 3){
+                document.getElementById("form-pengajuan").innerHTML = "<div><label for='pengajuan'>Pengajuan*</label><input class='form-control' name='pengajuan' value='"+pengajuann+"' type='text' id='pengajuan' disabled>    <table class='table' id='dynamic'>@foreach ($isi_pengajuan as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first) <label for='transaksi'>Keterangan</label> @else @endif<input class='form-control' type='text' name='transaksi[]' value='{{ $position->transaksi }}' id='transaksi' disabled></td><td> @if ($loop->first)<label for='nominal'>Nominal</label> @else @endif<input class='form-control' type='text' name='nominal[]' value='{{ $position->nominal }}' id='nominal' disabled></td></tr>@endforeach <tr><td><label for='total'>Total</label> </td><td> <input class='form-control' type='text' name='total[]' value='"+total+"' id='total' disabled></td></tr></table>        <label for='catatan'>Catatan*</label><input class='form-control' type='text' name='catatan' value='"+catatan+"' id='catatan' disabled><br><h3>Tujuan</h3><label for='namarek'>Nama Rekening*</label><input class='form-control' name='namarek' value='"+namarek+"' type='text' id='namarek' disabled><label for='norek'>No Rekening*</label>            <input class='form-control' name='norek' value='"+norek+"' type='text' id='norek' disabled><label for='bank'>Bank*</label><input class='form-control' name='bank' value='"+bank+"' type='text' id='Bank' disabled></div>"
+            }else if ( "{{ $closing->jenis_pengajuan_id }}" == 5){
+                document.getElementById("form-pengajuan").innerHTML = "<div><label for='pengajuan'>Pengajuan*</label><input class='form-control' name='pengajuan' value='"+pengajuann+"' type='text' id='pengajuan' disabled>    <table class='table' id='dynamic'>@foreach ($isi_pengajuan as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first)<label for='coa'>COA</label> @else @endif<input class='form-control' type='text' name='coa[]' value='{{ $position->coa }}' id='coa' disabled></td><td>@if ($loop->first) <label for='transaksi'>Keterangan</label> @else @endif<input class='form-control' type='text' name='transaksi[]' value='{{ $position->transaksi }}' id='transaksi' disabled></td><td> @if ($loop->first)<label for='nominal'>Nominal</label> @else @endif<input class='form-control' type='text' name='nominal[]' value='{{ $position->nominal }}' id='nominal' disabled></td> <td>@if ($loop->first)<label for='saldo'>Saldo</label> @else @endif<input class='form-control' type='text' name='saldo[]' value='{{ $position->saldo }}' id='saldo' disabled></td> </tr>@endforeach</table>      <label for='catatan'>Catatan</label><br><input class='form-control' type='text' name='catatan' value='"+catatan+"' id='catatan' disabled><h3>Tujuan</h3><label for='namarek'>Nama Rekening*</label><input class='form-control' name='namarek' value='"+namarek+"' type='text' id='namarek' disabled><label for='norek'>No Rekening*</label><input class='form-control' name='norek' value='"+norek+"' type='text' id='norek' disabled><label for='bank'>Bank*</label><input class='form-control' name='bank' value='"+bank+"' type='text' id='Bank' disabled></div>"
+            }
+            var no =1;
+            $('#tambah').click(function(){
+                no++;
+                $('#dynamic').append("<tr id='row"+no+"'><td><input class='form-control' type='text' name='transaksi[]' id='transaksi"+no+"'></td><td><input class='form-control' type='number' name='nominala[]' id='nominal"+no+"'></td><td><button type='button' id='"+no+"' class='btn btn-danger btn_remove'>Hapus</button></td></tr>");
+            });
+
+            $(document).on('click', '.btn_remove', function(){
+                var button_id = $(this).attr("id"); 
+                $('#row'+button_id+'').remove();
+            });
+            $(document).on('click', '.btn_removea', function(){
+                var button_id = $(this).attr("id"); 
+                $('#'+button_id+'').remove();
+            });       
+            $(document).on('change', '.form-control', function() {
+                var nom = document.getElementsByName('nominala[]');
+                var tot=0;
+                for(var i=0;i<nom.length;i++){
+                    if(parseFloat(nom[i].value))
+                        tot += parseFloat(nom[i].value);
+                }
+                document.getElementById("totalclosing").value = tot;
+                document.getElementById("selisih").value = total-tot;
+                if (total>tot) {
+                    document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari pengajuan</span>';
+                }else if (total<tot) {
+                    document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi pengajuan</span>';
+                }else {
+                    document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai pengajuan</span>';
+                }
+            });
+        });
+    </script>
+@endsection

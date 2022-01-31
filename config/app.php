@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'E-Office'),
+    'name' => env('APP_NAME', 'BDPay E-Office'),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://bdp.cahjaya.com:8000'),
 
     'asset_url' => env('ASSET_URL', null),
 

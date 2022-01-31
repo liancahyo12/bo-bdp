@@ -1,3 +1,11 @@
 *
 !public/
+!format/
+!lampiran/
+!purchase-order/
+!bukti-bayar/
+!suratkeluar/
+!suratkeluarjadi/
+!suratkeluarscan/
+!public/
 !.gitignore

@@ -20,7 +20,7 @@
                         <span class="direct-chat-timestamp float-right">{{ $approve->created_at }}</span>
                     </div>
                     <!-- /.direct-chat-infos -->
-                    <img src="{{ mix('/images/user128.jpg', '/assets/vendor/boilerplate') }}" class="direct-chat-img" alt="{{ Auth::user()->name }}" width="30" height="30">
+                    <img src="{{ App\Models\Boilerplate\User::where('id', $approve->uid)->first()->avatar_url }}" class="direct-chat-img" alt="{{ Auth::user()->name }}" width="30" height="30">
                     <!-- /.direct-chat-img -->
                     <div class="direct-chat-text">
                         {{ $approve->komentar }}

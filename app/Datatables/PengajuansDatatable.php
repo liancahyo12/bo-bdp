@@ -17,13 +17,16 @@ class PengajuansDatatable extends Datatable
         // return User::query();
         return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['user_id', '=', Auth::user()->id], ['status', '=', '1']])->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
         'pengajuan',
+        'no_pengajuan',
         'tgl_pengajuan',
+        'jenis_pengajuan_id',
         'jenis_pengajuan',
         'review_status',
         'review_time',
         'reviewdep_status',
         'reviewdep_time',
         'approve_status',
+        'bayar_status',
         'approve_time',
         'send_time',
         'send_status',]);
@@ -53,100 +56,113 @@ class PengajuansDatatable extends Datatable
 
             Column::add('Id')
                 ->data('id'),
+
+            Column::add('No Pengajuan')
+                ->data('no_pengajuan'),
             
             Column::add('Jenis Pengajuan')
+                ->width('160px')
                 ->data('jenis_pengajuan'),
 
             Column::add('Pengajuan')
+                ->width('160px')
                 ->data('pengajuan'),
 
             Column::add('Tgl Pengajuan')
                 ->data('tgl_pengajuan'),
 
-            Column::add('Status Review Dep')
+            Column::add('Status Pengajuan')
                 ->width('40px')
-                ->data('reviewdep_status', function (pengajuan $pengajuan) {
-                    $badge1 = '<span class="badge badge-pill badge-%s">%s</span>';
+                ->data('pengajuan_status', function (pengajuan $pengajuan) {
+                    $badge1 = '<span class="badge badge-pill badge-%s">Review Dep %s</span>';
+                    $badge2 = '<span class="badge badge-pill badge-%s">Review %s</span>';
+                    $badge3 = '<span class="badge badge-pill badge-%s">Aprove %s</span>';
+                    $badge4 = '<span class="badge badge-pill badge-%s">%s</span>';
+                    $a;
+                    $b;
+                    $c;
+                    $d;
                     if ($pengajuan->reviewdep_status == 0) {
-                        return sprintf($badge1, 'info', __('baru'));
+                        $a= sprintf($badge1, 'info', __('baru'));
                     }else if($pengajuan->reviewdep_status == 1){
-                        return sprintf($badge1, 'secondary', __('dilihat'));
+                        $a= sprintf($badge1, 'secondary', __('dilihat'));
                     }else if($pengajuan->reviewdep_status == 2){
-                        return sprintf($badge1, 'success', __('disetujui'));
+                        $a= sprintf($badge1, 'success', __('disetujui'));
                     }else if($pengajuan->reviewdep_status == 3){
-                        return sprintf($badge1, 'warning', __('revisi'));
+                        $a= sprintf($badge1, 'warning', __('revisi'));
                     }else if($pengajuan->reviewdep_status == 4){
-                        return sprintf($badge1, 'danger', __('ditolak'));
+                        $a= sprintf($badge1, 'danger', __('ditolak'));
                     }else if($pengajuan->reviewdep_status == 5){
-                        return sprintf($badge1, 'info', __('telah direvisi'));
+                        $a= sprintf($badge1, 'info', __('telah direvisi'));
                     }
-                    return sprintf($badge1, 'secondary', __('draft'));
-                })
-                ->notSortable(),
-
-            Column::add('Waktu Review Dep')
-                ->data('reviewdep_time'),
-            
-            Column::add('Status Review')
-                ->width('40px')
-                ->data('review_status', function (pengajuan $pengajuan) {
-                    $badge1 = '<span class="badge badge-pill badge-%s">%s</span>';
                     if ($pengajuan->review_status == 0) {
-                        return sprintf($badge1, 'info', __('baru'));
+                        $b= sprintf($badge2, 'info', __('baru'));
                     }else if($pengajuan->review_status == 1){
-                        return sprintf($badge1, 'secondary', __('dilihat'));
+                        $b= sprintf($badge2, 'secondary', __('dilihat'));
                     }else if($pengajuan->review_status == 2){
-                        return sprintf($badge1, 'success', __('disetujui'));
+                        $b= sprintf($badge2, 'success', __('disetujui'));
                     }else if($pengajuan->review_status == 3){
-                        return sprintf($badge1, 'warning', __('revisi'));
+                        $b= sprintf($badge2, 'warning', __('revisi'));
                     }else if($pengajuan->review_status == 4){
-                        return sprintf($badge1, 'danger', __('ditolak'));
+                        $b= sprintf($badge2, 'danger', __('ditolak'));
                     }else if($pengajuan->review_status == 5){
-                        return sprintf($badge1, 'info', __('telah direvisi'));
+                        $b= sprintf($badge2, 'info', __('telah direvisi'));
                     }
-                    return sprintf($badge1, 'secondary', __('draft'));
-                })
-                ->notSortable(),
-
-            Column::add('Waktu Review')
-                ->data('review_time'),
-
-            Column::add('Status Approve')
-                ->width('40px')
-                ->data('approve_status', function (pengajuan $pengajuan) {
-                    $badge1 = '<span class="badge badge-pill badge-%s">%s</span>';
                     if ($pengajuan->approve_status == 0) {
-                        return sprintf($badge1, 'info', __('baru'));
+                        $c= sprintf($badge3, 'info', __('baru'));
                     }else if($pengajuan->approve_status == 1){
-                        return sprintf($badge1, 'secondary', __('dilihat'));
+                        $c= sprintf($badge3, 'secondary', __('dilihat'));
                     }else if($pengajuan->approve_status == 2){
-                        return sprintf($badge1, 'success', __('disetujui'));
+                        $c= sprintf($badge3, 'success', __('disetujui'));
                     }else if($pengajuan->approve_status == 3){
-                        return sprintf($badge1, 'warning', __('revisi'));
+                        $c= sprintf($badge3, 'warning', __('revisi'));
                     }else if($pengajuan->approve_status == 4){
-                        return sprintf($badge1, 'danger', __('ditolak'));
+                        $c= sprintf($badge3, 'danger', __('ditolak'));
                     }else if($pengajuan->approve_status == 5){
-                        return sprintf($badge1, 'info', __('telah direvisi'));
+                        $c= sprintf($badge3, 'info', __('telah direvisi'));
                     }
-                    return sprintf($badge1, 'secondary', __('draft'));
+                    if ($pengajuan->jenis_pengajuan_id<5) {
+                        if ($pengajuan->bayar_status == 1) {
+                            $d= sprintf($badge4, 'info', __('belum dibayar'));
+                        }else if($pengajuan->bayar_status == 2){
+                            $d= sprintf($badge4, 'success', __('sudah dibayar'));
+                        }else {
+                            $d= sprintf($badge4, 'secondary', __(''));
+                        }
+                    }else {
+                        $d= sprintf($badge4, 'secondary', __(''));
+                    }
+                    return join([$a, $b, $c, $d]);
                 })
                 ->notSortable(),
 
-            Column::add('Waktu Approve')
-                ->data('approve_time'),
-            // Column::add('Status Pengajuan')
-            //     ->data(''),
+            Column::add('Waktu Perubahan Status')
+                ->data('status_time', function (pengajuan $pengajuan) {
+                    if ($pengajuan->approve_time>$pengajuan->review_time) {
+                        return $pengajuan->approve_time;
+                    }else if ($pengajuan->review_time>$pengajuan->reviewdep_time) {
+                        return $pengajuan->review_time;
+                    }else if ($pengajuan->review_time<$pengajuan->reviewdep_time) {
+                        return $pengajuan->reviewdep_time;
+                    }
+                }),
                 
-            Column::add()
+            Column::add('Aksi')
                 ->actions(function(pengajuan $pengajuan) {
-                    if ($pengajuan->send_status == 1 && ($pengajuan->review_status == 3 ||  $pengajuan->approve_status == 3)) {
+                    if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==5 ) && $pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2) {
                         return join([
-                        Button::edit('boilerplate.edit-pengajuan', $pengajuan->id),          
-                    ]);
+                            Button::show('boilerplate.edit-pengajuan', $pengajuan->id),  
+                            Button::add('closing')->route('boilerplate.buat-closing-pengajuan', $pengajuan->id)->color('primary')->make(), 
+                        ]);
+                    }
+                    if ($pengajuan->send_status == 1 && $pengajuan->revisi_status == 1) {
+                        return join([
+                            Button::edit('boilerplate.edit-pengajuan', $pengajuan->id),   
+                        ]);
                     }else if($pengajuan->send_status == 1){
                         return join([
-                        Button::show('boilerplate.edit-pengajuan', $pengajuan->id),           
-                    ]);  
+                            Button::show('boilerplate.edit-pengajuan', $pengajuan->id),           
+                        ]);  
                     }
                     return join([
                         Button::edit('boilerplate.edit-pengajuan', $pengajuan->id),    

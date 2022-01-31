@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Boilerplate\User;
+use App\Notifications\Boilerplate\ReviewdepPengajuan;
 
 class pengajuan extends Model
 {
@@ -23,10 +25,16 @@ class pengajuan extends Model
     {
         return $this->hasMany(Isi_pengajuan::class);
     }
+    public function User()
+    {  
+        return $this- belongsTo(User::class);
+    }
     protected $fillable = [
         'user_id',
         'jenis_pengajuan_id',
         'departemen_id',
+        'no_urut',
+        'no_pengajuan',
         'pengajuan',
         'tgl_pengajuan',
         'no_invoice',
@@ -34,6 +42,8 @@ class pengajuan extends Model
         'alamat',
         'phone',
         'kontak',
+        'ppn',
+        'dpp',
         'email',
         'bank',
         'nama_rek',
@@ -53,5 +63,15 @@ class pengajuan extends Model
         'approver_id',
         'approve_status',
         'approve_time',
+        'bukti_bayar',
+        'bayar_status',
+        'bayar_time',
+        'revisi_status',
+        'pengajuan_jadi',
     ];
+
+    public function sendReviewdepPengajuanNotification($id)
+    {
+        $this->notify(new ReviewdepPengajuan($id, $this));
+    }
 }

@@ -78,7 +78,7 @@ class RolesController extends Controller
         $role = $roleModel::create($input);
         $role->permissions()->sync(array_keys($request->input('permission', [])));
 
-        return redirect()->route('boilerplate.roles.edit', $role)
+        return redirect()->route('boilerplate.roles.create')
                          ->with('growl', [__('boilerplate::role.successadd'), 'success']);
     }
 

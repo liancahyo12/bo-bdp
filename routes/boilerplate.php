@@ -10,6 +10,7 @@ use App\Http\Controllers\Boilerplate\Logs\LogViewerController;
 use App\Http\Controllers\Boilerplate\Users\RolesController;
 use App\Http\Controllers\Boilerplate\Users\UsersController;
 use App\Http\Controllers\ApprovepengajuanController;
+use App\Http\Controllers\BayarpengajuanController;
 use App\Http\Controllers\CekpengajuanController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\SuratkeluarController;
@@ -19,6 +20,11 @@ use App\Http\Controllers\RequestSuratKeluarController;
 use App\Http\Controllers\ArsipSuratKeluarController;
 use App\Http\Controllers\ReviewdeppengajuanController;
 use App\Http\Controllers\ReviewpengajuanController;
+use App\Http\Controllers\ClosingController;
+use App\Http\Controllers\ReviewdepclosingController;
+use App\Http\Controllers\ReviewclosingController;
+use App\Http\Controllers\ApproveclosingController;
+use App\Http\Controllers\Rek_userController;
 
 Route::group([
     'prefix'     => config('boilerplate.app.prefix', ''),
@@ -92,6 +98,25 @@ Route::group([
                 });
             });
         });
+
+        // Rekening Karyawan
+        Route::get('/rekening-karyawan', [Rek_userController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
+            ->name('rekening-karyawan');
+        Route::post('/buat-rekening-karyawan', [Rek_userController::class, 'store'])
+            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
+            ->name('buat-rekening-karyawan');
+        Route::get('/edit-rekening-karyawan', [Rek_userController::class, 'edit'])
+            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
+            ->name('edit-rekening-karyawan');
+        Route::put('/update-rekening-karyawan', [Rek_userController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
+            ->name('update-rekening-karyawan');
+        Route::delete('/delete-rekening-karyawan', [Rek_userController::class, 'destroy'])
+            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
+            ->name('delete-rekening-karyawan');
+
+
          // Pengajuan
         Route::get('/saya-pengajuan', [PengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
@@ -108,6 +133,12 @@ Route::group([
         Route::get('/edit-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('edit-pengajuan-lampiran');
+        Route::get('/edit-pengajuan-bukti/{id}', [PengajuanController::class, 'unduh_bukti'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('edit-pengajuan-bukti');
+        Route::get('/edit-pengajuan-jadi/{id}', [PengajuanController::class, 'unduh_pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('edit-pengajuan-jadi');
         Route::put('/edit-pengajuan/{id}', [PengajuanController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('update-pengajuan');
@@ -115,10 +146,7 @@ Route::group([
             ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('edit-pengajuan-hapus');
 
-        Route::get('/buat-closing-pengajuan', [PengajuanController::class, 'create'])
-            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
-            ->name('buat-closing-pengajuan');
-
+        // reviewdep pengajuan
         Route::get('/reviewdep-pengajuan', [ReviewdeppengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
             ->name('reviewdep-pengajuan');
@@ -132,6 +160,7 @@ Route::group([
             ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
             ->name('detail-reviewdep-pengajuan-lampiran');
 
+        // review pengajuan
         Route::get('/review-pengajuan', [ReviewpengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('review-pengajuan');
@@ -145,6 +174,7 @@ Route::group([
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('detail-review-pengajuan-lampiran');
             
+        // approve pengajuan
         Route::get('/approve-pengajuan', [ApprovepengajuanController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
             ->name('approve-pengajuan');
@@ -157,6 +187,82 @@ Route::group([
         Route::get('/detail-approve-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
             ->name('detail-approve-pengajuan-lampiran');
+        
+        // bayar pengajuan
+        Route::get('/bayar-pengajuan', [BayarpengajuanController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,bayar_pengajuan'])
+            ->name('bayar-pengajuan');
+        Route::get('/detail-bayar-pengajuan/{id}', [BayarpengajuanController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,bayar_pengajuan'])
+            ->name('detail-bayar-pengajuan');
+        Route::put('/update-bayar-pengajuan/{id}', [BayarpengajuanController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,bayar_pengajuan'])
+            ->name('update-bayar-pengajuan');
+        Route::get('/detail-bayar-pengajuan-lampiran/{id}', [BayarpengajuanController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,bayar_pengajuan'])
+            ->name('detail-bayar-pengajuan-lampiran');
+
+        // closing saya
+        Route::get('/saya-closing-pengajuan', [ClosingController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('saya-closing-pengajuan');
+        Route::get('/buat-closing-pengajuan/{id}', [ClosingController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('buat-closing-pengajuan');
+        Route::post('/buat-closing-pengajuan/{id}', [ClosingController::class, 'store'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('buat-closing-pengajuan');
+        Route::get('/edit-closing-pengajuan/{id}', [ClosingController::class, 'edit'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('edit-closing-pengajuan');
+        Route::put('/update-closing-pengajuan/{id}', [ClosingController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('update-closing-pengajuan');
+        Route::get('/edit-closing-pengajuan-lampiran/{id}', [ClosingController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('edit-closing-pengajuan-lampiran');
+
+        // reviewdep closing
+        Route::get('/reviewdep-closing-pengajuan', [ReviewdepclosingController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
+            ->name('reviewdep-closing-pengajuan');
+        Route::get('/detail-reviewdep-closing-pengajuan/{id}', [ReviewdepclosingController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
+            ->name('detail-reviewdep-closing-pengajuan');
+        Route::put('/update-reviewdep-closing-pengajuan/{id}', [ReviewdepclosingController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
+            ->name('update-reviewdep-closing-pengajuan');
+        Route::get('/detail-reviewdep-closing-pengajuan-lampiran/{id}', [ClosingController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
+            ->name('detail-reviewdep-closing-pengajuan-lampiran');
+
+        // review closing
+        Route::get('/review-closing-pengajuan', [ReviewclosingController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
+            ->name('review-closing-pengajuan');
+        Route::get('/detail-review-closing-pengajuan/{id}', [ReviewclosingController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
+            ->name('detail-review-closing-pengajuan');
+        Route::put('/update-review-closing-pengajuan/{id}', [ReviewclosingController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
+            ->name('update-review-closing-pengajuan');
+        Route::get('/detail-review-closing-pengajuan-lampiran/{id}', [ClosingController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
+            ->name('detail-review-closing-pengajuan-lampiran');
+            
+        // approve closing
+        Route::get('/approve-closing-pengajuan', [ApproveclosingController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
+            ->name('approve-closing-pengajuan');
+        Route::get('/detail-approve-closing-pengajuan/{id}', [ApproveclosingController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
+            ->name('detail-approve-closing-pengajuan');
+        Route::put('/update-approve-closing-pengajuan/{id}', [ApproveclosingController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
+            ->name('update-approve-closing-pengajuan');
+        Route::get('/detail-approve-closing-pengajuan-lampiran/{id}', [ClosingController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
+            ->name('detail-approve-closing-pengajuan-lampiran');
 
         //request surat keluar
         Route::get('/surat-keluar-request-buat', [RequestSuratKeluarController::class, 'create'])

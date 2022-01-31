@@ -10,6 +10,7 @@ class Pengajuan
     {
         $item = $menu->add('Pengajuan', [
             'icon' => 'tasks',
+            'permission' => 'buat_pengajuan,approve_pengajuan,reviewdep_pengajuan,review_pengajuan',
             'order' => 1001,
         ]);
         $item->add('Buat Pengajuan', [
@@ -24,7 +25,7 @@ class Pengajuan
             'permission' => 'buat_pengajuan',
             'order' => 101,
         ]);
-        $item->add('Approvement', [
+        $item->add('Approvement Pengajuan', [
             'route' => 'boilerplate.approve-pengajuan',
             'active' => 'boilerplate.approve-pengajuan,boilerplate.detail-approve-pengajuan',
             'permission' => 'approve_pengajuan',
@@ -40,7 +41,38 @@ class Pengajuan
             'route' => 'boilerplate.review-pengajuan',
             'active' => 'boilerplate.review-pengajuan,boilerplate.detail-review-pengajuan',
             'permission' => 'review_pengajuan',
-            'order' => 103,
+            'order' => 104,
         ]);
+        $item->add('Bayar Pengajuan', [
+            'route' => 'boilerplate.bayar-pengajuan',
+            'active' => 'boilerplate.bayar-pengajuan,boilerplate.detail-bayar-pengajuan',
+            'permission' => 'bayar_pengajuan',
+            'order' => 105,
+        ]);
+        $item->add('Closing Pengajuan Saya', [
+            'route' => 'boilerplate.saya-closing-pengajuan',
+            'active' => 'boilerplate.saya-closing-pengajuan,boilerplate.edit-closing-pengajuan',
+            'permission' => 'buat_pengajuan',
+            'order' => 106,
+        ]);
+        $item->add('Approvement Closing Pengajuan', [
+            'route' => 'boilerplate.approve-closing-pengajuan',
+            'active' => 'boilerplate.approve-closing-pengajuan,boilerplate.detail-approve-closing-pengajuan',
+            'permission' => 'approve_pengajuan',
+            'order' => 107,
+        ]);
+        $item->add('Review Closing Pengajuan', [
+            'route' => 'boilerplate.reviewdep-closing-pengajuan',
+            'active' => 'boilerplate.reviewdep-closing-pengajuan,boilerplate.detail-reviewdep-closing-pengajuan',
+            'permission' => 'reviewdep_pengajuan',
+            'order' => 108,
+        ]);
+        $item->add('Review Closing Pengajuan', [
+            'route' => 'boilerplate.review-closing-pengajuan',
+            'active' => 'boilerplate.review-closing-pengajuan,boilerplate.detail-review-closing-pengajuan',
+            'permission' => 'review_pengajuan',
+            'order' => 109,
+        ]);
+        
     }
 }

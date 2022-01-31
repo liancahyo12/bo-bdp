@@ -26,6 +26,7 @@ use PhpOffice\PhpWord\IOFactory;
 use NcJoes\OfficeConverter\OfficeConverter;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Storage;
+use App\Notifications\Boilerplate\ApproveaSuratkeluar;
 use Auth;
 use DB;
 
@@ -164,12 +165,12 @@ class SuratkeluarController extends Controller
             $perihal = $request->perihal;
             $suratkeluar = Suratkeluar::create($input);
             // $isisuratkeluar = Isi_surat::create($isisurat);
-
-            $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=4 limit 1');
+            $link = route('boilerplate.surat-keluar-review', $ssr);
+            $mailto = DB::select('select email from permission_role left join role_user  on permission_role.role_id=role_user.role_id left join users on role_user.user_id=users.id where permission_id=7');
             $details = [
                 'title' => '',
                 'body' => 'Surat Keluar '.$request->perihal,
-                'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-review/'.$ssr,
+                'body2' => 'Untuk approve surat keluar silahkan klik link ini '.$link,
             ];
             
             \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
@@ -306,14 +307,17 @@ class SuratkeluarController extends Controller
             $suratkeluar = Suratkeluar::create($input);
             // $isisuratkeluar = Isi_surat::create($isisurat);
 
-                $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=4 limit 1');
-                $details = [
-                    'title' => '',
-                    'body' => 'Surat Keluar '.$request->perihal,
-                    'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-approve/'.$ssr,
-                ];
+            // $link = route('boilerplate.surat-keluar-approve.edit', $ssr);
+            // $mailto = DB::select('select email from permission_role left join role_user  on permission_role.role_id=role_user.role_id left join users on role_user.user_id=users.id where permission_id=7');
+            //     $details = [
+            //         'title' => '',
+            //         'body' => 'Surat Keluar '.$request->perihal,
+            //         'body2' => 'Untuk approve surat keluar silahkan klik link ini '.$link,
+            //     ];
             
-            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 7)->first();
+            $user->notify(new ApproveaSuratkeluar($ssr));
 
             return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Surat berhasil dikirim'), 'success']);
@@ -366,7 +370,7 @@ class SuratkeluarController extends Controller
             'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
             'jenis_surat' => jenis_surat::all(),
             'departemens' => departemen::all(),
-            'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->select('approvesuratkeluars.*', 'first_name')->where('surat_keluar_id', $id)->get(),
+            'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->select('approvesuratkeluars.*', 'last_name', 'first_name', 'users.id as uid')->where('surat_keluar_id', $id)->get(),
         ]
         );
     }
@@ -451,17 +455,20 @@ class SuratkeluarController extends Controller
                 }else{
                     $input['approve_status'] = 0;
                 }
-                $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=4 limit 1');
-                $details = [
-                    'title' => '',
-                    'body' => 'Surat Keluar '.$request->perihal,
-                    'body2' => 'Untuk approve surat keluar silahkan klik link ini http://localhost:8000/surat-keluar-approve/'.$id,
-                ];
+                // $link = route('boilerplate.surat-keluar-approve.edit', $id);
+                // $mailto = DB::select('select email from permission_role left join role_user  on permission_role.role_id=role_user.role_id left join users on role_user.user_id=users.id where permission_id=7');
+                // $details = [
+                //     'title' => '',
+                //     'body' => 'Surat Keluar '.$request->perihal,
+                //     'body2' => 'Untuk approve surat keluar silahkan klik link ini '.$link,
+                // ];
 
                 $suratkeluar = $input->save();
                 // $isisuratkeluar = $isisurat->save();
 
-                \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+                // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 7)->first();
+                $user->notify(new ApproveaSuratkeluar($id));
 
                 return redirect()->route('boilerplate.surat-keluar-saya.index')
                                 ->with('growl', [__('Surat berhasil dikirim'), 'success']);

@@ -17,8 +17,8 @@ class CreatePengajuansTable extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('user_id');
-            $table->string('jenis_pengajuan_id');
-            $table->string('departemen_id');
+            $table->smallInteger('jenis_pengajuan_id');
+            $table->smallInteger('departemen_id');
             $table->string('no_urut')->nullable();
             $table->string('no_pengajuan')->nullable();
             $table->string('pengajuan')->nullable();
@@ -28,6 +28,8 @@ class CreatePengajuansTable extends Migration
             $table->string('alamat')->nullable();
             $table->string('phone')->nullable();
             $table->string('kontak')->nullable();
+            $table->double('dpp', 20, 2)->nullable();
+            $table->double('ppn', 20, 2)->nullable();
             $table->string('email')->nullable();
             $table->string('bank')->nullable();
             $table->string('nama_rek')->nullable();
@@ -47,6 +49,11 @@ class CreatePengajuansTable extends Migration
             $table->unsignedBigInteger('approver_id')->nullable();
             $table->tinyInteger('approve_status')->nullable()->comment('0 = pending, 1 = dilihat, 2 = setuju, 3 = revisi, 4= tolak, 5=telah direvisi');
             $table->dateTime('approve_time')->nullable();
+            $table->tinyInteger('revisi_status')->nullable()->comment('1 = butuh revisi, 2=telah direvisi');
+            $table->string('bukti_bayar')->nullable();
+            $table->dateTime('bayar_time')->nullable();
+            $table->tinyInteger('bayar_status')->nullable()->comment('1 = belum dibayar, 2=telah dibayar');
+            $table->string('pengajuan_jadi')->nullable();
             $table->tinyInteger('status')->default(1)->comment('0 = not valid, 1= valid');
         });
     }
