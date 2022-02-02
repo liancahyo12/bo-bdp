@@ -11,7 +11,7 @@ class ManajemenKaryawan
         $item = $menu->add('Manajemen Karyawan', [
             'permission' => 'tambah_rekening',
             'icon' => 'users-cog',
-            'order' => 100,
+            'order' => 1002,
         ]);
 
         $item->add('Rekening Karyawan', [
