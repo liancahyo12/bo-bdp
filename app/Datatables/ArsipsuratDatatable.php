@@ -19,6 +19,7 @@ class ArsipsuratDatatable extends Datatable
     {
         return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->where([['suratkeluars.status', '=', '1'], ['approve_status', '=', '2']])->orderByDesc('suratkeluars.approve_time')->get(['suratkeluars.id',
         'perihal',
+        'no_urut',
         'tgl_surat',
         'departemen',
         'jenis_surats.kode as kodes',
@@ -38,16 +39,17 @@ class ArsipsuratDatatable extends Datatable
     public function columns(): array
     {
         return [
-                 
-
             Column::add('Waktu Approve')
                 ->data('approve_time'),
 
-            Column::add('No Surat')
-                ->data('no_surat'),
-
             Column::add('Kode')
                 ->data('kodes'),
+
+            Column::add('No')
+                ->data('no_urut'),
+
+            Column::add('No Surat')
+                ->data('no_surat'),
 
             Column::add('Departemen')
                 ->data('departemen'),
