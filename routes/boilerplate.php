@@ -14,6 +14,7 @@ use App\Http\Controllers\BayarpengajuanController;
 use App\Http\Controllers\CekpengajuanController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\SuratkeluarController;
+use App\Http\Controllers\SuratmasukController;
 use App\Http\Controllers\ReviewsuratkeluarController;
 use App\Http\Controllers\ApprovesuratkeluarController;
 use App\Http\Controllers\RequestSuratKeluarController;
@@ -400,5 +401,31 @@ Route::group([
         Route::get('/surat-keluar-surat-scan/{id}', [ArsipSuratKeluarController::class, 'unduh_surat_scan'])
             ->middleware(['boilerplateauth', 'ability:admin,arsip_surat'])
             ->name('surat-keluar-surat-scan');
+
+        //surat masuk
+        Route::get('/surat-masuk-buat', [SuratmasukController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_masuk'])
+            ->name('surat-masuk-buat');
+        Route::post('/surat-masuk-buat', [SuratmasukController::class, 'store'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_masuk'])
+            ->name('surat-masuk-buat');
+        Route::get('/surat-masuk-saya', [SuratmasukController::class, 'saya'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_masuk'])
+            ->name('surat-masuk-saya');
+        Route::get('/surat-masuk-edit/{id}', [SuratmasukController::class, 'edit'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_masuk'])
+            ->name('surat-masuk-edit');
+        Route::get('/surat-masuk', [SuratmasukController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,surat_masuk'])
+            ->name('surat-masuk');
+        Route::get('/surat-masuk-detail/{id}', [SuratmasukController::class, 'detail'])
+            ->middleware(['boilerplateauth', 'ability:admin,surat_masuk'])
+            ->name('surat-masuk-detail');
+        Route::get('/surat-masuk-arsip', [SuratmasukController::class, 'arsip'])
+            ->middleware(['boilerplateauth', 'ability:admin,arsip_surat_masuk'])
+            ->name('surat-masuk-arsip');
+        Route::post('/surat-masuk-arsip-detail/{id}', [SuratmasukController::class, 'detail_arsip'])
+            ->middleware(['boilerplateauth', 'ability:admin,arsip_surat_masuk'])
+            ->name('surat-masuk-arsip-detail');
     });
 });

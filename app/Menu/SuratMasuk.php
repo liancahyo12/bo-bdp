@@ -9,27 +9,25 @@ class SuratMasuk
     public function make(Builder $menu)
     {
         $item = $menu->add('Surat Masuk', [
-            'route' => 'boilerplate.dashboard',
-            'active' => 'boilerplate.dashboard',
             'permission' => 'surat_masuk',
             'icon' => 'inbox',
             'order' => 999,
         ]);
         $item->add('Tambah Surat Masuk', [
-            'route' => 'boilerplate.dashboard',
-            'active' => 'boilerplate.dashboard',
-            'permission' => 'tambah_surat_masuk',
+            'route' => 'boilerplate.surat-masuk-buat',
+            'active' => 'boilerplate.surat-masuk-buat,',
+            'permission' => 'buat_surat_masuk',
             'order' => 100,
         ]);
         $item->add('Surat Masuk', [
-            'route' => 'boilerplate.dashboard',
-            'active' => 'boilerplate.dashboard',
+            'route' => 'boilerplate.surat-masuk',
+            'active' => 'boilerplate.surat-masuk,boilerplate.surat-masuk-detail',
             'permission' => 'surat_masuk',
             'order' => 101,
         ]);
         $item->add('Arsip Surat Masuk', [
-            'route' => 'boilerplate.dashboard',
-            'active' => 'boilerplate.dashboard',
+            'route' => 'boilerplate.surat-masuk-arsip',
+            'active' => 'boilerplate.surat-masuk-arsip,boilerplate.surat-masuk-arsip-detail',
             'permission' => 'arsip_surat_masuk',
             'order' => 102,
         ]);
