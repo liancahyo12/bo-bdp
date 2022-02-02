@@ -14,7 +14,7 @@ class ReviewdepClosingDatatable extends Datatable
 
     public function datasource()
     {
-        return closing::leftJoin('jenis_pengajuans', 'closings.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['departemen_id', '=', Auth::user()->departemen_id], ['send_status', '=', '1'], ['status', '=', '1']])->orderByDesc('closings.updated_at')->get(['closings.id',
+        return closing::leftJoin('jenis_pengajuans', 'closings.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['departemen_id', '=', Auth::user()->departemen_id], ['send_status', '=', '1'], ['closings.status', '=', '1']])->orderByDesc('closings.updated_at')->get(['closings.id',
         'closing',
         'tgl_closing',
         'jenis_pengajuan',

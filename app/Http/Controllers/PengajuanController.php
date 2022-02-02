@@ -78,7 +78,6 @@ class PengajuanController extends Controller
         $this->validate($request, [
                 'jenis_pengajuan' => 'required',
                 'tgl_pengajuan'  => 'required',
-                'pengajuan' => 'required',
                 'file_lampiran' => 'mimes:pdf|max:20480',
         ]);
         if (Laratrust::isAbleTo('pengajuan_fags')==true) {
@@ -93,7 +92,6 @@ class PengajuanController extends Controller
         $input['user_id'] = Auth::user()->id;
         $input['jenis_pengajuan_id'] = $request->jenis_pengajuan;
         $input['departemen_id'] = Auth::user()->departemen_id;
-        $input['pengajuan'] = $request->pengajuan;
         $input['catatan'] = $request->catatan;
         $input['tgl_pengajuan'] = $request->tgl_pengajuan;
 
@@ -194,6 +192,9 @@ class PengajuanController extends Controller
         elseif ($request->jenis_pengajuan == 6) {
             $this->validate($request, [
                 'jumpc' => 'required',
+                'namarek' => 'required',
+                'norek' => 'required',
+                'bank' => 'required',
             ]);
             foreach($request->input('jenistr') as $key => $value) {
                 $inpengajuan["jenistr.{$key}"] = 'required';
@@ -207,6 +208,9 @@ class PengajuanController extends Controller
                     $isipengajuan = Isi_pengajuan::create($inpengajuan);
                 }
                 $input['jumlah_pc'] = $request->jumpc;
+                $input['nama_rek'] = $request->namarek;
+                $input['no_rek'] = $request->norek;
+                $input['bank'] = $request->bank;
             }
         }elseif ($request->jenis_pengajuan == 7) {
             $this->validate($request, [
@@ -325,8 +329,8 @@ class PengajuanController extends Controller
             // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
             [
                 'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $id], ['status', '=', 1]])->get(),
-                'jenis_pengajuan' => jenis_pengajuan::all(),
-                'departemens' => departemen::all(),
+                'jenis_pengajuan' => jenis_pengajuan::where('status', 1)->get(),
+                'departemens' => departemen::where('status', 1)->get(),
                 'komentar' => $approvepengajuan,
                 
             ]
@@ -350,11 +354,9 @@ class PengajuanController extends Controller
             $total = 0;
             $this->validate($request, [
                     'tgl_pengajuan'  => 'required',
-                    'pengajuan' => 'required',
                     'catatan' => 'required',
                     'file_lampiran' => 'mimes:pdf|max:20480',
             ]);
-            $input['pengajuan'] = $request->pengajuan;
             $input['catatan'] = $request->catatan;
             $input['tgl_pengajuan'] = $request->tgl_pengajuan;
 
@@ -466,6 +468,9 @@ class PengajuanController extends Controller
             elseif ($request->jenis_pengajuan == 6) {
                 $this->validate($request, [
                     'jumpc' => 'required',
+                    'namarek' => 'required',
+                    'norek' => 'required',
+                    'bank' => 'required',
                 ]);
                 foreach($request->input('jenistr') as $key => $value) {
                     $inpengajuan["jenistr.{$key}"] = 'required';
@@ -480,6 +485,9 @@ class PengajuanController extends Controller
                         $isipengajuan = Isi_pengajuan::create($inpengajuan);
                     }
                     $input['jumlah_pc'] = $request->jumpc;
+                    $input['nama_rek'] = $request->namarek;
+                    $input['no_rek'] = $request->norek;
+                    $input['bank'] = $request->bank;
                 }
             }elseif ($request->jenis_pengajuan == 7) {
                 $this->validate($request, [

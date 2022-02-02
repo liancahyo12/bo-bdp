@@ -51,7 +51,7 @@ class ApprovepengajuanController extends Controller
      */
     public function create($id)
     {
-        $pengajuan = pengajuan::leftJoin('isi_pengajuans', 'pengajuan_id', 'pengajuans.id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'pengajuans.jenis_pengajuan_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('pengajuans.id as ida', 'pengajuans.user_id as suser_id', 'pengajuans.status as sstatus', 'isi_pengajuans.*', 'pengajuans.*', 'jenis_pengajuans.*', 'departemen')->where([['pengajuans.id', '=', $id], ['pengajuans.status', '=', 1]])->first();
+        $pengajuan = pengajuan::leftJoin('isi_pengajuans', 'pengajuan_id', 'pengajuans.id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'pengajuans.jenis_pengajuan_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->leftJoin('users', 'users.id', 'pengajuans.user_id')->select('first_name', 'last_name', 'pengajuans.id as ida', 'pengajuans.user_id as suser_id', 'pengajuans.status as sstatus', 'isi_pengajuans.*', 'pengajuans.*', 'jenis_pengajuans.*', 'departemen')->where([['pengajuans.id', '=', $id], ['pengajuans.status', '=', 1]])->first();
         if ($pengajuan->review_status==2 || $pengajuan->approver_id==Auth::user()->id) {
             if( $pengajuan->approve_status == 0 || $pengajuan->approve_status == 5){
                 DB::update('update pengajuans set approve_status = 1 where id = ?', [$id]);
@@ -111,7 +111,7 @@ class ApprovepengajuanController extends Controller
         $mm = substr($request->tgl_pengajuan, 5, 2);
         $yy = substr($request->tgl_pengajuan, 0, 4);
 
-        $pengajuan = pengajuan::leftJoin('departemens', 'departemens.id', 'departemen_id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'jenis_pengajuan_id')->select('pengajuans.*', 'departemens.kode as kode_departemen', 'jenis_pengajuans.kode as kode_pengajuan')->where([['pengajuans.id', '=', $id],['status', '=', 1]])->first();
+        $pengajuan = pengajuan::leftJoin('departemens', 'departemens.id', 'departemen_id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'jenis_pengajuan_id')->select('pengajuans.*', 'departemens.kode as kode_departemen', 'jenis_pengajuans.kode as kode_pengajuan')->where([['pengajuans.id', '=', $id],['pengajuans.status', '=', 1]])->first();
         $isi_pengajuan= isi_pengajuan::where([['id', '=', $id], ['status', '=', 1]])->select('transaksi', 'nominal')->get();
         if ($pengajuan->review_status!=2) {
             return redirect()->route('boilerplate.approve-pengajuan')

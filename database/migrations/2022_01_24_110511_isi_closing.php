@@ -21,7 +21,9 @@ class IsiClosing extends Migration
             $table->smallInteger('jenis_pengajuan_id')->nullable();
             $table->integer('no')->nullable();
             $table->string('transaksi')->nullable();
+            $table->string('coa')->nullable();
             $table->double('nominal', 20, 2)->nullable();
+            $table->double('saldo', 20, 2)->nullable();
             $table->string('jumlah_barang')->nullable();
             $table->tinyInteger('status')->default(1)->comment('0 = not valid, 1= valid');
 

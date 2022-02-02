@@ -14,42 +14,9 @@
                 <h4><b>Closing</b></h4>
             </x-slot>
             <x-boilerplate::datetimepicker name="tgl_closing" label='Tanggal Closing' value="{{ $closing->tgl_closing}}" disabled/>
-            <div>
-                    <label for='closing'>Closing</label>
-                    <input class='form-control' name='closing' value='Closing {{$closing->closing}}' type='text' id='closing' disabled>    
-                    <table class='table' id='dynamic'>@foreach ($isi_closing as $key => $position) <tr id='ro{{ $position->id }}'>
-                        <td>@if ($loop->first) 
-                            <label for='transaksia'>Keterangan</label> @else @endif
-                            <input class='form-control' type='text' name='transaksia[]' value='{{ $position->transaksi }}' id='transaksia' disabled>
-                        </td>
-                        <td> @if ($loop->first)
-                            <label for='nominala'>Nominal</label> @else @endif
-                            <input class='form-control' type='number' name='nominala[]' value='{{ $position->nominal }}' id='nominala' disabled>
-                        </td>
-                    </tr>@endforeach
-                    
-                </table>
-                <table class='table'>
-                    <tr>
-                        <td>
-                            <label for='totalclosing'>Total</label> 
-                        </td>
-                        <td> 
-                            <input class='form-control' type='text' name='totalclosing' id='totalclosing' disabled>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for='selisih'>Selisih dengan pengajuan</label>
-                            <div id="icselisih"></div>
-                        </td>
-                        <td> 
-                            <input class='form-control' type='text' name='selisih' id='selisih' disabled>
-                        </td>
-                    </tr>
-                </table>
-                <x-boilerplate::input name="catatana" type="text" label="Catatan" value="{{$closing->catatan}}" disabled/>
+            <div id="form-closing">
             </div>
+            <x-boilerplate::input name="catatana" type="text" label="Catatan" value="{{$closing->catatan}}" disabled/>
             <div class="form-group" @if ($closing->lampiran!=null)
             
                 @else
@@ -148,24 +115,27 @@
             var namarek = "{{ $pengajuan->nama_rek }}";
             var total = "{{ $pengajuan->total_nominal }}";
             var nom = document.getElementsByName('nominala[]');
+            var jumpc = "{{ $pengajuan->jumlah_pc }}";
             var tot=0;
-            for(var i=0;i<nom.length;i++){
-                if(parseFloat(nom[i].value))
-                    tot += parseFloat(nom[i].value);
-            }
-            document.getElementById("totalclosing").value = tot;
-            document.getElementById("selisih").value = total-tot;
-            if (total>tot) {
-                document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari pengajuan</span>';
-            }else if (total<tot) {
-                document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi pengajuan</span>';
-            }else {
-                document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai pengajuan</span>';
-            }
             if ( "{{ $closing->jenis_pengajuan_id }}" == 3){
-                document.getElementById("form-pengajuan").innerHTML = "<div><label for='pengajuan'>Pengajuan</label><input class='form-control' name='pengajuan' value='"+pengajuann+"' type='text' id='pengajuan' disabled>    <table class='table' id='dynamic'>@foreach ($isi_pengajuan as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first) <label for='transaksi'>Keterangan</label> @else @endif<input class='form-control' type='text' name='transaksi[]' value='{{ $position->transaksi }}' id='transaksi' disabled></td><td> @if ($loop->first)<label for='nominal'>Nominal</label> @else @endif<input class='form-control' type='text' name='nominal[]' value='{{ $position->nominal }}' id='nominal' disabled></td></tr>@endforeach <tr><td><label for='total'>Total</label> </td><td> <input class='form-control' type='text' name='total[]' value='"+total+"' id='total' disabled></td></tr></table>        <label for='catatan'>Catatan</label><input class='form-control' type='text' name='catatan' value='"+catatan+"' id='catatan' disabled><br><h3>Tujuan</h3><label for='namarek'>Nama Rekening</label><input class='form-control' name='namarek' value='"+namarek+"' type='text' id='namarek' disabled><label for='norek'>No Rekening</label>            <input class='form-control' name='norek' value='"+norek+"' type='text' id='norek' disabled><label for='bank'>Bank</label>           <input class='form-control' name='bank' value='"+bank+"' type='text' id='Bank' disabled></div>"
-            }else if ( "{{ $closing->jenis_pengajuan_id }}" == 5){
-                document.getElementById("form-pengajuan").innerHTML = "<div><label for='pengajuan'>Pengajuan</label><input class='form-control' name='pengajuan' value='"+pengajuann+"' type='text' id='pengajuan' disabled>    <table class='table' id='dynamic'>@foreach ($isi_pengajuan as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first)<label for='coa'>COA</label> @else @endif<input class='form-control' type='text' name='coa[]' value='{{ $position->coa }}' id='coa' disabled></td><td>@if ($loop->first) <label for='transaksi'>Keterangan</label> @else @endif<input class='form-control' type='text' name='transaksi[]' value='{{ $position->transaksi }}' id='transaksi' disabled></td><td> @if ($loop->first)<label for='nominal'>Nominal</label> @else @endif<input class='form-control' type='text' name='nominal[]' value='{{ $position->nominal }}' id='nominal' disabled></td> <td>@if ($loop->first)<label for='saldo'>Saldo</label> @else @endif<input class='form-control' type='text' name='saldo[]' value='{{ $position->saldo }}' id='saldo' disabled></td> </tr>@endforeach</table>      <label for='catatan'>Catatan</label><br><input class='form-control' type='text' name='catatan' value='"+catatan+"' id='catatan' disabled><h3>Tujuan</h3><label for='namarek'>Nama Rekening Tujuan</label><input class='form-control' name='namarek' value='"+namarek+"' type='text' id='namarek' disabled><label for='norek'>No Rekening Tujuan</label>            <input class='form-control' name='norek' value='"+norek+"' type='text' id='norek' disabled><label for='bank'>Bank Tujuan</label>           <input class='form-control' name='bank' value='"+bank+"' type='text' id='Bank' disabled></div>"
+                document.getElementById("form-pengajuan").innerHTML = "<div>    <table class='table' id='dynamic'>@foreach ($isi_closing as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first) <label for='transaksi'>Keterangan</label> @else @endif<input class='form-control' type='text' name='transaksi[]' value='{{ $position->transaksi }}' id='transaksi' disabled></td><td> @if ($loop->first)<label for='nominal'>Nominal</label> @else @endif<input class='form-control' type='text' name='nominal[]' value='{{ $position->nominal }}' id='nominal' disabled></td></tr>@endforeach <tr><td><label for='total'>Total</label> </td><td> <input class='form-control' type='text' name='total[]' value='"+total+"' id='total' disabled></td></tr></table>        <label for='catatan'>Catatan**</label><input class='form-control' type='text' name='catatan' value='"+catatan+"' id='catatan' disabled><br><h3>Tujuan</h3><label for='namarek'>Nama Rekening**</label><input class='form-control' name='namarek' value='"+namarek+"' type='text' id='namarek' disabled><label for='norek'>No Rekening</label>            <input class='form-control' name='norek' value='"+norek+"' type='text' id='norek' disabled><label for='bank'>Bank</label>           <input class='form-control' name='bank' value='"+bank+"' type='text' id='Bank' disabled></div>"
+                document.getElementById("form-closing").innerHTML = "<table class='table' id='dynamic'>@foreach ($isi_closing as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first) <label for='transaksia'>Keterangan</label> @else @endif <input class='form-control' type='text' name='transaksia[]' value='{{ $position->transaksi }}' id='transaksia' disabled></td><td> @if ($loop->first) <label for='nominala'>Nominal</label> @else @endif <input class='form-control' type='number' name='nominala[]' value='{{ $position->nominal }}' id='nominala' disabled></td> </tr>@endforeach </table>      <table class='table'><tr><td><label for='totalclosing'>Total</label> </td><td> <input class='form-control' type='text' name='totalclosing' id='totalclosing' disabled></td></tr><tr><td><label for='selisih'>Selisih dengan pengajuan</label><div id='icselisih'></div></td><td> <input class='form-control' type='text' name='selisih' id='selisih' disabled></td></tr></table>"
+                for(var i=0;i<nom.length;i++){
+                    if(parseFloat(nom[i].value))
+                        tot += parseFloat(nom[i].value);
+                }
+                document.getElementById("totalclosing").value = tot;
+                document.getElementById("selisih").value = total-tot;
+                if (total>tot) {
+                    document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari pengajuan</span>';
+                }else if (total<tot) {
+                    document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi pengajuan</span>';
+                }else {
+                    document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai pengajuan</span>';
+                }
+            }else if ( "{{ $closing->jenis_pengajuan_id }}" == 6){
+                document.getElementById("form-pengajuan").innerHTML = "<div><label for='jumpc'>Jumlah Petty Cash(dalam rupiah)</label><input class='form-control' name='jumpc' value='"+jumpc+"' type='text' id='jumpc' disabled></input></div>       <br><h3>Kebutuhan</h3><table class='table' id='dynamic'>@foreach ($isi_pengajuan as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first) <label for='jenistr'>Jenis Transaksi</label> @else @endif<input class='form-control' type='text' name='jenistr[]' value='{{ $position->jenis_transaksi }}' id='jenistr' disabled></td> </tr>@endforeach</table> <label for='catatan'>Catatan</label><input class='form-control' type='text' name='catatan' value='"+catatan+"' id='catatan' disabled><h3>Tujuan</h3><label for='namarek'>Nama Rekening Tujuan</label><input class='form-control' name='namarek' value='"+namarek+"' type='text' id='namarek' disabled><label for='norek'>No Rekening Tujuan</label>            <input class='form-control' name='norek' value='"+norek+"' type='text' id='norek' disabled><label for='bank'>Bank Tujuan</label>           <input class='form-control' name='bank' value='"+bank+"' type='text' id='Bank' disabled>"
+                document.getElementById("form-closing").innerHTML = "<div>    <table class='table' id='dynamic'>@foreach ($isi_closing as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first)<label for='coa'>COA</label> @else @endif<input class='form-control' type='text' name='coa[]' value='{{ $position->coa }}' id='coa' disabled></td><td>@if ($loop->first) <label for='transaksia'>Keterangan</label> @else @endif<input class='form-control' type='text' name='transaksia[]' value='{{ $position->transaksi }}' id='transaksia' disabled></td><td> @if ($loop->first)<label for='nominala'>Nominal</label> @else @endif<input class='form-control' type='text' name='nominala[]' value='{{ $position->nominal }}' id='nominala' disabled></td> <td>@if ($loop->first)<label for='saldoa'>Saldo</label> @else @endif<input class='form-control' type='text' name='saldoa[]' value='{{ $position->saldo }}' id='saldoa' disabled></td> </tr>@endforeach</table></div>"
             }
         });
     </script>

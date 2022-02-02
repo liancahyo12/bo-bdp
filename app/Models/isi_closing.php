@@ -11,6 +11,7 @@ class isi_closing extends Model
     protected $fillable = [
         'closing_id',
         'jenis_pengajuan_id',
+        'pengajuan_id',
         'no',
         'transaksi',
         'jenis_transaksi',
@@ -18,6 +19,7 @@ class isi_closing extends Model
         'nominal',
         'saldo',
         'jumlah_barang',
+        
     ];
     public function closing()
     {  

@@ -18,6 +18,7 @@ class Departemen extends Migration
             $table->id();
             $table->string('kode');
             $table->string('departemen');
+            $table->tinyInteger('status')->default(1)->comment('0 = not valid, 1= valid');
 
         });
     }

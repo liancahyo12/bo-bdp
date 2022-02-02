@@ -14,7 +14,7 @@ class ClosingDatatable extends Datatable
 
     public function datasource()
     {
-        return closing::leftJoin('jenis_pengajuans', 'closings.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['user_id', '=', Auth::user()->id], ['status', '=', '1']])->orderByDesc('closings.updated_at')->get(['closings.id',
+        return closing::leftJoin('jenis_pengajuans', 'closings.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['user_id', '=', Auth::user()->id], ['closings.status', '=', '1']])->orderByDesc('closings.updated_at')->get(['closings.id',
         'closing',
         'no_pengajuan',
         'tgl_closing',

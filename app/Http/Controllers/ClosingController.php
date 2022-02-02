@@ -49,13 +49,13 @@ class ClosingController extends Controller
         if ($pengajuan->idp!=null) {
             return redirect()->route('boilerplate.saya-closing-pengajuan')
                 ->with('growl', [__('Closing telah dibuat'), 'danger']);
-        }else if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==5 ) &&$pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2) {
+        }else if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==6 ) &&$pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2) {
             return view('boilerplate::closing-pengajuan.buat', compact('pengajuan'), 
             // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
             [
                 'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $id], ['status', '=', 1]])->get(),
-                'jenis_pengajuan' => jenis_pengajuan::all(),
-                'departemens' => departemen::all(),
+                'jenis_pengajuan' => jenis_pengajuan::where('status', 1)->get(),
+                'departemens' => departemen::where('status', 1)->get(),
                 
             ]
             );
@@ -116,12 +116,11 @@ class ClosingController extends Controller
                 'file_lampiran' => 'mimes:pdf|max:20480',
         ]);
         $pengajuan = pengajuan::where('id',$id)->first();
-        if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==5 ) &&$pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2) {
+        if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==6 ) &&$pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2) {
             $input['user_id'] = Auth::user()->id;
             $input['pengajuan_id'] = $id;
             $input['jenis_pengajuan_id'] = $pengajuan->jenis_pengajuan_id;
             $input['departemen_id'] = Auth::user()->departemen_id;
-            $input['closing'] = 'Closing '.$pengajuan->pengajuan;
             $input['no_urut'] = $pengajuan->no_urut;
             $input['no_pengajuan'] = $pengajuan->no_pengajuan;
             $input['catatan'] = $request->catatana;
@@ -136,23 +135,46 @@ class ClosingController extends Controller
                 $path = $request->file('file_lampiran')->storeAs('lampiran-pengajuan', $filename);
                 $input['lampiran'] = $path;
             }
-            foreach($request->input('transaksia') as $key => $value) {
+            if ($pengajuan->jenis_pengajuan_id==3) {
+                foreach($request->input('transaksia') as $key => $value) {
                     $inclosing["transaksia.{$key}"] = 'required';
                     $inclosing["nominala.{$key}"] = 'required';
                 }
-            $validator = Validator::make($request->all(), $inclosing);
-            if ($validator->passes()) {
-                foreach($request->transaksia as $key => $value) {
-                    $inclosing['transaksi'] = $value;
-                    $inclosing['nominal'] = $request->nominala[$key];
-                    $inclosing['closing_id'] = $idf;
-                    $inclosing['pengajuan_id'] = $id;
-                    $inclosing['jenis_pengajuan_id'] = $pengajuan->jenis_pengajuan_id;
-                    $isipengajuan = Isi_closing::create($inclosing);
-                    $total += $request->nominala[$key];
+                $validator = Validator::make($request->all(), $inclosing);
+                if ($validator->passes()) {
+                    foreach($request->transaksia as $key => $value) {
+                        $inclosing['transaksi'] = $value;
+                        $inclosing['nominal'] = $request->nominala[$key];
+                        $inclosing['closing_id'] = $idf;
+                        $inclosing['pengajuan_id'] = $id;
+                        $inclosing['jenis_pengajuan_id'] = $pengajuan->jenis_pengajuan_id;
+                        $isipengajuan = Isi_closing::create($inclosing);
+                        $total += $request->nominala[$key];
+                    }
+                    $input['total_nominal'] = $total;
                 }
-                $input['total_nominal'] = $total;
+            }elseif ($pengajuan->jenis_pengajuan_id==6) {
+                foreach($request->input('transaksia') as $key => $value) {
+                    $inclosing["transaksia.{$key}"] = 'required';
+                    $inclosing["saldoa.{$key}"] = 'required';
+                }
+                $validator = Validator::make($request->all(), $inclosing);
+                if ($validator->passes()) {
+                    foreach($request->transaksia as $key => $value) {
+                        $inclosing['transaksi'] = $value;
+                        $inclosing['nominal'] = $request->nominala[$key];
+                        $inclosing['coa'] = $request->coa[$key];
+                        $inclosing['saldo'] = $request->saldoa[$key];
+                        $inclosing['closing_id'] = $idf;
+                        $inclosing['pengajuan_id'] = $id;
+                        $inclosing['jenis_pengajuan_id'] = $pengajuan->jenis_pengajuan_id;
+                        $isipengajuan = Isi_closing::create($inclosing);
+                        $total += $request->nominala[$key];
+                    }
+                    $input['total_nominal'] = $total;
+                }
             }
+            
             $input['send_status'] = 1;
             $input['send_time'] = Carbon::now()->toDateTimeString();
             $input['reviewdep_status'] = 0;
@@ -171,7 +193,7 @@ class ClosingController extends Controller
             $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->first();
             $user->notify(new ReviewdepaClosing($idf));
 
-            return redirect()->route('boilerplate.saya-pengajuan')
+            return redirect()->route('boilerplate.saya-closing-pengajuan')
                             ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);
         }else {
             return redirect()->route('boilerplate.saya-pengajuan')
@@ -186,7 +208,6 @@ class ClosingController extends Controller
             $this->validate($request, [
                     'tgl_closing'  => 'required',
                     'catatana' => 'required',
-                    'file_lampiran' => 'required|mimes:pdf|max:20480',
             ]);
             $input['catatan'] = $request->catatana;
             $input['tgl_closing'] = $request->tgl_closing;
@@ -195,25 +216,48 @@ class ClosingController extends Controller
             if ($request->file_lampiran!=null) {
                 $path = $request->file('file_lampiran')->storeAs('lampiran-pengajuan', $filename);
             }
-
-            foreach($request->input('transaksia') as $key => $value) {
+            if ($input->jenis_pengajuan_id==3) {
+                foreach($request->input('transaksia') as $key => $value) {
                     $inclosing["transaksia.{$key}"] = 'required';
                     $inclosing["nominala.{$key}"] = 'required';
                 }
-            $validator = Validator::make($request->all(), $inclosing);
-            if ($validator->passes()) {
-                Isi_closing::where('closing_id', $id)->update(['status' => 0]);
-                foreach($request->transaksia as $key => $value) {
-                    $inclosing['transaksi'] = $value;
-                    $inclosing['nominal'] = $request->nominala[$key];
-                    $inclosing['closing_id'] = $id;
-                    $inclosing['pengajuan_id'] = $input->pengajuan_id;
-                    $inclosing['jenis_pengajuan_id'] = $input->jenis_pengajuan_id;
-                    $isipengajuan = Isi_closing::create($inclosing);
-                    $total += $request->nominala[$key];
+                $validator = Validator::make($request->all(), $inclosing);
+                if ($validator->passes()) {
+                    Isi_closing::where('closing_id', $id)->update(['status' => 0]);
+                    foreach($request->transaksia as $key => $value) {
+                        $inclosing['transaksi'] = $value;
+                        $inclosing['nominal'] = $request->nominala[$key];
+                        $inclosing['closing_id'] = $id;
+                        $inclosing['pengajuan_id'] = $input->pengajuan_id;
+                        $inclosing['jenis_pengajuan_id'] = $input->jenis_pengajuan_id;
+                        $isipengajuan = Isi_closing::create($inclosing);
+                        $total += $request->nominala[$key];
+                    }
+                    $input['total_nominal'] = $total;
                 }
-                $input['total_nominal'] = $total;
+            }elseif ($input->jenis_pengajuan_id==6) {
+                foreach($request->input('transaksia') as $key => $value) {
+                    $inclosing["transaksia.{$key}"] = 'required';
+                    $inclosing["saldoa.{$key}"] = 'required';
+                }
+                $validator = Validator::make($request->all(), $inclosing);
+                if ($validator->passes()) {
+                    Isi_closing::where('closing_id', $id)->update(['status' => 0]);
+                    foreach($request->transaksia as $key => $value) {
+                        $inclosing['transaksi'] = $value;
+                        $inclosing['nominal'] = $request->nominala[$key];
+                        $inclosing['coa'] = $request->coa[$key];
+                        $inclosing['saldo'] = $request->saldoa[$key];
+                        $inclosing['closing_id'] = $id;
+                        $inclosing['pengajuan_id'] = $input->pengajuan_id;
+                        $inclosing['jenis_pengajuan_id'] = $input->jenis_pengajuan_id;
+                        $isipengajuan = Isi_closing::create($inclosing);
+                        $total += $request->nominala[$key];
+                    }
+                    $input['total_nominal'] = $total;
+                }
             }
+            
             if ($input->send_status == 1 && $input->revisi_status==1) {
                     $input['reviewdep_status'] = 5;
                     $input['revisi_status'] = 2;
@@ -237,10 +281,10 @@ class ClosingController extends Controller
                 
                 // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
                 $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->first();
-                $user->notify(new ReviewdepaClosing($idf));
+                $user->notify(new ReviewdepaClosing($id));
 
                 return redirect()->route('boilerplate.saya-closing-pengajuan')
-                                ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);
+                                ->with('growl', [__('Closing pengajuan berhasil dikirim'), 'success']);
         }
     }
     public function unduh_lampiran($id)
