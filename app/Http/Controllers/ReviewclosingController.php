@@ -56,8 +56,8 @@ class ReviewclosingController extends Controller
             return view('boilerplate::closing-pengajuan.detail-review', compact('closing'), [
                 'isi_closing' => isi_closing::where([['closing_id', '=', $id], ['status', '=', 1]])->get(),
                 'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $closing->pengajuan_id], ['status', '=', 1]])->get(),
-                'jenis_pengajuan' => jenis_pengajuan::all(),
-                'departemens' => departemen::all(),
+                'jenis_pengajuan' => jenis_pengajuan::where('status', 1)->get(),
+                'departemens' => departemen::where('status', 1)->get(),
                 'komentar' => $approveclosing,
                 'pengajuan' => $pengajuan,
             ]); 

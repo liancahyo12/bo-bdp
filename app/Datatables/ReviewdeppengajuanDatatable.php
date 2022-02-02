@@ -14,7 +14,7 @@ class ReviewdeppengajuanDatatable extends Datatable
 
     public function datasource()
     {
-        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['departemen_id', '=', Auth::user()->departemen_id], ['send_status', '=', '1'], ['status', '=', '1']])->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
+        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['departemen_id', '=', Auth::user()->departemen_id], ['send_status', '=', '1'], ['pengajuans.status', '=', '1']])->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
         'pengajuan',
         'tgl_pengajuan',
         'jenis_pengajuan',

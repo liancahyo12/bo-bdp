@@ -20,23 +20,24 @@ class jenis_pengajuan extends Seeder
                 'jenis_pengajuan' => 'PURCHASE REQUEST',
             ],
             [
-                'kode' => 'PC',
-                'jenis_pengajuan' => 'PETTY CASH',
-            ],
-            [
-                'kode' => 'PP',
-                'jenis_pengajuan' => 'POSTPAID PAYMENT',
+                'kode' => 'RP',
+                'jenis_pengajuan' => 'REIMBURSEMENT PAYMENT',
             ],
             [
                 'kode' => 'CA',
                 'jenis_pengajuan' => 'CASH ADVANCE',
             ],
             [
-                'kode' => 'RP',
-                'jenis_pengajuan' => 'REIMBURSEMENT PAYMENT',
+                'kode' => 'PP',
+                'jenis_pengajuan' => 'POSTPAID PAYMENT',
             ],
             [
-                'kode' => 'PPC',
+                'kode' => 'PC',
+                'jenis_pengajuan' => 'PETTY CASH',
+                'status' = > 0,
+            ],
+            [
+                'kode' => 'PCC',
                 'jenis_pengajuan' => 'PETTY CASH CUSTODIAN',
             ],
             [

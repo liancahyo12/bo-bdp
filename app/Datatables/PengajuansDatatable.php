@@ -15,7 +15,7 @@ class PengajuansDatatable extends Datatable
     public function datasource()
     {
         // return User::query();
-        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['user_id', '=', Auth::user()->id], ['status', '=', '1']])->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
+        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['user_id', '=', Auth::user()->id], ['pengajuans.status', '=', '1']])->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
         'pengajuan',
         'no_pengajuan',
         'tgl_pengajuan',
@@ -149,7 +149,7 @@ class PengajuansDatatable extends Datatable
                 
             Column::add('Aksi')
                 ->actions(function(pengajuan $pengajuan) {
-                    if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==5 ) && $pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2) {
+                    if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==6 ) && $pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2) {
                         return join([
                             Button::show('boilerplate.edit-pengajuan', $pengajuan->id),  
                             Button::add('closing')->route('boilerplate.buat-closing-pengajuan', $pengajuan->id)->color('primary')->make(), 

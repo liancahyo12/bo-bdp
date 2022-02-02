@@ -14,7 +14,7 @@ class BayarPengajuanDatatable extends Datatable
 
     public function datasource()
     {
-        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->whereRaw('status = 1 and review_status=2 and reviewdep_status=2 and approve_status=2 and jenis_pengajuan_id<6')->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
+        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->whereRaw('pengajuans.status = 1 and review_status=2 and reviewdep_status=2 and approve_status=2 and jenis_pengajuan_id<6')->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
         'pengajuan',
         'tgl_pengajuan',
         'jenis_pengajuan',

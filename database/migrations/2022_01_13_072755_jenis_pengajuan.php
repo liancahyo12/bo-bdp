@@ -19,6 +19,7 @@ class JenisPengajuan extends Migration
             $table->string('kode');
             $table->string('jenis_pengajuan');
             $table->string('format')->nullable();
+            $table->tinyInteger('status')->default(1)->comment('0 = not valid, 1= valid');
         });
     }
 
