@@ -184,7 +184,7 @@ class ApprovesuratkeluarController extends Controller
 
         //buat no surat
         $nosurat= '';
-        if ($request->jenis_surat == '12') {
+        if ($request->jenis_surat != '12') {
             $nosurat= sprintf("%03d", $nourut).'/BDP-'.$surat_kode.'/'.$departemen_kode.'/'.$romawi.'/'.$yy;
         }else {
             $nosurat= sprintf("%03d", $nourut).'/BDP-'.$surat_kode.'/'.$romawi.'/'.$yy;

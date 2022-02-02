@@ -9,7 +9,7 @@ class Pengajuan
     public function make(Builder $menu)
     {
         $item = $menu->add('Pengajuan', [
-            'icon' => 'tasks',
+            'icon' => 'money-bill-wave',
             'permission' => 'buat_pengajuan,approve_pengajuan,reviewdep_pengajuan,review_pengajuan',
             'order' => 1001,
         ]);

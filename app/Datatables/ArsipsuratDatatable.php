@@ -7,6 +7,7 @@ use Sebastienheyd\Boilerplate\Datatables\Column;
 use Sebastienheyd\Boilerplate\Datatables\Datatable;
 use App\Models\Suratkeluar;
 use App\Models\User;
+use Carbon\Carbon;
 use Auth;
 use DB;
 
@@ -16,10 +17,11 @@ class ArsipsuratDatatable extends Datatable
 
     public function datasource()
     {
-        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->where([['user_id', '=', Auth::user()->id], ['status', '=', '1'], ['approve_status', '=', '2']])->orderByDesc('suratkeluars.approve_time')->get(['suratkeluars.id',
+        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->where([['suratkeluars.status', '=', '1'], ['approve_status', '=', '2']])->orderByDesc('suratkeluars.approve_time')->get(['suratkeluars.id',
         'perihal',
         'tgl_surat',
-        'jenis_surat',
+        'departemen',
+        'jenis_surats.kode as kodes',
         'review_status',
         'approve_status',
         'approve_time',
@@ -37,17 +39,18 @@ class ArsipsuratDatatable extends Datatable
     {
         return [
                  
-            Column::add('Id')
-                ->data('id'),
-
-            // Column::add('Id Permintaan')
-            //     ->data('request_surat_keluar_id'),
 
             Column::add('Waktu Approve')
                 ->data('approve_time'),
-            
-            Column::add('Jenis Surat')
-                ->data('jenis_surat'),
+
+            Column::add('No Surat')
+                ->data('no_surat'),
+
+            Column::add('Kode')
+                ->data('kodes'),
+
+            Column::add('Departemen')
+                ->data('departemen'),
 
             Column::add('Perihal Surat')
                 ->data('perihal'),
@@ -55,9 +58,6 @@ class ArsipsuratDatatable extends Datatable
             Column::add('Tgl Surat')
                 ->data('tgl_surat'),
             
-            Column::add('No Surat')
-                ->data('no_surat'),
-
             Column::add()
                 ->actions(function(Suratkeluar $suratkeluar) {
                     if ($suratkeluar->surat_scan == null) {
