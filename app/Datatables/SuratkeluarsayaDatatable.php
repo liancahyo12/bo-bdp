@@ -18,7 +18,7 @@ class SuratkeluarsayaDatatable extends Datatable
     public function datasource()
     {
         
-        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->where([['user_id', '=', Auth::user()->id], ['status', '=', '1']])->orderByDesc('suratkeluars.updated_at')->get(['suratkeluars.id',
+        return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->where([['user_id', '=', Auth::user()->id], ['suratkeluars.status', '=', '1']])->orderByDesc('suratkeluars.updated_at')->get(['suratkeluars.id',
         'perihal',
         'tgl_surat',
         'jenis_surat',

@@ -13,7 +13,19 @@ class Suratmasuk extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('suratmasuks', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->date('tgl_diterima')->nullable();
+            $table->date('tgl_surat')->nullable();
+            $table->string('no_surat')->nullable();
+            $table->string('pengirim')->nullable();
+            $table->smallInteger('departemen_id');
+            $table->string('ringkasan')->nullable();
+            $table->string('isi_surat')->nullable();
+            $table->tinyInteger('status')->default(1)->comment('0 = not valid, 1= valid');
+        });
     }
 
     /**
@@ -23,6 +35,6 @@ class Suratmasuk extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('suratmasuks');
     }
 }
