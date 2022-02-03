@@ -19,7 +19,7 @@ class SuratMasuk
             'permission' => 'buat_surat_masuk',
             'order' => 100,
         ]);
-        $item->add('Surat Masuk', [
+        $item->add('Surat Masuk Departemen', [
             'route' => 'boilerplate.surat-masuk',
             'active' => 'boilerplate.surat-masuk,boilerplate.surat-masuk-detail',
             'permission' => 'surat_masuk',
