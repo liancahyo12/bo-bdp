@@ -14,6 +14,7 @@ use App\Notifications\Boilerplate\ResetPassword;
 use App\Notifications\Boilerplate\RdepPengajuan;
 use Thomaswelton\LaravelGravatar\Facades\Gravatar;
 use App\Models\Suratkeluar;
+use App\Models\Suratmasuk;
 use App\Models\rek_user;
 
 class User extends Authenticatable
@@ -41,6 +42,11 @@ class User extends Authenticatable
     public function suratkeluar()
     {
         return $this->hasMany(Suratkeluar::class);
+    }
+
+    public function suratmasuk()
+    {
+        return $this->hasMany(Suratmasuk::class);
     }
 
     public function rek_user()

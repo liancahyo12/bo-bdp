@@ -415,6 +415,9 @@ Route::group([
         Route::get('/surat-masuk-edit/{id}', [SuratmasukController::class, 'edit'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_surat_masuk'])
             ->name('surat-masuk-edit');
+        Route::get('/surat-masuk-saya-detail/{id}', [SuratmasukController::class, 'detail_saya'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_masuk'])
+            ->name('surat-masuk-saya-detail');
         Route::get('/surat-masuk', [SuratmasukController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,surat_masuk'])
             ->name('surat-masuk');
@@ -427,5 +430,14 @@ Route::group([
         Route::post('/surat-masuk-arsip-detail/{id}', [SuratmasukController::class, 'detail_arsip'])
             ->middleware(['boilerplateauth', 'ability:admin,arsip_surat_masuk'])
             ->name('surat-masuk-arsip-detail');
+        Route::get('/surat-masuk-file-arsip/{id}', [SuratmasukController::class, 'file_arsip'])
+            ->middleware(['boilerplateauth', 'ability:admin,arsip_surat_masuk'])
+            ->name('surat-masuk-file-arsip');
+        Route::get('/surat-masuk-file-saya/{id}', [SuratmasukController::class, 'file_saya'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_masuk'])
+            ->name('surat-masuk-file-saya');
+        Route::get('/surat-masuk-file/{id}', [SuratmasukController::class, 'file'])
+            ->middleware(['boilerplateauth', 'ability:admin,surat_masuk'])
+            ->name('surat-masuk-file');
     });
 });
