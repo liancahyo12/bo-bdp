@@ -66,7 +66,7 @@ class SuratmasukController extends Controller
         $input['no_surat'] = $request->no_surat;
         $input['pengirim'] = $request->pengirim;
         $suratmasuk = Suratmasuk::create($input);
-        return redirect()->route('boilerplate.surat-masuk-saya.index')
+        return redirect()->route('boilerplate.surat-masuk-saya')
                 ->with('growl', [__('Surat berhasil dikirim'), 'success']);
     }
     public function edit($id)
