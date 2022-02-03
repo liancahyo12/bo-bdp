@@ -11,7 +11,7 @@ class SuratKeluar
         $item = $menu->add('Surat Keluar', [
             'icon' => 'envelope',
             'permission' => 'request_surat_keluar,review_surat,buat_surat_keluar,approve_surat,arsip_surat',
-            'order' => 1004,
+            'order' => 1005,
         ]);
         // $item->add('Buat Permintaan Surat', [
         //     'route' => 'boilerplate.surat-keluar-request-buat',
