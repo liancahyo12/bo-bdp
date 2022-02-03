@@ -37,7 +37,7 @@ class SuratmasukController extends Controller
             'departemens' => departemen::all(),
         ]);
     }
-    public function store()
+    public function store(Request $request)
     {
         $this->validate($request, [
                 'departemen'  => 'required',
@@ -51,12 +51,11 @@ class SuratmasukController extends Controller
 
         $input['user_id'] = Auth::user()->id;
         $last_surat_masuk = DB::table('suratmasuks')->select('id')->orderBy('id', 'DESC')->limit(1)->value('id');
-        $ssr = $last_surat_keluar+1;
+        $ssr = $last_surat_masuk+1;
         $filenameS = $ssr.Str::random(16);
         $pathS ='';
         if ($request->file_surat!=null) {
             $pathS = $request->file('file_surat')->storeAs('suratmasuk', $filenameS.'.pdf');
-            $converter->convertTo($filenameS.'.pdf'); 
             $input['isi_surat'] = 'suratmasuk/'.$filenameS.'.pdf';
         }
         
@@ -67,6 +66,8 @@ class SuratmasukController extends Controller
         $input['no_surat'] = $request->no_surat;
         $input['pengirim'] = $request->pengirim;
         $suratmasuk = Suratmasuk::create($input);
+        return redirect()->route('boilerplate.surat-masuk-saya.index')
+                ->with('growl', [__('Surat berhasil dikirim'), 'success']);
     }
     public function edit($id)
     {
@@ -88,14 +89,64 @@ class SuratmasukController extends Controller
         return view('boilerplate::surat-masuk.saya');
         //
     }
-    public function detail()
+    public function detail($id)
     {
-        return view('boilerplate::surat-masuk.detail');
-        //
+        if(Suratmasuk::where('id', $id)->value('departemen_id') == Auth::user()->departemen_id){
+            return view('boilerplate::surat-masuk.detail', [
+                'suratmasuk' => Suratmasuk::where([['id', '=', Auth::user()->id], ['status', '=', 1]])->first(),
+                'departemens' => departemen::all(),
+            ]);
+        }else {
+            return redirect()->route('boilerplate.surat-masuk')
+                            ->with('growl', [__('Anda tidak memiliki akses surat ini'), 'warning']);
+        }
     }
-    public function detail_arsip()
+    public function detail_arsip($id)
     {
-        return view('boilerplate::surat-masuk.detail-arsip');
-        //
+        return view('boilerplate::surat-masuk.detail', [
+                'suratmasuk' => Suratmasuk::where([['id', '=', Auth::user()->id], ['status', '=', 1]])->first(),
+                'departemens' => departemen::all(),
+            ]);
+    }
+    public function detail_saya($id)
+    {
+        if(Suratmasuk::where('id', $id)->value('user_id') == Auth::user()->id){
+            return view('boilerplate::surat-masuk.detail', [
+                'suratmasuk' => Suratmasuk::where([['id', '=', Auth::user()->id], ['status', '=', 1]])->first(),
+                'departemens' => departemen::all(),
+            ]);
+        }else {
+            return redirect()->route('boilerplate.surat-masuk-saya')
+                            ->with('growl', [__('Anda tidak memiliki akses surat ini'), 'warning']);
+        }
+    }
+
+    public function file_saya($id)
+    {
+        if(Suratmasuk::where('id', $id)->value('user_id') == Auth::user()->id){
+            $file= Storage::disk('local')->get(Suratmasuk::where('id', $id)->value('isi_surat'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf');
+        }else {
+            return redirect()->route('boilerplate.surat-masuk-saya')
+                            ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
+        }
+    }
+    public function file($id)
+    {
+        if(Suratmasuk::where('id', $id)->value('departemen_id') == Auth::user()->departemen_id){
+            $file= Storage::disk('local')->get(Suratmasuk::where('id', $id)->value('isi_surat'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf');
+        }else {
+            return redirect()->route('boilerplate.surat-masuk')
+                            ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
+        }
+    }
+    public function file_arsip($id)
+    {
+        $file= Storage::disk('local')->get(Suratmasuk::where('id', $id)->value('isi_surat'));
+        return (new Response($file, 200))
+            ->header('Content-Type', 'application/pdf');
     }
 }

@@ -47,20 +47,10 @@ class SuratMasukArsipDatatable extends Datatable
             Column::add('Ringkasan')
                 ->data('ringkasan'),
 
-            Column::add()
-                ->actions(function(Suratkeluar $suratkeluar) {
-                    if ($suratkeluar->send_status == 1 && ($suratkeluar->review_status == 3 ||  $suratkeluar->approve_status == 3)) {
-                        return join([
-                        Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),          
-                    ]);
-                    }else if($suratkeluar->send_status == 1){
-                        return join([
-                        Button::show('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),           
-                    ]);  
-                    }
+            Column::add('Lihat')
+                ->actions(function(Suratmasuk $suratmasuk) {
                     return join([
-                        Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),    
-                        Button::delete('boilerplate.surat-keluar-saya.destroy', $suratkeluar->id),           
+                        Button::show('boilerplate.surat-masuk-arsip-detail', $suratmasuk->id),           
                     ]);
                     
                 }),

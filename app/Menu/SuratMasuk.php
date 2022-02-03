@@ -31,5 +31,11 @@ class SuratMasuk
             'permission' => 'arsip_surat_masuk',
             'order' => 102,
         ]);
+        $item->add('Surat Masuk Saya', [
+            'route' => 'boilerplate.surat-masuk-saya',
+            'active' => 'boilerplate.surat-masuk-saya,boilerplate.surat-masuk-saya-detail',
+            'permission' => 'buat_surat_masuk',
+            'order' => 103,
+        ]);
     }
 }
