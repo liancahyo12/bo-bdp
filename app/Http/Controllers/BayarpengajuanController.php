@@ -57,7 +57,7 @@ class BayarpengajuanController extends Controller
             $pengajuan['bayar_time'] = Carbon::now()->toDateTimeString();;
             $pengajuan->save();
 
-            $link = route('boilerplate.detail-saya-pengajuan', $id);
+            $link = route('boilerplate.bayar-pengajuan', $id);
 
             $mailto = pengajuan::leftJoin('users', 'users.id', 'pengajuans.user_id')->where('pengajuans.id', $id)->value('users.email');
                 $details = [
@@ -75,6 +75,12 @@ class BayarpengajuanController extends Controller
             ->with('growl', [__('Pengajuan tidak ada'), 'danger']);
     }
     public function unduh_lampiran($id)
+    {
+        $file= Storage::disk('local')->get(pengajuan::where([['id', '=', $id], ['status', '=', 1]])->value('lampiran'));
+        return (new Response($file, 200))
+            ->header('Content-Type', 'application/pdf');
+    }
+    public function unduh_bukti($id)
     {
         $file= Storage::disk('local')->get(pengajuan::where([['id', '=', $id], ['status', '=', 1]])->value('bukti_bayar'));
         return (new Response($file, 200))

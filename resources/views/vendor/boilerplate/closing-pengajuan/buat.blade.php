@@ -15,14 +15,14 @@
                 <x-slot name="header">
                     <h4><b>Form Closing</b></h4>
                 </x-slot>
-                <x-boilerplate::datetimepicker name="tgl_closing" label='Tanggal Closing'/>
+                <x-boilerplate::datetimepicker name="tgl_closing" label='Tanggal Closing*'/>
                 <x-boilerplate::select2 name="jenis_pengajuan" label="Pilih Jenis Pengajuan" id='jenis_pengajuan' disabled>
                         <option value="{{ $pengajuan->jenis_pengajuan_id }}" selected>{{ $pengajuan->jenis_pengajuan }}</option>
                 </x-boilerplate::select2>
                 <div id="form-closing">
                 </div>
-                <x-boilerplate::input name="catatana" type="text" label="Catatan" />
-                <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran" />
+                <x-boilerplate::input name="catatana" type="text" label="Catatan*" />
+                <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran* (PDF Maks 20MB)" />
                 <div class="row">
                     &nbsp; &nbsp;
                     {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}

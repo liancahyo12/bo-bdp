@@ -55,7 +55,7 @@ class PengajuanController extends Controller
     {
         $jenis_pengajuan = [];
         if (Laratrust::isAbleTo('pengajuan_fags')==true) {
-            $jenis_pengajuan = jenis_pengajuan::all();
+            $jenis_pengajuan = jenis_pengajuan::where('status', 1)->get();
         }else {
             $jenis_pengajuan = jenis_pengajuan::whereRaw('id<=3')->get();
         }

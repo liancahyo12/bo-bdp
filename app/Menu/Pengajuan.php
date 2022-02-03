@@ -31,7 +31,7 @@ class Pengajuan
             'permission' => 'approve_pengajuan',
             'order' => 102,
         ]);
-        $item->add('Review Pengajuan', [
+        $item->add('Review Pengajuan Departemen', [
             'route' => 'boilerplate.reviewdep-pengajuan',
             'active' => 'boilerplate.reviewdep-pengajuan,boilerplate.detail-reviewdep-pengajuan',
             'permission' => 'reviewdep_pengajuan',
@@ -61,7 +61,7 @@ class Pengajuan
             'permission' => 'approve_pengajuan',
             'order' => 107,
         ]);
-        $item->add('Review Closing Pengajuan', [
+        $item->add('Review Closing Pengajuan Departemen', [
             'route' => 'boilerplate.reviewdep-closing-pengajuan',
             'active' => 'boilerplate.reviewdep-closing-pengajuan,boilerplate.detail-reviewdep-closing-pengajuan',
             'permission' => 'reviewdep_pengajuan',

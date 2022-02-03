@@ -202,6 +202,9 @@ Route::group([
         Route::get('/detail-bayar-pengajuan-lampiran/{id}', [BayarpengajuanController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,bayar_pengajuan'])
             ->name('detail-bayar-pengajuan-lampiran');
+        Route::get('/detail-bayar-pengajuan-bukti/{id}', [BayarpengajuanController::class, 'unduh_bukti'])
+            ->middleware(['boilerplateauth', 'ability:admin,bayar_pengajuan'])
+            ->name('detail-bayar-pengajuan-bukti');
 
         // closing saya
         Route::get('/saya-closing-pengajuan', [ClosingController::class, 'index'])
@@ -233,7 +236,7 @@ Route::group([
         Route::put('/update-reviewdep-closing-pengajuan/{id}', [ReviewdepclosingController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
             ->name('update-reviewdep-closing-pengajuan');
-        Route::get('/detail-reviewdep-closing-pengajuan-lampiran/{id}', [ClosingController::class, 'unduh_lampiran'])
+        Route::get('/detail-reviewdep-closing-pengajuan-lampiran/{id}', [ReviewdepclosingController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
             ->name('detail-reviewdep-closing-pengajuan-lampiran');
 
@@ -247,7 +250,7 @@ Route::group([
         Route::put('/update-review-closing-pengajuan/{id}', [ReviewclosingController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('update-review-closing-pengajuan');
-        Route::get('/detail-review-closing-pengajuan-lampiran/{id}', [ClosingController::class, 'unduh_lampiran'])
+        Route::get('/detail-review-closing-pengajuan-lampiran/{id}', [ReviewclosingController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('detail-review-closing-pengajuan-lampiran');
             
@@ -261,7 +264,7 @@ Route::group([
         Route::put('/update-approve-closing-pengajuan/{id}', [ApproveclosingController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
             ->name('update-approve-closing-pengajuan');
-        Route::get('/detail-approve-closing-pengajuan-lampiran/{id}', [ClosingController::class, 'unduh_lampiran'])
+        Route::get('/detail-approve-closing-pengajuan-lampiran/{id}', [ApproveclosingController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
             ->name('detail-approve-closing-pengajuan-lampiran');
 

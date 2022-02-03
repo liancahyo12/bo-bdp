@@ -120,6 +120,7 @@
                     document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari pengajuan</span>';
                 }else if (total<tot) {
                     document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi pengajuan</span>';
+                    document.getElementById("reimburse").innerHTML ='<a href="/buat-pengajuan/"><button class="btn btn-primary" form="a">Buat Pengajuan Reimburse</button></a>';
                 }else {
                     document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai pengajuan</span>';
                 }
