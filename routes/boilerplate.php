@@ -427,7 +427,7 @@ Route::group([
         Route::get('/surat-masuk-arsip', [SuratmasukController::class, 'arsip'])
             ->middleware(['boilerplateauth', 'ability:admin,arsip_surat_masuk'])
             ->name('surat-masuk-arsip');
-        Route::post('/surat-masuk-arsip-detail/{id}', [SuratmasukController::class, 'detail_arsip'])
+        Route::get('/surat-masuk-arsip-detail/{id}', [SuratmasukController::class, 'detail_arsip'])
             ->middleware(['boilerplateauth', 'ability:admin,arsip_surat_masuk'])
             ->name('surat-masuk-arsip-detail');
         Route::get('/surat-masuk-file-arsip/{id}', [SuratmasukController::class, 'file_arsip'])
