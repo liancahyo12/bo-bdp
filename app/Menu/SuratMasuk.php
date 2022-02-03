@@ -11,7 +11,7 @@ class SuratMasuk
         $item = $menu->add('Surat Masuk', [
             'permission' => 'surat_masuk',
             'icon' => 'inbox',
-            'order' => 999,
+            'order' => 1005,
         ]);
         $item->add('Tambah Surat Masuk', [
             'route' => 'boilerplate.surat-masuk-buat',

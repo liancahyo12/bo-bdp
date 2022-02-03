@@ -11,7 +11,7 @@ class Pengajuan
         $item = $menu->add('Pengajuan', [
             'icon' => 'hand-holding-usd',
             'permission' => 'buat_pengajuan,approve_pengajuan,reviewdep_pengajuan,review_pengajuan',
-            'order' => 1001,
+            'order' => 1006,
         ]);
         $item->add('Buat Pengajuan', [
             'route' => 'boilerplate.buat-pengajuan',
