@@ -202,7 +202,7 @@ class ReviewclosingController extends Controller
     }
     public function unduh_lampiran($id)
     {
-            $file= Storage::disk('local')->get(pengajuan::where([['id', '=', $id], ['status', '=', 1]])->value('lampiran'));
+            $file= Storage::disk('local')->get(closing::where([['id', '=', $id], ['status', '=', 1]])->value('lampiran'));
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
     }
