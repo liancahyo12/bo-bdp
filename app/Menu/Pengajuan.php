@@ -25,7 +25,7 @@ class Pengajuan
             'permission' => 'buat_pengajuan',
             'order' => 101,
         ]);
-        $item->add('Daftar Pengajuan - Approvement', [
+        $item->add('Daftar Pengajuan - Persetujuan', [
             'route' => 'boilerplate.approve-pengajuan',
             'active' => 'boilerplate.approve-pengajuan,boilerplate.detail-approve-pengajuan',
             'permission' => 'approve_pengajuan',
