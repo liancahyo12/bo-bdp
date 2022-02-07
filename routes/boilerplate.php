@@ -26,6 +26,7 @@ use App\Http\Controllers\ReviewdepclosingController;
 use App\Http\Controllers\ReviewclosingController;
 use App\Http\Controllers\ApproveclosingController;
 use App\Http\Controllers\Rek_userController;
+use App\Http\Controllers\LogReportController;
 
 Route::group([
     'prefix'     => config('boilerplate.app.prefix', ''),
@@ -225,6 +226,12 @@ Route::group([
         Route::get('/edit-closing-pengajuan-lampiran/{id}', [ClosingController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
             ->name('edit-closing-pengajuan-lampiran');
+        Route::put('/pengembalian-closing-pengajuan/{id}', [ClosingController::class, 'update_pengembalian'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('pengembalian-closing-pengajuan');
+        Route::get('/pengembalian-closing-pengajuan-bukti/{id}', [ClosingController::class, 'unduh_bukti_pengembalian'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_pengajuan'])
+            ->name('edit-closing-pengajuan-lampiran');
 
         // reviewdep closing
         Route::get('/reviewdep-closing-pengajuan', [ReviewdepclosingController::class, 'index'])
@@ -251,6 +258,12 @@ Route::group([
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('update-review-closing-pengajuan');
         Route::get('/detail-review-closing-pengajuan-lampiran/{id}', [ReviewclosingController::class, 'unduh_lampiran'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
+            ->name('detail-review-closing-pengajuan-lampiran');
+        Route::get('/detail-review-closing-pengajuan-pengembalian/{id}', [ReviewclosingController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
+            ->name('detail-review-closing-pengajuan-pengembalian');
+        Route::get('/detail-review-closing-pengajuan-bukti/{id}', [ReviewclosingController::class, 'unduh_bukti_pengembalian'])
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('detail-review-closing-pengajuan-lampiran');
             
@@ -442,5 +455,25 @@ Route::group([
         Route::get('/surat-masuk-file/{id}', [SuratmasukController::class, 'file'])
             ->middleware(['boilerplateauth', 'ability:admin,surat_masuk'])
             ->name('surat-masuk-file');
+
+        // log report
+        Route::get('/log-report-pengajuan-saya', [LogReportController::class, 'lr_pengajuan_saya'])
+            ->middleware(['boilerplateauth', 'ability:admin,log_report_pengajuan_saya'])
+            ->name('log-report-pengajuan-saya');
+        Route::get('/log-report-pengajuan', [LogReportController::class, 'lr_pengajuan'])
+            ->middleware(['boilerplateauth', 'ability:admin,log_report_pengajuan'])
+            ->name('log-report-pengajuan');
+        Route::get('/log-report-suratkeluar-saya', [LogReportController::class, 'lr_suratkeluar_saya'])
+            ->middleware(['boilerplateauth', 'ability:admin,log_report_suratkeluar_saya'])
+            ->name('log-report-suratkeluar-saya');
+        Route::get('/log-report-suratkeluar', [LogReportController::class, 'lr_suratkeluar'])
+            ->middleware(['boilerplateauth', 'ability:admin,log_report_suratkeluar'])
+            ->name('log-report-suratkeluar');
+        Route::get('/log-report-closing-saya', [LogReportController::class, 'lr_closing_saya'])
+            ->middleware(['boilerplateauth', 'ability:admin,log_report_closing_saya'])
+            ->name('log-report-closing-saya');
+        Route::get('/log-report-closing', [LogReportController::class, 'lr_closing'])
+            ->middleware(['boilerplateauth', 'ability:admin,log_report_closing'])
+            ->name('log-report-closing');
     });
 });

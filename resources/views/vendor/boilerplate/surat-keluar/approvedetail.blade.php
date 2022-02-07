@@ -16,8 +16,18 @@
             @foreach ( $approve as $approve)
                 <div class="direct-chat-msg">
                     <div class="direct-chat-infos clearfix">
-                        <span class="direct-chat-name float-left">{{ $approve->first_name }}</span>
-                        <span class="direct-chat-timestamp float-right">{{ $approve->created_at }}</span>
+                        <span class="direct-chat-name float-left">{{ $approve->first_name }}&nbsp;</span>
+                        <span class="badge badge-pill badge-secondary float-left">{{ $approve->kode }}</span>
+                        @if ($approve->statuss == 2)
+                            <span class="badge badge-pill badge-success float-right">disetujui</span>
+                        @endif
+                        @if ($approve->statuss == 3)
+                            <span class="badge badge-pill badge-warning float-right">revisi</span>
+                        @endif
+                        @if ($approve->statuss == 4)
+                            <span class="badge badge-pill badge-danger float-right">ditolak</span>
+                        @endif
+                        <span class="direct-chat-timestamp float-right">{{ $approve->waktu_komentar }}&nbsp;</span>
                     </div>
                     <!-- /.direct-chat-infos -->
                     <img src="{{ App\Models\Boilerplate\User::where('id', $approve->uid)->first()->avatar_url }}" class="direct-chat-img" alt="{{ Auth::user()->name }}" width="30" height="30">
@@ -36,7 +46,7 @@
                 
             </div>
             <div>
-                <a target="_blank" href="/surat-keluar-approve-preview/{{ $surat->ida }}" ><button class="btn btn-secondary" form="a">Preview Surat</button></a>
+                <a target="_blank" href="/surat-keluar-approve-preview/{{ $surat->ida }}" ><button class="btn btn-secondary" form="a">Lihat Surat</button></a>
                 &nbsp;
                 <input class="btn btn-warning" name="submitbutton" type="submit" value="Revisi" @if ($surat->approve_status==2 || $surat->approve_status==3 || $surat->approve_status==4)
                 style='display:none;'

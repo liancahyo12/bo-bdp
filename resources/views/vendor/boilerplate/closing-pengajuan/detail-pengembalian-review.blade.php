@@ -1,42 +1,12 @@
 @extends('boilerplate::layout.index', [
-    'title' => __('Closing Pengajuan'),
-    'subtitle' => __('Closing Pengajuan'),
+    'title' => __('Pengembalian Kelebihan Dana'),
+    'subtitle' => __('Pengembalian Kelebihan Dana Closing Pengajuan'),
     'breadcrumb' => [
-        __('Closing Pengajuan') 
+        __('Pengembalian Kelebihan Dana Closing Pengajuan') 
     ]
 ])
 
 @section('content')
-<x-boilerplate::card>
-                <x-slot name="header">
-                    <b>Komentar</b>
-                </x-slot>
-                @foreach ( $komentar as $komentar)
-                    <div class="direct-chat-msg">
-                        <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-left">{{ $komentar->first_name }}&nbsp;</span>
-                            <span class="badge badge-pill badge-secondary float-left">{{ $komentar->kode }}</span>
-                            @if ($komentar->statuss == 2)
-                                <span class="badge badge-pill badge-success float-right">disetujui</span>
-                            @endif
-                            @if ($komentar->statuss == 3)
-                                <span class="badge badge-pill badge-warning float-right">revisi</span>
-                            @endif
-                            @if ($komentar->statuss == 4)
-                                <span class="badge badge-pill badge-danger float-right">ditolak</span>
-                            @endif
-                            <span class="direct-chat-timestamp float-right">{{ $komentar->waktu_komentar }}&nbsp;</span>
-                        </div>
-                        <!-- /.direct-chat-infos -->
-                        <img src="{{ App\Models\Boilerplate\User::where('id', $komentar->uid)->first()->avatar_url }}" class="direct-chat-img" alt="{{ $komentar->first_name }}" width="30" height="30">
-                        <!-- /.direct-chat-img -->
-                        <div class="direct-chat-text">
-                            {{ $komentar->komentar }}
-                        </div>
-                        <!-- /.direct-chat-text -->
-                    </div>
-                @endforeach
-            </x-boilerplate::card>
 <div class="row">
     <div class="col-md-6">
             <x-boilerplate::card>
@@ -57,11 +27,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><span class="fas fa-file"></span></span>
                         </div>
-                        <a target="_blank" href="/edit-closing-pengajuan-lampiran/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
+                        <a target="_blank" href="/detail-review-closing-pengajuan-lampiran/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
                     </div>
-                </div>
-                <div id="reimburse">
-                    
                 </div>
                 <div class="form-group" @if ($closing->bukti_pengembalian!=null)
                 
@@ -73,17 +40,10 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><span class="fas fa-file"></span></span>
                         </div>
-                        <a target="_blank" href="/pengembalian-closing-pengajuan-bukti/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Bukti Pengembalian</button></a>
+                        <a target="_blank" href="/detail-review-closing-pengajuan-bukti/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Bukti Pengembalian</button></a>
                     </div>
                 </div>
-                <div>
-                    <x-boilerplate::form :route="['boilerplate.pengembalian-closing-pengajuan', $closing->ida]" method="put" files>
-                        @csrf
-                        <div id="pengembalian">
-                        </div>
-                    </x-boilerplate::form>
-                </div>
-            </x-boilerplate::card>            
+            </x-boilerplate::card>       
                 
     </div>
     <div class="col-md-6">
@@ -113,6 +73,56 @@
         </x-boilerplate::card>
     </div>
 </div>
+<x-boilerplate::form :route="['boilerplate.update-review-closing-pengajuan-pengembalian', $closing->ida]" method="put" files>
+    @csrf
+    <x-boilerplate::card>
+        <x-slot name="header">
+            <b>Komentar</b>
+        </x-slot>
+        @foreach ( $komentar as $komentar)
+            <div class="direct-chat-msg">
+                <div class="direct-chat-infos clearfix">
+                    <span class="direct-chat-name float-left">{{ $komentar->first_name }}&nbsp;</span>
+                    <span class="badge badge-pill badge-secondary float-left">{{ $komentar->kode }}</span>
+                    @if ($komentar->statuss == 2)
+                        <span class="badge badge-pill badge-success float-right">disetujui</span>
+                    @endif
+                    @if ($komentar->statuss == 3)
+                        <span class="badge badge-pill badge-warning float-right">revisi</span>
+                    @endif
+                    @if ($komentar->statuss == 4)
+                        <span class="badge badge-pill badge-danger float-right">ditolak</span>
+                    @endif
+                    <span class="direct-chat-timestamp float-right">{{ $komentar->waktu_komentar }}&nbsp;</span>
+                </div>
+                <!-- /.direct-chat-infos -->
+                <img src="{{ App\Models\Boilerplate\User::where('id', $komentar->uid)->first()->avatar_url }}" class="direct-chat-img" alt="{{ $komentar->first_name }}" width="30" height="30">
+                <!-- /.direct-chat-img -->
+                <div class="direct-chat-text">
+                    {{ $komentar->komentar }}
+                </div>
+                <!-- /.direct-chat-text -->
+            </div>
+        @endforeach
+        <div @if ($closing->review_status==1 || $closing->review_status==5 || $closing->pengembalian_status==4 || $closing->pengembalian_status==5)
+            
+        @else
+            style='display:none;'
+        @endif>
+            <x-boilerplate::input name="komentar" />
+            
+        </div>
+        <div @if ($closing->review_status==2 || $closing->review_status==3 || $closing->review_status==4 && ($closing->pengembalian_status<4))
+            style='display:none;'
+            @endif>
+            <input class="btn btn-warning" name="submitbutton" type="submit" value="Revisi">
+            &nbsp;
+            <input class="btn btn-danger" name="submitbutton" type="submit" value="Tolak">
+            &nbsp;
+            <input class="btn btn-primary" name="submitbutton" type="submit" value="Setujui">
+        </div>
+    </x-boilerplate::card>
+</x-boilerplate::form>
     <script>        
         $(document).ready(function(){
             var pengajuann = "{{ $pengajuan->pengajuan }}";
@@ -135,12 +145,9 @@
                 document.getElementById("selisih").value = total-tot;
                 if (total>tot) {
                     document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari pengajuan</span>';
-                    if ("{{ $closing->pengembalian_status }}"==1 || "{{ $closing->pengembalian_status }}"==3){
-                        document.getElementById("pengembalian").innerHTML ='<div class="form-group"><label for="bukti_pengembalian">Unggah Bukti Pengembalian Kelebihan Dana* (PDF Maks 20MB)</label><input class="form-control-file" autocomplete="off" name="bukti_pengembalian" type="file" id="bukti_pengembalian"></div><div class="row">&nbsp; &nbsp;<input class="btn btn-primary" name="submitbutton" type="submit" value="Kirim"></div>';
-                    }
                 }else if (total<tot) {
                     document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi pengajuan</span>';
-                    document.getElementById("pengembalian").innerHTML ='<a href="/buat-pengajuan/"><button class="btn btn-primary" form="a">Buat Pengajuan Reimburse</button></a>';
+                    document.getElementById("reimburse").innerHTML ='<a href="/buat-pengajuan/"><button class="btn btn-primary" form="a">Buat Pengajuan Reimburse</button></a>';
                 }else {
                     document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai pengajuan</span>';
                 }

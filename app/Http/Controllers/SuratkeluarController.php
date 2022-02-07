@@ -363,16 +363,30 @@ class SuratkeluarController extends Controller
             return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Surat keluar tidak ada'), 'danger']);
         }
-        return view('boilerplate::surat-keluar.edit', compact('surat'), 
-        // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
-        [
-            'approver' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4'),
-            'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
-            'jenis_surat' => jenis_surat::all(),
-            'departemens' => departemen::all(),
-            'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->select('approvesuratkeluars.*', 'last_name', 'first_name', 'users.id as uid')->where('surat_keluar_id', $id)->get(),
-        ]
-        );
+        if ($surat->approve_status == 3 || $surat->send_status == 0) {
+            return view('boilerplate::surat-keluar.edit', compact('surat'), 
+            // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
+            [
+                'approver' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4'),
+                'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
+                'jenis_surat' => jenis_surat::all(),
+                'departemens' => departemen::all(),
+                'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('kode', 'approve_status as statuss', 'approvesuratkeluars.created_at as waktu_komentar', 'approvesuratkeluars.*', 'last_name', 'first_name', 'users.id as uid')->where('surat_keluar_id', $id)->get(),
+            ]
+            );
+        }else {
+            return view('boilerplate::surat-keluar.detail', compact('surat'), 
+            // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
+            [
+                'approver' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=4'),
+                'reviewer' => DB::select('select users.id, first_name from role_user left join users on role_user.user_id=users.id where role_id=3'),
+                'jenis_surat' => jenis_surat::all(),
+                'departemens' => departemen::all(),
+                'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('kode', 'approve_status as statuss', 'approvesuratkeluars.created_at as waktu_komentar', 'approvesuratkeluars.*', 'last_name', 'first_name', 'kode', 'users.id as uid')->where('surat_keluar_id', $id)->get(),
+            ]
+            );
+        }
+        
     }
 
     /**

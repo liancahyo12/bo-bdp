@@ -45,11 +45,11 @@
                 <x-slot name="header">
                     <h4><b>Form Closing</b></h4>
                 </x-slot>
-                <x-boilerplate::datetimepicker name="tgl_closing" label='Tanggal Closing' value="{{ $closing->tgl_closing}}"/>
+                <x-boilerplate::datetimepicker name="tgl_closing" label='Tanggal Closing*' value="{{ $closing->tgl_closing}}"/>
                 <div id="form-closing">
                 </div>
-                <x-boilerplate::input name="catatana" type="text" label="Catatan" value="{{$closing->catatan}}"/>
-                <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran" />
+                <x-boilerplate::input name="catatana" type="text" label="Catatan*" value="{{$closing->catatan}}"/>
+                <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran* (PDF Maks 20MB)" />
                 <div class="form-group" @if ($closing->lampiran!=null)
                 
                     @else
@@ -60,7 +60,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><span class="fas fa-file"></span></span>
                         </div>
-                        <a target="_blank" href="/edit-closing-pengajuan-lampiran/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran Lama</button></a>
+                        <a target="_blank" href="/edit-closing-pengajuan-lampiran/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
                     </div>
                 </div>
                 <div class="row">
@@ -93,7 +93,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><span class="fas fa-file"></span></span>
                     </div>
-                    <a target="_blank" href="/detail-review-pengajuan-lampiran/{{ $pengajuan->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
+                    <a target="_blank" href="/edit-pengajuan-lampiran/{{ $pengajuan->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
                 </div>
             </div>
         </x-boilerplate::card>

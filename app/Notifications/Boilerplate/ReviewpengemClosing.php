@@ -6,9 +6,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class RevisiSuratkeluar extends Notification
+class ReviewpengemClosing extends Notification
 {
     use Queueable;
+
     /**
      * Get the notification's delivery channels.
      *
@@ -43,14 +44,14 @@ class RevisiSuratkeluar extends Notification
         return (new MailMessage())
             ->from('it@bdpay.co.id', '[BDPay E-Office] No-reply')
             ->markdown('boilerplate::notifications.email')
-            ->subject(__('Notifikasi Surat Keluar', ['name' => 'BDPay E-Office']))
-            ->line(__('Surat keluar perlu direvisi', [
+            ->subject(__('Notifikasi Closing Pengajuan', ['name' => 'BDPay E-Office']))
+            ->line(__('Bukti pengembalian telah dikirimkan oleh '.$currentUser->first_name.' '.$currentUser->last_name, [
             ]))
             ->action(
-                __('Revisi Surat'),
-                route('boilerplate.surat-keluar-saya.edit', $this->id)
+                __('Review Bukti Pengembalian'),
+                route('boilerplate.detail-review-closing-pengajuan', $this->id)
             )
-            ->line(__('Silahkan tekan tombol di atas untuk revisi surat keluar'));
+            ->line(__('Silahkan tekan tombol di atas untuk review closing pengajuan'));
     }
 
     /**

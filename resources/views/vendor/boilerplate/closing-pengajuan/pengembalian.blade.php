@@ -1,8 +1,8 @@
 @extends('boilerplate::layout.index', [
-    'title' => __('Closing Pengajuan'),
-    'subtitle' => __('Closing Pengajuan'),
+    'title' => __('Pengembalian Kelebihan Dana'),
+    'subtitle' => __('Pengembalian Kelebihan Dana Closing Pengajuan'),
     'breadcrumb' => [
-        __('Closing Pengajuan') 
+        __('Pengembalian Kelebihan Dana Closing Pengajuan') 
     ]
 ])
 
@@ -39,6 +39,8 @@
             </x-boilerplate::card>
 <div class="row">
     <div class="col-md-6">
+        <x-boilerplate::form :route="['boilerplate.pengembalian-closing-pengajuan', $closing->ida]" method="put" files>
+        @csrf
             <x-boilerplate::card>
                 <x-slot name="header">
                     <h4><b>Form Closing</b></h4>
@@ -60,9 +62,6 @@
                         <a target="_blank" href="/edit-closing-pengajuan-lampiran/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
                     </div>
                 </div>
-                <div id="reimburse">
-                    
-                </div>
                 <div class="form-group" @if ($closing->bukti_pengembalian!=null)
                 
                     @else
@@ -73,17 +72,16 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><span class="fas fa-file"></span></span>
                         </div>
-                        <a target="_blank" href="/pengembalian-closing-pengajuan-bukti/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Bukti Pengembalian</button></a>
+                        <a target="_blank" href="/edit-closing-pengajuan-bukti/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Bukti Pengembalian</button></a>
                     </div>
                 </div>
-                <div>
-                    <x-boilerplate::form :route="['boilerplate.pengembalian-closing-pengajuan', $closing->ida]" method="put" files>
-                        @csrf
-                        <div id="pengembalian">
-                        </div>
-                    </x-boilerplate::form>
+                <x-boilerplate::input name="bukti_pengambalian" type="file" label="Unggah Bukti Pengembalian Kelebihan Dana* (PDF Maks 20MB)" />
+                <div class="row">
+                    &nbsp; &nbsp;
+                    {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
                 </div>
-            </x-boilerplate::card>            
+            </x-boilerplate::card>
+        </x-boilerplate::form>            
                 
     </div>
     <div class="col-md-6">
@@ -135,12 +133,9 @@
                 document.getElementById("selisih").value = total-tot;
                 if (total>tot) {
                     document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari pengajuan</span>';
-                    if ("{{ $closing->pengembalian_status }}"==1 || "{{ $closing->pengembalian_status }}"==3){
-                        document.getElementById("pengembalian").innerHTML ='<div class="form-group"><label for="bukti_pengembalian">Unggah Bukti Pengembalian Kelebihan Dana* (PDF Maks 20MB)</label><input class="form-control-file" autocomplete="off" name="bukti_pengembalian" type="file" id="bukti_pengembalian"></div><div class="row">&nbsp; &nbsp;<input class="btn btn-primary" name="submitbutton" type="submit" value="Kirim"></div>';
-                    }
                 }else if (total<tot) {
                     document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi pengajuan</span>';
-                    document.getElementById("pengembalian").innerHTML ='<a href="/buat-pengajuan/"><button class="btn btn-primary" form="a">Buat Pengajuan Reimburse</button></a>';
+                    document.getElementById("reimburse").innerHTML ='<a href="/buat-pengajuan/"><button class="btn btn-primary" form="a">Buat Pengajuan Reimburse</button></a>';
                 }else {
                     document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai pengajuan</span>';
                 }

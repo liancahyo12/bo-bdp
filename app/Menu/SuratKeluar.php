@@ -37,25 +37,25 @@ class SuratKeluar
             'permission' => 'buat_surat_keluar',
             'order' => 100,
         ]);
-        $item->add('Surat Saya', [
+        $item->add('Daftar Surat - Saya', [
             'route' => 'boilerplate.surat-keluar-saya.index',
             'active' => 'boilerplate.surat-keluar-saya.index,boilerplate.surat-keluar-saya.edit',
             'permission' => 'buat_surat_keluar',
             'order' => 101,
         ]);
-        $item->add('Review Surat', [
-            'route' => 'boilerplate.surat-keluar-review.index',
-            'active' => 'boilerplate.surat-keluar-review.index,boilerplate.surat-keluar-review.edit',
-            'permission' => 'review_surat',
-            'order' => 102,
-        ]);
-        $item->add('Approve Surat', [
+        // $item->add('Review Surat', [
+        //     'route' => 'boilerplate.surat-keluar-review.index',
+        //     'active' => 'boilerplate.surat-keluar-review.index,boilerplate.surat-keluar-review.edit',
+        //     'permission' => 'review_surat',
+        //     'order' => 102,
+        // ]);
+        $item->add('Daftar Surat - Persetujuan', [
             'route' => 'boilerplate.surat-keluar-approve.index',
             'active' => 'boilerplate.surat-keluar-approve.index,boilerplate.surat-keluar-approve.edit',
             'permission' => 'approve_surat',
             'order' => 103,
         ]);
-        $item->add('Arsip Surat', [
+        $item->add('Daftar Surat', [
             'route' => 'boilerplate.surat-keluar-arsip',
             'active' => 'boilerplate.surat-keluar-arsip,boilerplate.surat-keluar-arsip-edit',
             'permission' => 'arsip_surat',
