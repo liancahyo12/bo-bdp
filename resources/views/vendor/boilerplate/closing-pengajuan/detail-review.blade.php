@@ -29,6 +29,18 @@
                     <a target="_blank" href="/detail-review-closing-pengajuan-lampiran/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
                 </div>
             </div>
+            <div class="form-group" @if ($closing->bukti_pengembalian!=null)
+                
+                @else
+                style='display:none;'
+                @endif id="unduh-bukti">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/detail-review-closing-pengajuan-bukti/{{ $closing->ida }}"><button class="btn btn-secondary" form="a">Lihat Bukti Pengembalian</button></a>
+                </div>
+            </div>
         </x-boilerplate::card>
     </div>
     <div class="col-md-6">
@@ -89,14 +101,18 @@
                 <!-- /.direct-chat-text -->
             </div>
         @endforeach
-        <div @if ($closing->review_status==2 || $closing->review_status==3 || $closing->review_status==4)
-            style='display:none;'
+        <div @if ($closing->review_status==1 || $closing->review_status==5 || $closing->pengembalian_status==4 || $closing->pengembalian_status==5)
+            
+            @else
+                style='display:none;'
             @endif>
             <x-boilerplate::input name="komentar" />
             
         </div>
-        <div @if ($closing->review_status==2 || $closing->review_status==3 || $closing->review_status==4)
-            style='display:none;'
+        <div @if ($closing->review_status==1 || $closing->review_status==5 || $closing->pengembalian_status==4 || $closing->pengembalian_status==5)
+            
+            @else
+                style='display:none;'
             @endif>
             <input class="btn btn-warning" name="submitbutton" type="submit" value="Revisi">
             &nbsp;

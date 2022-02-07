@@ -24,7 +24,9 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Notifications\Boilerplate\ApproveaClosing;
 use App\Notifications\Boilerplate\ReviewedClosing;
+use App\Notifications\Boilerplate\ReviewedpClosing;
 use App\Notifications\Boilerplate\RevisiClosing;
+use App\Notifications\Boilerplate\RevisipClosing;
 use App\Notifications\Boilerplate\TolakClosing;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -77,9 +79,17 @@ class ReviewclosingController extends Controller
     }
     public function update(Request $request, $id)
     {
+        $this->validate($request, [
+                    'komentar' => 'required',
+                ]);
         $closing = closing::where([['id', '=', $id],['status', '=', 1]])->first();
-        $closing['reviewer_id'] = Auth::user()->id;
-        $closing['review_time'] = Carbon::now()->toDateTimeString();
+        
+        if ($closing->pengembalian_status==1 || $closing->pengembalian_status==3) {
+            $closing['rev_pengembalian_time'] = Carbon::now()->toDateTimeString();
+        }else {
+            $closing['reviewer_id'] = Auth::user()->id;
+            $closing['review_time'] = Carbon::now()->toDateTimeString();
+        }
 
         $reviewclosing['closing_id'] = $id;
         $reviewclosing['user_id'] = $closing->user_id;
@@ -88,84 +98,88 @@ class ReviewclosingController extends Controller
         $link = route('boilerplate.edit-closing-pengajuan', $id);
         switch ($request->submitbutton) {
         case 'Setujui':
-            if($closing->review_status == 2){
-                return redirect()->route('boilerplate.review-closing-pengajuan')
-                                ->with('growl', [__('Closing pengajuan telah disetujui'), 'danger']);
-            }else{
-            $this->validate($request, [
-                'komentar' => 'required',
-            ]);
-            // send
-            if ($closing->approve_status==3) {
-                $closing['approve_status'] = 5;
-                $reviewdepclosing['approve_status'] = 5;
-            }
-            $closing['review_status'] = 2;
-            $reviewclosing['review_status'] = 2;
-            $closing = $closing->save();
-            $reviewclosinga = reviewclosing::create($reviewclosing);
+            if ($closing->pengembalian_status==4 || $closing->pengembalian_status==5) {
+                if($closing->pengembalian_status == 2){
+                    return redirect()->route('boilerplate.review-closing-pengajuan')
+                        ->with('growl', [__('Pengembalian telah disetujui'), 'danger']);
+                }else{
+                    $closing['pengembalian_status'] = 2;
+                    $reviewclosing['review_status'] = 2;
+                    $closing = $closing->save();
+                    $reviewclosinga = reviewclosing::create($reviewclosing);
+                    $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
+                    $user->notify(new ReviewedpClosing($id));
 
-            // $mailto = closing::leftJoin('users', 'users.id', 'closings.user_id')->where('closings.id', $id)->value('users.email');
-            // $details = [
-            //     'title' => '',
-            //     'body' => 'Closing Pengajuan '.$request->closing,
-            //     'body2' => 'Closing Pengajuan sudah direviewdep untuk melihat detail silahkan klik link ini '.$link,
-            // ];
-            
-            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+                    return redirect()->route('boilerplate.review-closing-pengajuan')
+                            ->with('growl', [__('Pengembalian berhasil disetujui'), 'success']);
+                }
+            }else {
+                if($closing->review_status == 2){
+                    return redirect()->route('boilerplate.review-closing-pengajuan')
+                                    ->with('growl', [__('Closing pengajuan telah disetujui'), 'danger']);
+                }else{
+                // send
+                    if ($closing->approve_status==3) {
+                        $closing['approve_status'] = 5;
+                        $reviewdepclosing['approve_status'] = 5;
+                    }
+                    $closing['review_status'] = 2;
+                    $reviewclosing['review_status'] = 2;
+                    $closing = $closing->save();
+                    $reviewclosinga = reviewclosing::create($reviewclosing);
 
-            // $link2 = route('boilerplate.detail-approve-closing-pengajuan', $id);
+                    $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
+                    $user->notify(new ReviewedClosing($id));
 
-            // $mailto = DB::select('select email from permission_role left join role_user  on permission_role.role_id=role_user.role_id left join users on role_user.user_id=users.id where permission_id=15');
+                    $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 15)->first();
+                    $user->notify(new ApproveaClosing($id));
 
-            //     $details = [
-            //         'title' => '',
-            //         'body' => 'Closing Pengajuan '.$request->closing,
-            //         'body2' => 'Untuk review closing pengajuan silahkan klik link ini '.$link2,
-            //     ];
-            
-            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
-            $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
-            $user->notify(new ReviewedClosing($id));
-
-            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 15)->first();
-            $user->notify(new ApproveaClosing($id));
-
-            return redirect()->route('boilerplate.review-closing-pengajuan')
-                            ->with('growl', [__('closing berhasil disetujui'), 'success']);
+                    return redirect()->route('boilerplate.review-closing-pengajuan')
+                                    ->with('growl', [__('closing berhasil disetujui'), 'success']);
+                }
             }
             break;
 
         case 'Revisi':
-            if($closing->review_status == 3){
-                return redirect()->route('boilerplate.review-closing-pengajuan')
-                                ->with('growl', [__('closing telah diminta revisi'), 'danger']);
-            }else{
-            $this->validate($request, [
-                'komentar' => 'required',
-            ]);
-            // revisi
-            $closing['review_status'] = 3;
-            $closing['revisi_status'] = 1;
-            $reviewclosing['review_status'] = 3;
+            if ($closing->pengembalian_status==4 || $closing->pengembalian_status==5) {
+                if($closing->pengembalian_status == 5){
+                    return redirect()->route('boilerplate.review-closing-pengajuan')
+                        ->with('growl', [__('Pengembalian telah diminta revisi'), 'danger']);
+                }else{
+                    $closing['pengembalian_status'] = 3;
+                    $reviewclosing['review_status'] = 3;
+                    $closing = $closing->save();
+                    $reviewclosinga = reviewclosing::create($reviewclosing);
+                    $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
+                    $user->notify(new RevisipClosing($id));
 
-            $closing = $closing->save();
-            $reviewclosinga = reviewclosing::create($reviewclosing);
+                    return redirect()->route('boilerplate.review-closing-pengajuan')
+                            ->with('growl', [__('Pengembalian berhasil diminta revisi'), 'success']);
+                }
+            }else {
+                if($closing->review_status == 3){
+                    return redirect()->route('boilerplate.review-closing-pengajuan')
+                                    ->with('growl', [__('closing telah diminta revisi'), 'danger']);
+                }else{
+                    $this->validate($request, [
+                        'komentar' => 'required',
+                    ]);
+                    // revisi
+                    $closing['review_status'] = 3;
+                    $closing['revisi_status'] = 1;
+                    $reviewclosing['review_status'] = 3;
 
-            // $mailto = closing::leftJoin('users', 'users.id', 'closings.user_id')->where('closings.id', $id)->value('users.email');
-            // $details = [
-            //     'title' => '',
-            //     'body' => 'Closing Pengajuan '.$request->closing,
-            //     'body2' => 'closing harus direvisi terlebih dahulu untuk revisi silahkan klik link ini '.$link,
-            // ];
-            
-            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
-            $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
-            $user->notify(new RevisiClosing($id));
+                    $closing = $closing->save();
+                    $reviewclosinga = reviewclosing::create($reviewclosing);
 
-            return redirect()->route('boilerplate.review-closing-pengajuan')
-                            ->with('growl', [__('closing berhasil revisi'), 'success']);
+                    $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
+                    $user->notify(new RevisiClosing($id));
+
+                    return redirect()->route('boilerplate.review-closing-pengajuan')
+                                    ->with('growl', [__('closing berhasil diminta revisi'), 'success']);
+                }
             }
+
             break;
         
         case 'Tolak':
@@ -183,14 +197,6 @@ class ReviewclosingController extends Controller
             $closing = $closing->save();
             $reviewclosinga = reviewclosing::create($reviewclosing);
 
-            // $mailto = closing::leftJoin('users', 'users.id', 'closings.user_id')->where('closings.id', $id)->value('users.email');
-            // $details = [
-            //     'title' => '',
-            //     'body' => 'Closing Pengajuan '.$request->closing,
-            //     'body2' => 'Closing Pengajuan ditolak untuk melihat detail silahkan klik link ini '.$link,
-            // ];
-            
-            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
             $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
             $user->notify(new TolakClosing($id));
 
@@ -203,6 +209,13 @@ class ReviewclosingController extends Controller
     public function unduh_lampiran($id)
     {
             $file= Storage::disk('local')->get(closing::where([['id', '=', $id], ['status', '=', 1]])->value('lampiran'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf');
+    }
+
+    public function unduh_bukti_pengembalian($id)
+    {
+            $file= Storage::disk('local')->get(closing::where([['id', '=', $id], ['status', '=', 1]])->value('bukti_pengembalian'));
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
     }

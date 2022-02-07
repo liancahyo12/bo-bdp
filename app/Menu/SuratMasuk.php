@@ -19,19 +19,19 @@ class SuratMasuk
             'permission' => 'buat_surat_masuk',
             'order' => 100,
         ]);
-        $item->add('Surat Masuk Departemen', [
+        $item->add('Daftar Surat Masuk - Departemen', [
             'route' => 'boilerplate.surat-masuk',
             'active' => 'boilerplate.surat-masuk,boilerplate.surat-masuk-detail',
             'permission' => 'surat_masuk',
             'order' => 101,
         ]);
-        $item->add('Arsip Surat Masuk', [
+        $item->add('Daftar Surat Masuk', [
             'route' => 'boilerplate.surat-masuk-arsip',
             'active' => 'boilerplate.surat-masuk-arsip,boilerplate.surat-masuk-arsip-detail',
             'permission' => 'arsip_surat_masuk',
             'order' => 102,
         ]);
-        $item->add('Surat Masuk Saya', [
+        $item->add('Daftar Surat Masuk - Saya', [
             'route' => 'boilerplate.surat-masuk-saya',
             'active' => 'boilerplate.surat-masuk-saya,boilerplate.surat-masuk-saya-detail',
             'permission' => 'buat_surat_masuk',

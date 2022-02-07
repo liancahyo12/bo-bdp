@@ -1,8 +1,8 @@
 @extends('boilerplate::layout.index', [
-    'title' => __('Edit Surat Keluar'),
-    'subtitle' => __('Edit Surat Keluar'),
+    'title' => __('Detail Surat Keluar'),
+    'subtitle' => __('Detail Surat Keluar'),
     'breadcrumb' => [
-        __('Edit Surat Keluar') 
+        __('Detail Surat Keluar') 
     ]
 ])
 
@@ -40,22 +40,22 @@
     <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files>
         @csrf
         <x-boilerplate::card>
-            <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat*" id='jenis_surat'>
+            <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat*" id='jenis_surat' disabled>
                 @foreach ($jenis_surat as $position)
                     <option value="{{ $position->id }}" @if ( $surat->jenis_surat_id==$position->id)
                         selected
                     @endif>{{ $position->jenis_surat }}</option>
                 @endforeach
             </x-boilerplate::select2>
-            <x-boilerplate::select2 name="departemen" label="Pilih Departemen*">
+            <x-boilerplate::select2 name="departemen" label="Pilih Departemen*" disabled>
                 @foreach ($departemens as $position)
                     <option value="{{ $position->id }}" @if ( $surat->departemen_id==$position->id)
                         selected
                     @endif>{{ $position->departemen }}</option>
                 @endforeach
             </x-boilerplate::select2>
-            <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat*'/>
-            <x-boilerplate::input name="perihal" label="Perihal*" value="{{ $surat->perihal }}" />
+            <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat*' disabled/>
+            <x-boilerplate::input name="perihal" label="Perihal*" value="{{ $surat->perihal }}" disabled/>
             <div class="form-group" @if ($surat->approve_status!=2)
                 
                 @else
@@ -68,15 +68,6 @@
                     <a target="_blank" href="/surat-keluar-buat-format/{{ $surat->jenis_surat_id }}"><button class="btn btn-secondary" form="a">Unduh Format Surat</button></a>
                 </div>
             </div>
-            <div @if ($surat->send_status==0 || $surat->approve_status==3)\
-                @else
-                    style='display:none;'
-                @endif>
-                <label for="file_surat">Unggah Surat Keluar* (Word DOCX Maks 20MB)</label> <br>
-            <input type="file" name="file_surat"> <br>
-            <h3> </h3>
-            </div>
-            
             <div class="form-group" @if ($surat->isi_surat!=null)
                 
                 @else
@@ -120,7 +111,7 @@
                 
                             @else
                             disabled
-                            @endif>
+                            @endif disabled>
                             <label for="icheck_61dbe7e7b33b3" class="font-weight-normal">Gunakan Lampiran Permintaan</label>
                         </div>
                     </div>
@@ -134,7 +125,7 @@
                 
                             @else
                             disabled
-                            @endif>
+                            @endif disabled>
                             <label for="icheck_61dbe7e7b353e" class="font-weight-normal">Unggah Lampiran Baru (PDF Maks 20MB)</label>
                         </div>
                     </div>
@@ -148,7 +139,7 @@
                 
                             @else
                             disabled
-                            @endif>
+                            @endif disabled>
                             <label for="icheck_61dc0ffdcad8b" class="font-weight-normal">Tanpa Lampiran</label>
                         </div>
                     </div>
@@ -171,7 +162,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><span class="fas fa-file"></span></span>
                     </div>
-                    <a target="_blank" href="/surat-keluar-lampiran/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
+                    <a target="_blank" href="/surat-keluar-lampiran/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran Lama</button></a>
                 </div>
             </div>
                    
@@ -183,6 +174,8 @@
         @endif>
             &nbsp; 
             {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}
+            &nbsp;
+            <input formtarget="_blank" class="btn btn-warning" name="submitbutton" type="submit" value="Preview Surat" >
             &nbsp;
             {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
         </div>

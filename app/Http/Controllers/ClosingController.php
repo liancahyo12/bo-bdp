@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Database\Eloquent\Collection;
 use App\Notifications\Boilerplate\ReviewdepaClosing;
+use App\Notifications\Boilerplate\ReviewpengemClosing;
 use Validator;
 use Auth;
 use DB;
@@ -105,6 +106,49 @@ class ClosingController extends Controller
         }
         //
     }
+
+    public function edit_pengembalian($id)
+    {
+        $closing = closing::leftJoin('isi_closings', 'closing_id', 'closings.id')->select('closings.id as ida', 'closings.user_id as suser_id', 'closings.status as sstatus', 'isi_closings.*', 'closings.*', )->where('closings.id', $id)->first();
+        $pengajuan = pengajuan::leftJoin('isi_pengajuans', 'pengajuan_id', 'pengajuans.id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'pengajuans.jenis_pengajuan_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('pengajuans.id as ida', 'pengajuans.user_id as suser_id', 'pengajuans.status as sstatus', 'isi_pengajuans.*', 'pengajuans.*', 'jenis_pengajuans.*', 'departemen')->where('pengajuans.id', $closing->pengajuan_id)->first();
+        if ($closing->suser_id != Auth::user()->id || $closing->sstatus==0) {
+            return redirect()->route('boilerplate.saya-closing-pengajuan')
+                            ->with('growl', [__('Closing tidak ada'), 'danger']);
+        }
+        $reviewdepclosing = reviewdepclosing::leftJoin('users', 'users.id', 'reviewdepclosings.reviewerdep_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('reviewdepclosings.created_at as waktu_komentar', 'reviewdep_status as statuss', 'komentar', 'first_name', 'last_name', 'kode', 'users.id as uid')->where([['closing_id', '=', $id], ['reviewdepclosings.status', '=', 1]]);
+        $reviewclosing = reviewclosing::leftJoin('users', 'users.id', 'reviewclosings.reviewer_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('reviewclosings.created_at as waktu_komentar', 'review_status as statuss', 'komentar', 'first_name', 'last_name', 'kode', 'users.id as uid')->where([['closing_id', '=', $id], ['reviewclosings.status', '=', 1]]);
+        $approveclosing = approveclosing::leftJoin('users', 'users.id', 'approveclosings.approver_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('approveclosings.created_at as waktu_komentar',  'approve_status as statuss','komentar', 'first_name', 'last_name', 'kode', 'users.id as uid')->where([['closing_id', '=', $id], ['approveclosings.status', '=', 1]])->union($reviewdepclosing)->union($reviewclosing)->get();
+        
+        if ($closing->pengembalian_status == 1 || $closing->pengembalian_status=3) {
+            return view('boilerplate::closing-pengajuan.pengembalian', compact('closing'), 
+            // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
+            [
+                'isi_closing' => isi_closing::where([['closing_id', '=', $id], ['status', '=', 1]])->get(),
+                'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $closing->pengajuan_id], ['status', '=', 1]])->get(),
+                'jenis_pengajuan' => jenis_pengajuan::all(),
+                'departemens' => departemen::all(),
+                'komentar' => $approveclosing,
+                'pengajuan' => $pengajuan,
+                
+            ]
+            );
+        }else {
+            return view('boilerplate::closing-pengajuan.detail-pengembalian', compact('closing'), 
+            // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
+            [
+                'isi_closing' => Isi_closing::where([['closing_id', '=', $id], ['status', '=', 1]])->get(),
+                'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $closing->pengajuan_id], ['status', '=', 1]])->get(),
+                'jenis_pengajuan' => jenis_pengajuan::all(),
+                'departemens' => departemen::all(),
+                'komentar' => $approveclosing,
+                'pengajuan' => $pengajuan,
+                
+            ]
+            );
+        }
+        //
+    }
+
     public function store(Request $request, $id)
     {
         $inclosing = [];
@@ -291,6 +335,53 @@ class ClosingController extends Controller
     {
         if(closing::where('id', $id)->value('user_id') == Auth::user()->id){
             $file= Storage::disk('local')->get(closing::where('id', $id)->value('lampiran'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf');
+        }else {
+            return redirect()->route('boilerplate.buat-closing')
+                            ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
+        }
+        
+    }
+    public function update_pengembalian(Request $request, $id)
+    {
+        $input = closing::where([['id', '=', $id], ['user_id', '=', Auth::user()->id], ['status', '=', 1]])->first();
+        if ($input->status==1 && ( $input->pengembalian_status==1 || $input->pengembalian_status==3) ) {
+        $this->validate($request, [
+                    'bukti_pengembalian'  => 'mimes:pdf|max:20480',
+            ]);
+            $filename = $id.Str::random(16).'.pdf';
+            $path ='';
+            if ($request->bukti_pengembalian!=null) {
+                if ($input->pengembalian_status==1) {
+                    $path = $request->file('bukti_pengembalian')->storeAs('bukti-pengembalian', $filename);
+                    $input['bukti_pengembalian'] = $path;
+                }else {
+                    $filename = Str::substr($input->lampiran, 19);
+                    $path = $request->file('bukti_pengembalian')->storeAs('bukti-pengembalian', $filename);
+                }
+            } 
+            $input['send_time'] = Carbon::now()->toDateTimeString();
+            if ($input->pengembalian_status==3) {
+                $input['pengembalian_status'] = 5;
+            }else {
+                $input['pengembalian_status'] = 4;
+                $input['pengembalian_time'] = Carbon::now()->toDateTimeString();
+            }
+            $closings = $input->save();
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 13)->first();
+            $user->notify(new ReviewpengemClosing($id));
+            return redirect()->route('boilerplate.saya-closing-pengajuan')
+                ->with('growl', [__('Bukti pengembalian berhasil dikirim'), 'success']);
+        }
+        return redirect()->route('boilerplate.saya-closing-pengajuan')
+            ->with('growl', [__('Bukti pengembalian tidak perlu dikirim'), 'warning']);
+    }
+
+    public function unduh_bukti_pengembalian($id)
+    {
+        if(closing::where('id', $id)->value('user_id') == Auth::user()->id){
+            $file= Storage::disk('local')->get(closing::where('id', $id)->value('bukti_pengembalian'));
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {

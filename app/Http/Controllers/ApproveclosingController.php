@@ -23,6 +23,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Notifications\Boilerplate\ApprovedClosing;
+use App\Notifications\Boilerplate\ApprovedpClosing;
 use App\Notifications\Boilerplate\RevisiClosing;
 use App\Notifications\Boilerplate\TolakClosing;
 use Carbon\Carbon;
@@ -100,23 +101,23 @@ class ApproveclosingController extends Controller
                 $reviewdepclosing['approve_status'] = 5;
             }
             $closing['approve_status'] = 2;
+            $closing['pengembalian_status'] = 1;
             $approveclosing['approve_status'] = 2;
             $closing = $closing->save();
             $approveclosinga = approveclosing::create($approveclosing);
 
-            // $mailto = closing::leftJoin('users', 'users.id', 'closings.user_id')->where('closings.id', $id)->value('users.email');
-            // $details = [
-            //     'title' => '',
-            //     'body' => 'Closing Pengajuan '.$request->closing,
-            //     'body2' => 'Closing Pengajuan sudah diapprove untuk melihat detail silahkan klik link ini '.$link,
-            // ];
-            
-            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            $cls = closing::where([['id', '=', $id],['status', '=', 1]])->first();
+            $pnj = pengajuan::where([['id', '=', $cls->pengajuan_id],['status', '=', 1]])->first();
             $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
-            $user->notify(new ApprovedClosing($id));
+            if ($cls->total_nominal < $pnj->total_nominal) {
+                $user->notify(new ApprovedpClosing($id));
+            }else {
+                $user->notify(new ApprovedClosing($id));
+            }
+            
 
             return redirect()->route('boilerplate.approve-closing-pengajuan')
-                            ->with('growl', [__('closing berhasil disetujui'), 'success']);
+                ->with('growl', [__('closing berhasil disetujui'), 'success']);
             }
             break;
 

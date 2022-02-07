@@ -76,6 +76,11 @@ class jenis_surat extends Seeder
                 'jenis_surat' => 'PERJANJIAN KERJA SAMA',
                 'format' =>'format/perjanjian-kerjasama.docx'
             ],
+            [
+                'kode' => '13',
+                'jenis_surat' => 'INTERNAL MEMO',
+                'format' =>'format/internal-memo.docx'
+            ],
         ]);
     }
 }

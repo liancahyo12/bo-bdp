@@ -101,7 +101,7 @@ class ApprovesuratkeluarController extends Controller
             $surat = Suratkeluar::leftJoin('jenis_surats', 'jenis_surat_id', 'jenis_surats.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->leftJoin('isi_surats', 'isi_surats.surat_keluar_id', 'suratkeluars.id')->select('suratkeluars.id as ida', 'suratkeluars.*', 'jenis_surats.*', 'isi_surats.*', 'departemens.*')->where('suratkeluars.id', $id)->first();
 
             return view('boilerplate::surat-keluar.approvedetail', compact('surat'), [
-                'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->select('approvesuratkeluars.*', 'last_name', 'first_name', 'users.id as uid')->where('surat_keluar_id', $id)->get(),
+                'approve' => Approvesuratkeluar::leftJoin('users', 'approver_id', 'users.id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('kode', 'approve_status as statuss', 'approvesuratkeluars.created_at as waktu_komentar', 'approvesuratkeluars.*', 'last_name', 'first_name', 'users.id as uid')->where('surat_keluar_id', $id)->get(),
             ]); 
         }  
         return redirect()->route('boilerplate.surat-keluar-approve.index')
@@ -212,7 +212,9 @@ class ApprovesuratkeluarController extends Controller
             $template->setValues([
                 'no_surat' => $nosurat,
                 'tgl_surat' => $tgl_surat_t,
+                'perihal' => $surat->perihal,
             ]);
+            // $templateProcessor->setImageValue('foto', array('path' => 'dummy_foto.jpg', 'width' => 100, 'height' => 100, 'ratio' => true));
             $template->saveAs($saveDocPath);
             $converter = new OfficeConverter($saveDocPath);
             $converter->convertTo($filename.'.pdf'); 
@@ -233,23 +235,6 @@ class ApprovesuratkeluarController extends Controller
             $suratkeluar = $surat->save();
             $approvesurata = Approvesuratkeluar::create($approvesurat);
             $link = route('boilerplate.surat-keluar-saya.edit', $id);
-            // $mailto = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->value('email');
-            // $details = [
-            //     'title' => '',
-            //     'body' => 'Surat Keluar '.$request->perihal,
-            //     'body2' => 'Surat keluar sudah diapprove untuk melihat detail silahkan klik link ini '.$link,
-            // ];
-            
-            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
-
-            // $mailto = Request_surat_keluar::leftJoin('users', 'users.id', 'request_surat_keluars.user_id')->where('request_surat_keluars.id', $surat->request_surat_keluar_id)->value('email');
-            // $details = [
-            //     'title' => '',
-            //     'body' => 'Surat Keluar '.$request->perihal,
-            //     'body2' => 'Permintaan surat keluar sudah selesai untuk melihat detail silahkan klik link ini http://localhost:8000/surat-keluar-request-saya/'.$surat->request_surat_keluar_id.'/edit',
-            // ];
-            
-            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
             $user=User::leftJoin('suratkeluars', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $id)->first();
             $user->notify(new ApprovedSuratkeluar($id));
 
@@ -361,8 +346,14 @@ class ApprovesuratkeluarController extends Controller
     }
     public function preview_surat($id)
     {
-        $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('isi_surat').'.pdf');
-        return (new Response($file, 200))
-            ->header('Content-Type', 'application/pdf');        
+        if (Suratkeluar::where('id', $id)->value('approve_status')==2) {
+            $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('surat_jadi'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf'); 
+        }else {
+            $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('isi_surat').'.pdf');
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf'); 
+        }    
     }
 }

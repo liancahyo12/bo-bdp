@@ -42,6 +42,10 @@ class Closing extends Migration
             $table->tinyInteger('revisi_status')->nullable()->comment('1 = butuh revisi, 2=telah direvisi');
             $table->string('bukti_bayar')->nullable();
             $table->tinyInteger('bayar_status')->nullable()->comment('1 = belum dibayar, 1 = sudah dibayar');
+            $table->dateTime('pengembalian_time')->nullable();
+            $table->dateTime('rev_pengembalian_time')->nullable();
+            $table->string('bukti_pengembalian')->nullable();
+            $table->tinyInteger('pengembalian_status')->nullable()->comment('1 = butuh kirim bukti, 2 = setuju, 3 = revisi, 4= bukti terkirim, 5=telah direvisi');
             $table->dateTime('bayar_time')->nullable();
             $table->tinyInteger('status')->default(1)->comment('0 = not valid, 1= valid');
         });
