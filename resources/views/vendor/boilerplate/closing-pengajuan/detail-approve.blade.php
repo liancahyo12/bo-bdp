@@ -100,8 +100,6 @@
             @endif>
             <input class="btn btn-warning" name="submitbutton" type="submit" value="Revisi">
             &nbsp;
-            <input class="btn btn-danger" name="submitbutton" type="submit" value="Tolak">
-            &nbsp;
             <input class="btn btn-primary" name="submitbutton" type="submit" value="Setujui">
         </div>
     </x-boilerplate::card>
