@@ -519,7 +519,7 @@ class PengajuanController extends Controller
                     $input['alamat'] = $request->alamat;
                     $input['phone'] = $request->notelepon;
                     $input['kontak'] = $request->kontak;
-                    $input['email'] = $request->email;
+                    $input['email_po'] = $request->email;
                     $input['ppn'] = $request->ppn;
                     $input['dpp'] = $request->dpp;
                 }

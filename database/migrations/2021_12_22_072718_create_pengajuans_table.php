@@ -30,7 +30,7 @@ class CreatePengajuansTable extends Migration
             $table->string('kontak')->nullable();
             $table->double('dpp', 20, 2)->nullable();
             $table->double('ppn', 20, 2)->nullable();
-            $table->string('email')->nullable();
+            $table->string('email_po')->nullable();
             $table->string('bank')->nullable();
             $table->string('nama_rek')->nullable();
             $table->string('no_rek')->nullable();
