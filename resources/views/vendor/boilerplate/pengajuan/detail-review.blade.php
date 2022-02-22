@@ -89,7 +89,7 @@
             var alamat = "{{ $pengajuan->alamat }}";
             var phone = "{{ $pengajuan->phone }}";
             var kontak = "{{ $pengajuan->kontak }}";
-            var email = "{{ $pengajuan->email }}";
+            var email = "{{ $pengajuan->email_po }}";
             var catatan = "{{ $pengajuan->catatan }}";
             var noinvoice = "{{ $pengajuan->no_invoice }}";
             var jumpc = "{{ $pengajuan->jumlah_pc }}";

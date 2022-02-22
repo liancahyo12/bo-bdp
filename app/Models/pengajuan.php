@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Boilerplate\User;
-use App\Notifications\Boilerplate\ReviewdepPengajuan;
 
 class pengajuan extends Model
 {
@@ -44,7 +43,7 @@ class pengajuan extends Model
         'kontak',
         'ppn',
         'dpp',
-        'email',
+        'email_po',
         'bank',
         'nama_rek',
         'no_rek',
@@ -69,9 +68,4 @@ class pengajuan extends Model
         'revisi_status',
         'pengajuan_jadi',
     ];
-
-    public function sendReviewdepPengajuanNotification($id)
-    {
-        $this->notify(new ReviewdepPengajuan($id, $this));
-    }
 }
