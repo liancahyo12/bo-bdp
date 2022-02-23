@@ -112,7 +112,7 @@ class ApprovepengajuanController extends Controller
         $yy = substr($request->tgl_pengajuan, 0, 4);
 
         $pengajuan = pengajuan::leftJoin('departemens', 'departemens.id', 'departemen_id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'jenis_pengajuan_id')->select('pengajuans.*', 'departemens.kode as kode_departemen', 'jenis_pengajuans.kode as kode_pengajuan')->where([['pengajuans.id', '=', $id],['pengajuans.status', '=', 1]])->first();
-        $isi_pengajuan= isi_pengajuan::where([['id', '=', $id], ['status', '=', 1]])->select('transaksi', 'nominal')->get();
+        $isi_pengajuan= isi_pengajuan::where([['pengajuan_id', '=', $id], ['status', '=', 1]])->select('transaksi', 'nominal')->get();
         if ($pengajuan->review_status!=2) {
             return redirect()->route('boilerplate.approve-pengajuan')
                     ->with('growl', [__('pengajuan belum bisa diproses'), 'danger']);
@@ -171,10 +171,11 @@ class ApprovepengajuanController extends Controller
                 $template_document->setValue('alamat', $pengajuan->alamat);
                 $template_document->setValue('kontak', $pengajuan->kontak);
                 $template_document->setValue('phone', $pengajuan->phone);
-                $template_document->setValue('email', $pengajuan->email);
+                $template_document->setValue('email', $pengajuan->email_po);
                 $template_document->cloneRow('no', $isi_pengajuan->count());
+                $a = 0;
                 foreach ($isi_pengajuan as $isi) {
-                    $a=+1;
+                    $a+=1;
                     $template_document->setValue('no#'.$a, $a);
                     $template_document->setValue('pembelian#'.$a, $isi->transaksi);
                     $template_document->setValue('nominal#'.$a, $isi->nominal);
@@ -195,7 +196,9 @@ class ApprovepengajuanController extends Controller
             $pengajuan['no_urut'] = $nourut;
             $pengajuan['no_pengajuan'] = $nopengajuan;
             $pengajuan['approve_status'] = 2;
-            $pengajuan['bayar_status'] = 1;
+            if ($pengajuan->jenis_pengajuan_id == 2 || $pengajuan->jenis_pengajuan_id == 3 || $pengajuan->jenis_pengajuan_id == 4 || $pengajuan->jenis_pengajuan_id == 6) {
+                $pengajuan['bayar_status'] = 1;
+            }
             $approvepengajuan['approve_status'] = 2;
             $pengajuan = $pengajuan->save();
             $approvepengajuana = approvepengajuan::create($approvepengajuan);

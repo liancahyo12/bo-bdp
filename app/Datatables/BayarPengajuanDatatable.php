@@ -14,10 +14,11 @@ class BayarPengajuanDatatable extends Datatable
 
     public function datasource()
     {
-        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->whereRaw('pengajuans.status = 1 and review_status=2 and reviewdep_status=2 and approve_status=2 ')->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
+        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->whereRaw('pengajuans.status = 1 and review_status=2 and reviewdep_status=2 and approve_status=2')->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
         'pengajuan',
         'tgl_pengajuan',
         'jenis_pengajuan',
+        'jenis_pengajuan_id',
         'no_pengajuan',
         'bayar_status',
         'bayar_time',
@@ -43,20 +44,21 @@ class BayarPengajuanDatatable extends Datatable
             Column::add('Jenis Pengajuan')
                 ->data('jenis_pengajuan'),
 
-            Column::add('Pengajuan')
-                ->data('pengajuan'),
-
             Column::add('Tgl Pengajuan')
                 ->data('tgl_pengajuan'),
 
             Column::add('Status Bayar')
                 ->width('40px')
-                ->data('bayar_status', function (pengajuan $pengajuan) {
+                ->data('custom_status', function (pengajuan $pengajuan) {
                     $badge1 = '<span class="badge badge-pill badge-%s">%s</span>';
-                    if ($pengajuan->bayar_status == 1) {
-                        return sprintf($badge1, 'info', __('belum dibayar'));
-                    }else if($pengajuan->bayar_status == 2){
-                        return sprintf($badge1, 'success', __('sudah dibayar'));
+                    if ($pengajuan->jenis_pengajuan_id == 2 || $pengajuan->jenis_pengajuan_id == 3 || $pengajuan->jenis_pengajuan_id == 4 || $pengajuan->jenis_pengajuan_id == 6) {
+                        if ($pengajuan->bayar_status == 1) {
+                            return sprintf($badge1, 'info', __('belum dibayar'));
+                        }else if($pengajuan->bayar_status == 2){
+                            return sprintf($badge1, 'success', __('sudah dibayar'));
+                        }
+                    }else {
+                        return sprintf($badge1, 'secondary', __('-'));
                     }
                 }),
 
@@ -65,11 +67,16 @@ class BayarPengajuanDatatable extends Datatable
                 
             Column::add('Aksi')
             ->actions(function(pengajuan $pengajuan) {
-                        return join([
-                        Button::show('boilerplate.detail-bayar-pengajuan', $pengajuan->id),           
-                    ]);
-                    
-                }),
+                if ($pengajuan->jenis_pengajuan_id == 2 || $pengajuan->jenis_pengajuan_id == 3 || $pengajuan->jenis_pengajuan_id == 4 || $pengajuan->jenis_pengajuan_id == 6) {
+                    if ($pengajuan->bayar_status == 1) {
+                            return Button::add('Bayar')->route('boilerplate.detail-bayar-pengajuan', $pengajuan->id)->color('primary')->make();
+                        }else if($pengajuan->bayar_status == 2){
+                            return Button::show('boilerplate.detail-bayar-pengajuan', $pengajuan->id);
+                        }
+                }else {
+                    return Button::show('boilerplate.detail-bayar-pengajuan', $pengajuan->id);
+                }
+            }),
         ];
     }
 }

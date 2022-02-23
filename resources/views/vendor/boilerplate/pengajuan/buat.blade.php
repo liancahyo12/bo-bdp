@@ -29,6 +29,11 @@
         </div>
     </x-boilerplate::form>
     <script src="{{ mix('/form-pengajuan.js', '/assets/vendor/boilerplate') }}"></script>
-    
-    
+    <script> $(document).keypress(
+        function(event){
+            if (event.which == '13') {
+            event.preventDefault();
+            }
+        });
+    </script>
 @endsection

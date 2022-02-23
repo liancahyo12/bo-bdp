@@ -42,8 +42,8 @@ class BayarpengajuanController extends Controller
 
     public function update(Request $request, $id)
     {
-        $pengajuan = pengajuan::where('id', $id)->first();
-        if ($pengajuan->review_status==2 || $pengajuan->reviewdep_status==2 || $pengajuan->approve_status==2) {
+        $pengajuan = pengajuan::where([['id', '=', $id], ['status', '=', 1]])->first();
+        if ($pengajuan->review_status==2 || $pengajuan->reviewdep_status==2 || $pengajuan->approve_status==2 && $pengajuan->bayar_status==1) {
             $this->validate($request, [
                     'bukti_bayar' => 'required|mimes:pdf|max:20480',
             ]);

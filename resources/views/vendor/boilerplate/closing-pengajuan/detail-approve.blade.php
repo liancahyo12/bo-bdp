@@ -104,7 +104,13 @@
         </div>
     </x-boilerplate::card>
 </x-boilerplate::form>
-    <script>        
+    <script>       
+    $(document).keypress(
+        function(event){
+            if (event.which == '13') {
+            event.preventDefault();
+            }
+        }); 
         $(document).ready(function(){
             var pengajuann = "{{ $pengajuan->pengajuan }}";
             var catatan = "{{ $pengajuan->catatan }}";

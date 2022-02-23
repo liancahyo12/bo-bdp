@@ -1,8 +1,8 @@
 @extends('boilerplate::layout.index', [
-    'title' => __('Bayar Pengajuan'),
-    'subtitle' => __('Bayar Pengajuan'),
+    'title' => __('Pengajuan'),
+    'subtitle' => __('Detail Pengajuan'),
     'breadcrumb' => [
-        __('Bayar Pengajuan') 
+        __('Detail Pengajuan') 
     ]
 ])
 
@@ -34,12 +34,18 @@
                 </div>
             </div>
         </x-boilerplate::card>
-        <x-boilerplate::card>
+        <div @if ($pengajuan->bayar_status==1 || $pengajuan->bayar_status==2)
+                    
+            @else
+                style='display:none;'
+            @endif><x-boilerplate::card>
             <x-slot name="header">
                 <b>Bayar</b>
             </x-slot>
-            <div @if ($pengajuan->bayar_status==2)
-                style='display:none;'
+            <div @if ($pengajuan->bayar_status==1)
+                    
+                @else
+                    style='display:none;'
                 @endif>
                 <x-boilerplate::input name="bukti_bayar" type="file"/>
                 
@@ -57,14 +63,24 @@
                 </div>
             </div>
             <div>
-                <input class="btn btn-primary" name="submitbutton" type="submit" value="Bayar" @if ($pengajuan->bayar_status==2)
-                style='display:none;'
+                <input class="btn btn-primary" name="submitbutton" type="submit" value="Bayar"
+                @if ($pengajuan->bayar_status==1)
+                    
+                @else
+                    style='display:none;'
                 @endif>
             </div>
             
-        </x-boilerplate::card>
+        </x-boilerplate::card></div>
+        
     </x-boilerplate::form>
-    <script>        
+    <script>      
+    $(document).keypress(
+        function(event){
+            if (event.which == '13') {
+            event.preventDefault();
+            }
+        });  
         $(document).ready(function(){
             var pengajuann = "{{ $pengajuan->pengajuan }}";
             var perusahaan = "{{ $pengajuan->perusahaan }}";
