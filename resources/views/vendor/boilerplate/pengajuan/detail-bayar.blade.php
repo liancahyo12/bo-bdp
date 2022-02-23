@@ -33,6 +33,18 @@
                     <a target="_blank" href="/detail-bayar-pengajuan-lampiran/{{ $pengajuan->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
                 </div>
             </div>
+            <div class="form-group" @if ($pengajuan->pengajuan_jadi!=null)
+                
+                @else
+                style='display:none;'
+                @endif id="unduh-pengajuan">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/detail-bayar-pengajuan-jadi/{{ $pengajuan->ida }}"><button class="btn btn-secondary" form="a">Lihat File Pengajuan</button></a>
+                </div>
+            </div>
         </x-boilerplate::card>
         <div @if ($pengajuan->bayar_status==1 || $pengajuan->bayar_status==2)
                     

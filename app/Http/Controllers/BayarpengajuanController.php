@@ -86,4 +86,10 @@ class BayarpengajuanController extends Controller
         return (new Response($file, 200))
             ->header('Content-Type', 'application/pdf');
     }
+    public function unduh_jadi($id)
+    {
+        $file= Storage::disk('local')->get(pengajuan::where([['id', '=', $id], ['status', '=', 1]])->value('pengajuan_jadi'));
+        return (new Response($file, 200))
+            ->header('Content-Type', 'application/pdf');
+    }
 }
