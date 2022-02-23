@@ -206,6 +206,9 @@ Route::group([
         Route::get('/detail-bayar-pengajuan-bukti/{id}', [BayarpengajuanController::class, 'unduh_bukti'])
             ->middleware(['boilerplateauth', 'ability:admin,bayar_pengajuan'])
             ->name('detail-bayar-pengajuan-bukti');
+        Route::get('/detail-bayar-pengajuan-jadi/{id}', [BayarpengajuanController::class, 'unduh_jadi'])
+            ->middleware(['boilerplateauth', 'ability:admin,bayar_pengajuan'])
+            ->name('detail-bayar-pengajuan-jadi');
 
         // closing saya
         Route::get('/saya-closing-pengajuan', [ClosingController::class, 'index'])
