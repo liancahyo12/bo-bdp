@@ -93,7 +93,7 @@ class SuratmasukController extends Controller
     {
         if(Suratmasuk::where('id', $id)->value('departemen_id') == Auth::user()->departemen_id){
             return view('boilerplate::surat-masuk.detail', [
-                'suratmasuk' => Suratmasuk::where([['departemen_id', '=', Auth::user()->departemen_id], ['status', '=', 1]])->first(),
+                'suratmasuk' => Suratmasuk::where([['departemen_id', '=', Auth::user()->departemen_id], ['status', '=', 1], ['id', '=', $id]])->first(),
                 'departemens' => departemen::all(),
             ]);
         }else {
@@ -104,7 +104,7 @@ class SuratmasukController extends Controller
     public function detail_arsip($id)
     {
         return view('boilerplate::surat-masuk.detail', [
-                'suratmasuk' => Suratmasuk::where('status',  1)->first(),
+                'suratmasuk' => Suratmasuk::where([['status', '=', 1], ['id', '=', $id]])->first(),
                 'departemens' => departemen::all(),
             ]);
     }
@@ -112,7 +112,7 @@ class SuratmasukController extends Controller
     {
         if(Suratmasuk::where('id', $id)->value('user_id') == Auth::user()->id){
             return view('boilerplate::surat-masuk.detail', [
-                'suratmasuk' => Suratmasuk::where([['id', '=', Auth::user()->id], ['status', '=', 1]])->first(),
+                'suratmasuk' => Suratmasuk::where([['id', '=', Auth::user()->id], ['status', '=', 1], ['id', '=', $id]])->first(),
                 'departemens' => departemen::all(),
             ]);
         }else {

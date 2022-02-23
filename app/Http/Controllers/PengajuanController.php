@@ -241,7 +241,7 @@ class PengajuanController extends Controller
                 $input['alamat'] = $request->alamat;
                 $input['phone'] = $request->notelepon;
                 $input['kontak'] = $request->kontak;
-                $input['email'] = $request->email;
+                $input['email_po'] = $request->email;
                 $input['ppn'] = $request->ppn;
                 $input['dpp'] = $request->dpp;
             }
@@ -378,7 +378,7 @@ class PengajuanController extends Controller
             
             
 
-            if ( $request->jenis_pengajuan <= 3) {
+            if ( $input->jenis_pengajuan_id <= 3) {
                 $this->validate($request, [
                     'namarek' => 'required',
                     'norek' => 'required',
@@ -405,7 +405,7 @@ class PengajuanController extends Controller
                     $input['bank'] = $request->bank;
                 }
 
-            }elseif ($request->jenis_pengajuan == 4) {
+            }elseif ($input->jenis_pengajuan_id == 4) {
                 $this->validate($request, [
                     'noinvoice' => 'required',
                     'namarek' => 'required',
@@ -434,7 +434,7 @@ class PengajuanController extends Controller
                     $input['bank'] = $request->bank;
                 }
             }
-            elseif ($request->jenis_pengajuan == 5) {
+            elseif ($input->jenis_pengajuan_id == 5) {
                 $this->validate($request, [
                     'namarek' => 'required',
                     'norek' => 'required',
@@ -465,7 +465,7 @@ class PengajuanController extends Controller
                     $input['bank'] = $request->bank;
                 }
             }
-            elseif ($request->jenis_pengajuan == 6) {
+            elseif ($input->jenis_pengajuan_id == 6) {
                 $this->validate($request, [
                     'jumpc' => 'required',
                     'namarek' => 'required',
@@ -489,7 +489,7 @@ class PengajuanController extends Controller
                     $input['no_rek'] = $request->norek;
                     $input['bank'] = $request->bank;
                 }
-            }elseif ($request->jenis_pengajuan == 7) {
+            }elseif ($input->jenis_pengajuan_id == 7) {
                 $this->validate($request, [
                     'perusahaan' => 'required',
                     'alamat' => 'required',
@@ -514,7 +514,7 @@ class PengajuanController extends Controller
                         $isipengajuan = Isi_pengajuan::create($inpengajuan);
                         $total += $request->nominal[$key];
                     }
-                    $input['total_nominal'] = $total;
+                    $input['total_nominal'] = $total+$request->ppn+$request->dpp;
                     $input['perusahaan'] = $request->perusahaan;
                     $input['alamat'] = $request->alamat;
                     $input['phone'] = $request->notelepon;

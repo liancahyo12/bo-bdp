@@ -43,7 +43,7 @@ class Pengajuan
             'permission' => 'review_pengajuan',
             'order' => 104,
         ]);
-        $item->add('Daftar Pengajuan - Bayar', [
+        $item->add('Daftar Pengajuan', [
             'route' => 'boilerplate.bayar-pengajuan',
             'active' => 'boilerplate.bayar-pengajuan,boilerplate.detail-bayar-pengajuan',
             'permission' => 'bayar_pengajuan',

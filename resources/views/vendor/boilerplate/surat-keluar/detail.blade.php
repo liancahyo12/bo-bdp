@@ -180,4 +180,11 @@
             {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
         </div>
     </x-boilerplate::form>
+    <script> $(document).keypress(
+        function(event){
+            if (event.which == '13') {
+            event.preventDefault();
+            }
+        });
+    </script>
 @endsection
