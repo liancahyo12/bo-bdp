@@ -112,7 +112,7 @@ class SuratmasukController extends Controller
     {
         if(Suratmasuk::where('id', $id)->value('user_id') == Auth::user()->id){
             return view('boilerplate::surat-masuk.detail', [
-                'suratmasuk' => Suratmasuk::where([['id', '=', Auth::user()->id], ['status', '=', 1], ['id', '=', $id]])->first(),
+                'suratmasuk' => Suratmasuk::where([['user_id', '=', Auth::user()->id], ['status', '=', 1], ['id', '=', $id]])->first(),
                 'departemens' => departemen::all(),
             ]);
         }else {
@@ -124,7 +124,7 @@ class SuratmasukController extends Controller
     public function file_saya($id)
     {
         if(Suratmasuk::where('id', $id)->value('user_id') == Auth::user()->id){
-            $file= Storage::disk('local')->get(Suratmasuk::where('id', $id)->value('isi_surat'));
+            $file= Storage::disk('local')->get(Suratmasuk::where([['status', '=', 1], ['id', '=', $id]])->value('isi_surat'));
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {
@@ -135,7 +135,7 @@ class SuratmasukController extends Controller
     public function file($id)
     {
         if(Suratmasuk::where('id', $id)->value('departemen_id') == Auth::user()->departemen_id){
-            $file= Storage::disk('local')->get(Suratmasuk::where('id', $id)->value('isi_surat'));
+            $file= Storage::disk('local')->get(Suratmasuk::where([['status', '=', 1], ['id', '=', $id]])->value('isi_surat'));
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {
@@ -145,7 +145,7 @@ class SuratmasukController extends Controller
     }
     public function file_arsip($id)
     {
-        $file= Storage::disk('local')->get(Suratmasuk::where('id', $id)->value('isi_surat'));
+        $file= Storage::disk('local')->get(Suratmasuk::where([['status', '=', 1], ['id', '=', $id]])->value('isi_surat'));
         return (new Response($file, 200))
             ->header('Content-Type', 'application/pdf');
     }
