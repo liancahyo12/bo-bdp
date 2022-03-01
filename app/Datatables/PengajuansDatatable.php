@@ -149,7 +149,7 @@ class PengajuansDatatable extends Datatable
                 
             Column::add('Aksi')
                 ->actions(function(pengajuan $pengajuan) {
-                    if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==6 ) && $pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2) {
+                    if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==6 ) && $pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2 &&$pengajuan->bayar_status==2) {
                         return join([
                             Button::show('boilerplate.edit-pengajuan', $pengajuan->id),  
                             Button::add('closing')->route('boilerplate.buat-closing-pengajuan', $pengajuan->id)->color('primary')->make(), 

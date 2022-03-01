@@ -118,11 +118,11 @@
                 });
             }else if ( "{{ $pengajuan->jenis_pengajuan_id }}" == 6){
                 document.getElementById("form-pengajuan").innerHTML = "<div><label for='jumpc'>Jumlah Petty Cash(dalam rupiah)</label><input class='form-control' name='jumpc' value='"+jumpc+"' type='text' id='jumpc' disabled></input></div>       <br><h3>Kebutuhan</h3><table class='table' id='dynamic'>@foreach ($isi_pengajuan as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first) <label for='jenistr'>Jenis Transaksi</label> @else @endif<input class='form-control' type='text' name='jenistr[]' value='{{ $position->jenis_transaksi }}' id='jenistr' disabled></td> </tr>@endforeach</table> <label for='catatan'>Catatan</label><input class='form-control' type='text' name='catatan' value='"+catatan+"' id='catatan' disabled><h3>Tujuan</h3><label for='namarek'>Nama Rekening Tujuan</label><input class='form-control' name='namarek' value='"+namarek+"' type='text' id='namarek' disabled><label for='norek'>No Rekening Tujuan</label>            <input class='form-control' name='norek' value='"+norek+"' type='text' id='norek' disabled><label for='bank'>Bank Tujuan</label>           <input class='form-control' name='bank' value='"+bank+"' type='text' id='Bank' disabled>"
-                document.getElementById("form-closing").innerHTML = "<div>    <table class='table' id='dynamic'><tr id='row'><td><label for='coa'>COA*</label><input class='form-control' type='text' name='coa[]' id='coa'></td><td><label for='transaksia'>Keterangan*</label><input class='form-control' type='text' name='transaksia[]' id='transaksia'></td><td><label for='nominala'>Nominal*</label><input class='form-control' type='number' name='nominala[]' id='nominala'></td><td><label for='saldoa'>Saldo*</label><input class='form-control' type='number' name='saldoa[]' id='saldoa'></td><td><br><button type='button' id='tambah' class='btn btn-success'>Tambah</button></td></tr></table></div>"
+                document.getElementById("form-closing").innerHTML = "<div>    <table class='table' id='dynamic'><tr id='row'><td width='12%'><label for='coa'>COA*</label><input class='form-control' type='text' name='coa[]' id='coa'></td><td><label for='transaksia'>Keterangan*</label><input class='form-control' type='text' name='transaksia[]' id='transaksia' placeholder='Saldo . . .'></td><td><label for='nominala'>Nominal*</label><input class='form-control' type='number' name='nominala[]' id='nominala' readonly></td><td><label for='saldoa'>Saldo*</label><input class='form-control' type='number' name='saldoa[]' id='saldoa'></td><td><button type='button' id='tambah' class='btn btn-success tambah'>Tambah</button></td></tr></table>   <a>*klik apapun untuk hitung</a>     <table class='table'><tr><td><label for='totalclosing'>Total nominal</label> </td><td> <input class='form-control' type='text' name='totalclosing' id='totalclosing' disabled></td></tr><tr><td><label for='selisih'>Selisih saldo</label><div id='icselisih'></div></td><td> <input class='form-control' type='text' name='selisih' id='selisih' disabled></td></tr></table></div>"
                 var no =1;
-                $('#tambah').click(function(){
+                $(document).on('click', '.tambah', function(){
                     no++;
-                    $('#dynamic').append("<tr id='row"+no+"'><td><input class='form-control' type='text' name='coa[]' id='coa"+no+"'></td><td><input class='form-control' type='text' name='transaksia[]' id='transaksia"+no+"'></td><td><input class='form-control nominala' type='number' name='nominala[]' id='nominala"+no+"'></td><td><input class='form-control saldoa' type='number' name='saldoa[]' id='saldoa"+no+"' readonly ></td><td><button type='button' id='"+no+"' class='btn btn-danger btn_remove'>Hapus</button></td></tr>");
+                    $('#dynamic').append("<tr id='row"+no+"'><td><input class='form-control' type='text' name='coa[]' id='coa"+no+"'></td><td><input class='form-control' type='text' name='transaksia[]' id='transaksia"+no+"'></td><td><input class='form-control nominala' type='number' name='nominala[]' id='nominala"+no+"'></td><td><input class='form-control saldoa' type='number' name='saldoa[]' id='saldoa"+no+"' readonly ></td><td><button type='button' id='tambah"+no+"' class='btn btn-success tambah'>+</button><button type='button' id='"+no+"' class='btn btn-danger btn_remove'>x</button></td></tr>");
                 });
 
                 $(document).on('click', '.btn_remove', function(){
@@ -142,6 +142,19 @@
                             totb = parseFloat(sald[a].value)-parseFloat(nom[i].value);
                             sald[i].value = totb;
                         }
+                    }
+                    for(var i=0;i<nom.length;i++){
+                        if(parseFloat(nom[i].value))
+                            tot += parseFloat(nom[i].value);
+                    }
+                    document.getElementById("totalclosing").value = tot;
+                    document.getElementById("selisih").value = totb;
+                    if (totb>0) {
+                        document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari saldo</span>';
+                    }else if (totb<0) {
+                        document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi saldo</span>';
+                    }else if (totb=0){
+                        document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai saldo</span>';
                     }
                 });
             }

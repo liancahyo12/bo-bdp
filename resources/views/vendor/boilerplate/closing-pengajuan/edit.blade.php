@@ -82,7 +82,7 @@
             </x-boilerplate::select2>
             <div id="form-pengajuan">
             </div>
-            <x-boilerplate::input name="catatana" type="text" label="Catatan" value="{{$closing->catatan}}"/>
+            <x-boilerplate::input name="catatana" type="text" label="Catatan" value="{{$closing->catatan}}" disabled/>
             <br>
             <div class="form-group" @if ($pengajuan->lampiran!=null)
                 
@@ -159,10 +159,35 @@
                 });
             }else if ( "{{ $pengajuan->jenis_pengajuan_id }}" == 6){
                 document.getElementById("form-pengajuan").innerHTML = "<div><label for='jumpc'>Jumlah Petty Cash(dalam rupiah)</label><input class='form-control' name='jumpc' value='"+jumpc+"' type='text' id='jumpc' disabled></input></div>       <br><h3>Kebutuhan</h3><table class='table' id='dynamic'>@foreach ($isi_pengajuan as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first) <label for='jenistr'>Jenis Transaksi</label> @else @endif<input class='form-control' type='text' name='jenistr[]' value='{{ $position->jenis_transaksi }}' id='jenistr' disabled></td> </tr>@endforeach</table> <label for='catatan'>Catatan</label><input class='form-control' type='text' name='catatan' value='"+catatan+"' id='catatan' disabled><h3>Tujuan</h3><label for='namarek'>Nama Rekening Tujuan</label><input class='form-control' name='namarek' value='"+namarek+"' type='text' id='namarek' disabled><label for='norek'>No Rekening Tujuan</label>            <input class='form-control' name='norek' value='"+norek+"' type='text' id='norek' disabled><label for='bank'>Bank Tujuan</label>           <input class='form-control' name='bank' value='"+bank+"' type='text' id='Bank' disabled>"
-                document.getElementById("form-closing").innerHTML = "<div>    <table class='table' id='dynamic'>@foreach ($isi_closing as $key => $position) <tr id='ro{{ $position->id }}'><td>@if ($loop->first)<label for='coa'>COA</label> @else @endif<input class='form-control' type='text' name='coa[]' value='{{ $position->coa }}' id='coa' ></td><td>@if ($loop->first) <label for='transaksia'>Keterangan</label> @else @endif<input class='form-control' type='text' name='transaksia[]' value='{{ $position->transaksi }}' id='transaksia' ></td><td> @if ($loop->first)<label for='nominala'>Nominal</label> @else @endif<input class='form-control' type='text' name='nominala[]' value='{{ $position->nominal }}' id='nominala' ></td> <td>@if ($loop->first)<label for='saldoa'>Saldo</label> <input class='form-control' type='text' name='saldoa[]' value='{{ $position->saldo }}' id='saldoa' >@else<input class='form-control' type='text' name='saldoa[]' value='{{ $position->saldo }}' id='saldoa' readonly> @endif</td> @if ($loop->first) <td><br><button type='button' id='tambah' class='btn btn-success'>Tambah</button></td>          @else <td><button type='button' id='ro{{ $position->id }}' class='btn btn-danger btn_removea'>Hapus</button></td>@endif</tr>@endforeach</table></div>"
-                $('#tambah').click(function(){
+                document.getElementById("form-closing").innerHTML = "<div>    <table class='table' id='dynamic'>@foreach ($isi_closing as $key => $position) <tr id='ro{{ $position->id }}'><td width='12%'>@if ($loop->first)<label for='coa'>COA</label> @else @endif<input class='form-control' type='text' name='coa[]' value='{{ $position->coa }}' id='coa' ></td><td>@if ($loop->first) <label for='transaksia'>Keterangan</label><input class='form-control' type='text' name='transaksia[]' value='{{ $position->transaksi }}' id='transaksia' placeholder='Saldo . . .'> @else <input class='form-control' type='text' name='transaksia[]' value='{{ $position->transaksi }}' id='transaksia'> @endif</td><td> @if ($loop->first)<label for='nominala'>Nominal</label> <input class='form-control' type='number' name='nominala[]' value='{{ $position->nominal }}' id='nominala' readonly>@else <input class='form-control' type='number' name='nominala[]' value='{{ $position->nominal }}' id='nominala'> @endif</td> <td>@if ($loop->first)<label for='saldoa'>Saldo</label> <input class='form-control' type='number' name='saldoa[]' value='{{ $position->saldo }}' id='saldoa' >@else<input class='form-control' type='text' name='saldoa[]' value='{{ $position->saldo }}' id='saldoa' readonly> @endif</td> @if ($loop->first) <td><br><button type='button' id='tambah' class='btn btn-success tambah'>Tambah</button></td>          @else <td><button type='button' id='tambah' class='btn btn-success tambah'>+</button><button type='button' id='ro{{ $position->id }}' class='btn btn-danger btn_removea'>x</button></td>@endif</tr>@endforeach</table>  <a>*klik apapun untuk hitung</a>     <table class='table'><tr><td><label for='totalclosing'>Total nominal</label> </td><td> <input class='form-control' type='text' name='totalclosing' id='totalclosing'disabled></td></tr><tr><td><label for='selisih'>Selisih saldo</label><div id='icselisih'></div></td><td> <input class='form-control' type='text' name='selisih' id='selisih' disabled></td></tr></table></div></div>"
+                var nom = document.getElementsByName('nominala[]');
+                var sald = document.getElementsByName('saldoa[]');
+                var totb=0;
+                for(var i=0;i<nom.length;i++){
+                    a=i-1;
+                    if(i==0){
+                        
+                    }else if (i>0){
+                        totb = parseFloat(sald[a].value)-parseFloat(nom[i].value);
+                        sald[i].value = totb;
+                    }
+                }
+                for(var i=0;i<nom.length;i++){
+                    if(parseFloat(nom[i].value))
+                        tot += parseFloat(nom[i].value);
+                }
+                document.getElementById("totalclosing").value = tot;
+                document.getElementById("selisih").value = totb;
+                if (totb>0) {
+                    document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari saldo</span>';
+                }else if (totb<0) {
+                    document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi saldo</span>';
+                }else if (totb=0){
+                    document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai saldo</span>';
+                }
+                $(document).on('click', '.tambah', function(){
                     no++;
-                    $('#dynamic').append("<tr id='row"+no+"'><td><input class='form-control' type='text' name='coa[]' id='coa"+no+"'></td><td><input class='form-control' type='text' name='transaksia[]' id='transaksia"+no+"'></td><td><input class='form-control nominala' type='number' name='nominala[]' id='nominala"+no+"'></td><td><input class='form-control saldoa' type='number' name='saldoa[]' id='saldoa"+no+"' readonly></td><td><button type='button' id='"+no+"' class='btn btn-danger btn_remove'>Hapus</button></td></tr>");
+                    $('#dynamic').append("<tr id='row"+no+"'><td><input class='form-control' type='text' name='coa[]' id='coa"+no+"'></td><td><input class='form-control' type='text' name='transaksia[]' id='transaksia"+no+"'></td><td><input class='form-control nominala' type='number' name='nominala[]' id='nominala"+no+"'></td><td><input class='form-control saldoa' type='number' name='saldoa[]' id='saldoa"+no+"' readonly></td><td><button type='button' id='tambah"+no+"' class='btn btn-success tambah'>+</button><button type='button' id='"+no+"' class='btn btn-danger btn_remove'>x</button></td></tr>");
                 });
 
                 $(document).on('click', '.btn_remove', function(){
@@ -185,6 +210,15 @@
                             totb = parseFloat(sald[a].value)-parseFloat(nom[i].value);
                             sald[i].value = totb;
                         }
+                    }
+                    document.getElementById("totalclosing").value = tot;
+                    document.getElementById("selisih").value = totb;
+                    if (totb>0) {
+                        document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-warning">kurang dari saldo</span>';
+                    }else if (totb<0) {
+                        document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-danger">melebihi saldo</span>';
+                    }else if (totb=0){
+                        document.getElementById("icselisih").innerHTML ='<span class="badge badge-pill badge-success">sesuai saldo</span>';
                     }
                 });
             }
