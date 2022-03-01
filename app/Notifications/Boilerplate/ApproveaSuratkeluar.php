@@ -45,7 +45,7 @@ class ApproveaSuratkeluar extends Notification
             ->from('it@bdpay.co.id', '[BDPay E-Office] No-reply')
             ->markdown('boilerplate::notifications.email')
             ->subject(__('Notifikasi Surat Keluar', ['name' => 'BDPay E-Office']))
-            ->line(__('Surat keluar telah dikirimkan oleh '.$currentUser->first_name.' '.$currentUser->last_name, [
+            ->line(__('Surat keluar butuh Approval'$currentUser->last_name, [
             ]))
             ->action(
                 __('Approve Surat Keluar'),
