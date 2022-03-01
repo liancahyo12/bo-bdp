@@ -162,7 +162,7 @@ Route::group([
         Route::put('/update-reviewdep-pengajuan/{id}', [ReviewdeppengajuanController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
             ->name('update-reviewdep-pengajuan');
-        Route::get('/detail-reviewdep-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
+        Route::get('/detail-reviewdep-pengajuan-lampiran/{id}', [ReviewdeppengajuanController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,reviewdep_pengajuan'])
             ->name('detail-reviewdep-pengajuan-lampiran');
 
@@ -176,7 +176,7 @@ Route::group([
         Route::put('/update-review-pengajuan/{id}', [ReviewpengajuanController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('update-review-pengajuan');
-        Route::get('/detail-review-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
+        Route::get('/detail-review-pengajuan-lampiran/{id}', [ReviewpengajuanController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,review_pengajuan'])
             ->name('detail-review-pengajuan-lampiran');
             
@@ -190,7 +190,7 @@ Route::group([
         Route::put('/update-approve-pengajuan/{id}', [ApprovepengajuanController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
             ->name('update-approve-pengajuan');
-        Route::get('/detail-approve-pengajuan-lampiran/{id}', [PengajuanController::class, 'unduh_lampiran'])
+        Route::get('/detail-approve-pengajuan-lampiran/{id}', [ApprovepengajuanController::class, 'unduh_lampiran'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_pengajuan'])
             ->name('detail-approve-pengajuan-lampiran');
         
