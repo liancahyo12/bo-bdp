@@ -5,6 +5,7 @@ namespace App\Notifications\Boilerplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Models\pengajuan;
 
 class ApproveaPengajuan extends Notification
 {
@@ -45,7 +46,7 @@ class ApproveaPengajuan extends Notification
             ->from('it@bdpay.co.id', '[BDPay E-Office] No-reply')
             ->markdown('boilerplate::notifications.email')
             ->subject(__('Notifikasi Pengajuan', ['name' => 'BDPay E-Office']))
-            ->line(__('Pengajuan telah dikirimkan oleh '.$currentUser->first_name.' '.$currentUser->last_name, [
+            ->line(__('Pengajuan butuh Approval', [
             ]))
             ->action(
                 __('Approve Pengajuan'),

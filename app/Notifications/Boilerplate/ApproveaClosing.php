@@ -45,7 +45,7 @@ class ApproveaClosing extends Notification
             ->from('it@bdpay.co.id', '[BDPay E-Office] No-reply')
             ->markdown('boilerplate::notifications.email')
             ->subject(__('Notifikasi Closing Pengajuan', ['name' => 'BDPay E-Office']))
-            ->line(__('Closing pengajuan telah dikirimkan oleh '.$currentUser->first_name.' '.$currentUser->last_name, [
+            ->line(__('Closing pengajuan butuh Approval', [
             ]))
             ->action(
                 __('Approve Closing Pengajuan'),
