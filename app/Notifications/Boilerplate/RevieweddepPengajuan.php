@@ -5,6 +5,7 @@ namespace App\Notifications\Boilerplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Database\Eloquent\Collection;
 
 class RevieweddepPengajuan extends Notification
 {

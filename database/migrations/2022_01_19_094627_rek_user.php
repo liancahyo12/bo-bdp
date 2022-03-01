@@ -17,6 +17,7 @@ class RekUser extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('karyawan_id')->nullable();
             $table->string('nama_rek')->nullable();
             $table->string('no_rek')->nullable();
             $table->string('bank')->nullable();

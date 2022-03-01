@@ -16,6 +16,7 @@ use Thomaswelton\LaravelGravatar\Facades\Gravatar;
 use App\Models\Suratkeluar;
 use App\Models\Suratmasuk;
 use App\Models\rek_user;
+use App\Models\karyawan;
 
 class User extends Authenticatable
 {
@@ -54,6 +55,10 @@ class User extends Authenticatable
         return $this->hasMany(rek_user::class);
     }
 
+    public function karyawan()
+    {
+        return $this->hasOne(karyawan::class);
+    }
     protected $dispatchesEvents = [
         'forceDeleted' => UserDeleted::class,
         'created'      => UserCreated::class,

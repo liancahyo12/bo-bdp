@@ -223,19 +223,12 @@ class ClosingController extends Controller
             $input['send_time'] = Carbon::now()->toDateTimeString();
             $input['reviewdep_status'] = 0;
             $pengajuann = closing::create($input);
-            // $link = route('boilerplate.detail-reviewdep-closing-pengajuan', $idf);
-            // // $isisuratkeluar = Isi_surat::create($isisurat);
-
-            //     $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=5 limit 1');
-            //     $details = [
-            //         'title' => '',
-            //         'body' => 'Pengajuan '.$request->pengajuan,
-            //         'body2' => 'Untuk review pengajuan silahkan klik link ini '.$link,
-            //     ];
+           
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->get();
+            foreach ($user as $user) {
+                $user->notify(new ReviewdepaClosing($idf));
+            }
             
-            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
-            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->first();
-            $user->notify(new ReviewdepaClosing($idf));
 
             return redirect()->route('boilerplate.saya-closing-pengajuan')
                             ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);
@@ -316,16 +309,10 @@ class ClosingController extends Controller
                 $pengajuann = $input->save();
                 $link = route('boilerplate.detail-reviewdep-closing-pengajuan', $id);
 
-                // $mailto = DB::select('select email from role_user left join users on role_user.user_id=users.id where role_id=5 limit 1');
-                //     $details = [
-                //         'title' => '',
-                //         'body' => 'Closing Pengajuan '.$input->closing,
-                //         'body2' => 'Untuk review closing pengajuan silahkan klik link ini '.$link,
-                //     ];
-                
-                // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
                 $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->first();
-                $user->notify(new ReviewdepaClosing($id));
+                foreach ($user as $user) {
+                    $user->notify(new ReviewdepaClosing($idf));
+                }
 
                 return redirect()->route('boilerplate.saya-closing-pengajuan')
                                 ->with('growl', [__('Closing pengajuan berhasil dikirim'), 'success']);
@@ -369,8 +356,11 @@ class ClosingController extends Controller
                 $input['pengembalian_time'] = Carbon::now()->toDateTimeString();
             }
             $closings = $input->save();
-            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 13)->first();
-            $user->notify(new ReviewpengemClosing($id));
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 13)->get();
+            foreach ($user as $user) {
+                $user->notify(new ReviewpengemClosing($id));
+            }
+
             return redirect()->route('boilerplate.saya-closing-pengajuan')
                 ->with('growl', [__('Bukti pengembalian berhasil dikirim'), 'success']);
         }

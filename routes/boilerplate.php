@@ -27,6 +27,7 @@ use App\Http\Controllers\ReviewclosingController;
 use App\Http\Controllers\ApproveclosingController;
 use App\Http\Controllers\Rek_userController;
 use App\Http\Controllers\LogReportController;
+use App\Http\Controllers\KaryawanController;
 
 Route::group([
     'prefix'     => config('boilerplate.app.prefix', ''),
@@ -102,21 +103,24 @@ Route::group([
         });
 
         // Rekening Karyawan
-        Route::get('/rekening-karyawan', [Rek_userController::class, 'index'])
-            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
-            ->name('rekening-karyawan');
-        Route::post('/buat-rekening-karyawan', [Rek_userController::class, 'store'])
-            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
-            ->name('buat-rekening-karyawan');
-        Route::get('/edit-rekening-karyawan', [Rek_userController::class, 'edit'])
-            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
-            ->name('edit-rekening-karyawan');
-        Route::put('/update-rekening-karyawan', [Rek_userController::class, 'update'])
-            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
-            ->name('update-rekening-karyawan');
-        Route::delete('/delete-rekening-karyawan', [Rek_userController::class, 'destroy'])
-            ->middleware(['boilerplateauth', 'ability:admin,tambah_rekening'])
-            ->name('delete-rekening-karyawan');
+        Route::get('/karyawan', [KaryawanController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,edit_karyawan,detail_karyawan,nonaktif_karyawan,hapus_karyawan'])
+            ->name('karyawan');
+        Route::get('/edit-karyawan', [KaryawanController::class, 'edit'])
+            ->middleware(['boilerplateauth', 'ability:admin,edit_karyawan'])
+            ->name('edit-karyawan');
+        Route::put('/update-karyawan', [KaryawanController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,edit_karyawan'])
+            ->name('update-karyawan');
+        Route::get('/detail-karyawan', [KaryawanController::class, 'show'])
+            ->middleware(['boilerplateauth', 'ability:admin,detail_karyawan'])
+            ->name('detail-karyawan');
+        Route::put('/nonaktif-karyawan', [KaryawanController::class, 'nonaktif'])
+            ->middleware(['boilerplateauth', 'ability:admin,nonaktif_karyawan'])
+            ->name('nonaktif-karyawan');
+        Route::delete('/delete-karyawan', [KaryawanController::class, 'destroy'])
+            ->middleware(['boilerplateauth', 'ability:admin,hapus_karyawan'])
+            ->name('delete-karyawan');
 
 
          // Pengajuan
