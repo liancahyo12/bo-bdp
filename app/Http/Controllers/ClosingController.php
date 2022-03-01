@@ -50,7 +50,7 @@ class ClosingController extends Controller
         if ($pengajuan->idp!=null) {
             return redirect()->route('boilerplate.saya-closing-pengajuan')
                 ->with('growl', [__('Closing telah dibuat'), 'danger']);
-        }else if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==6 ) &&$pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2) {
+        }else if (($pengajuan->jenis_pengajuan_id==3 ||$pengajuan->jenis_pengajuan_id==6 ) &&$pengajuan->reviewdep_status==2 && $pengajuan->review_status==2 &&$pengajuan->approve_status==2 &&$pengajuan->bayar_status==2) {
             return view('boilerplate::closing-pengajuan.buat', compact('pengajuan'), 
             // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
             [
@@ -309,9 +309,9 @@ class ClosingController extends Controller
                 $pengajuann = $input->save();
                 $link = route('boilerplate.detail-reviewdep-closing-pengajuan', $id);
 
-                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->first();
+                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->get();
                 foreach ($user as $user) {
-                    $user->notify(new ReviewdepaClosing($idf));
+                    $user->notify(new ReviewdepaClosing($id));
                 }
 
                 return redirect()->route('boilerplate.saya-closing-pengajuan')

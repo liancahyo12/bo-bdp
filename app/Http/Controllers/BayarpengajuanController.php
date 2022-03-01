@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\pengajuan;
 use App\Models\Isi_pengajuan;
+use App\Models\Boilerplate\User;
+use App\Notifications\Boilerplate\BayaredPengajuan;
 use App\Http\Requests\StorepengajuanRequest;
 use App\Http\Requests\UpdatepengajuanRequest;
 use Illuminate\Contracts\Foundation\Application;
@@ -30,7 +32,7 @@ class BayarpengajuanController extends Controller
 
     public function create($id)
     {
-        $pengajuan = pengajuan::leftJoin('isi_pengajuans', 'pengajuan_id', 'pengajuans.id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'pengajuans.jenis_pengajuan_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('pengajuans.id as ida', 'pengajuans.user_id as suser_id', 'pengajuans.status as sstatus', 'isi_pengajuans.*', 'pengajuans.*', 'jenis_pengajuans.*', 'departemen')->where([['pengajuans.id', '=', $id], ['pengajuans.status', '=', 1]])->first();
+        $pengajuan = pengajuan::leftJoin('isi_pengajuans', 'pengajuan_id', 'pengajuans.id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'pengajuans.jenis_pengajuan_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->leftJoin('users', 'users.id', 'pengajuans.user_id')->select('first_name', 'last_name', 'pengajuans.id as ida', 'pengajuans.user_id as suser_id', 'pengajuans.status as sstatus', 'isi_pengajuans.*', 'pengajuans.*', 'jenis_pengajuans.*', 'departemen')->where([['pengajuans.id', '=', $id], ['pengajuans.status', '=', 1]])->first();
         if ($pengajuan->review_status==2 || $pengajuan->reviewdep_status==2 || $pengajuan->approve_status==2) {
             return view('boilerplate::pengajuan.detail-bayar', compact('pengajuan'), [
                 'isi_pengajuan' => Isi_pengajuan::where([['pengajuan_id', '=', $id], ['status', '=', 1]])->get(),
@@ -57,16 +59,8 @@ class BayarpengajuanController extends Controller
             $pengajuan['bayar_time'] = Carbon::now()->toDateTimeString();;
             $pengajuan->save();
 
-            $link = route('boilerplate.bayar-pengajuan', $id);
-
-            $mailto = pengajuan::leftJoin('users', 'users.id', 'pengajuans.user_id')->where('pengajuans.id', $id)->value('users.email');
-                $details = [
-                    'title' => '',
-                    'body' => 'Pengajuan '.$request->pengajuan,
-                    'body2' => 'Pengajuan telah dibayarkan untuk lihat detail silahkan klik link ini '.$link,
-                ];
-
-            \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
+            $user=User::leftJoin('pengajuans', 'users.id', 'pengajuans.user_id')->where('pengajuans.id', $id)->first();
+            $user->notify(new BayaredPengajuan($id));
 
             return redirect()->route('boilerplate.bayar-pengajuan')
                 ->with('growl', [__('Pengajuan berhasil dibayar'), 'success']);

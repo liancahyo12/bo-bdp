@@ -59,7 +59,7 @@
                 @else
                     style='display:none;'
                 @endif>
-                <x-boilerplate::input name="bukti_bayar" type="file"/>
+                <x-boilerplate::input name="bukti_bayar" label="Unggah Bukti Bayar  (PDF Maks 20MB)" type="file"/>
                 
             </div>
             <div class="form-group" @if ($pengajuan->bukti_bayar!=null)

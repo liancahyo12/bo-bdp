@@ -25,6 +25,7 @@ use Illuminate\Validation\ValidationException;
 use App\Notifications\Boilerplate\ApprovedPengajuan;
 use App\Notifications\Boilerplate\RevisiPengajuan;
 use App\Notifications\Boilerplate\TolakPengajuan;
+use App\Notifications\Boilerplate\BayarPengajuan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -215,6 +216,11 @@ class ApprovepengajuanController extends Controller
             $user=User::leftJoin('pengajuans', 'users.id', 'pengajuans.user_id')->where('pengajuans.id', $id)->first();
             $user->notify(new ApprovedPengajuan($id));
 
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 17)->get();
+            foreach ($user as $user) {
+                $user->notify(new BayarPengajuan($id));
+            }
+            
             return redirect()->route('boilerplate.approve-pengajuan')
                             ->with('growl', [__('pengajuan berhasil disetujui'), 'success']);
             }

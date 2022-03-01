@@ -535,7 +535,7 @@ class PengajuanController extends Controller
                 
                 $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->get();
                 foreach ($user as $user) {
-                    $user->notify(new RdepPengajuan($idf));
+                    $user->notify(new RdepPengajuan($id));
                 }
 
                 return redirect()->route('boilerplate.saya-pengajuan')
