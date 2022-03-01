@@ -14,10 +14,10 @@ class ManajemenKaryawan
             'order' => 1002,
         ]);
 
-        $item->add('Rekening Karyawan', [
-            'permission' => 'tambah_rekening',
-            'active' => 'boilerplate.rekening-karyawan,buat-rekening-karyawan,edit-rekening-karyawan',
-            'route' => 'boilerplate.rekening-karyawan',
+        $item->add('Daftar Karyawan', [
+            'permission' => 'edit_karyawan,detail_karyawan,nonaktif_karyawan,hapus_karyawan',
+            'active' => 'boilerplate.karyawan,boilerplate.edit-karyawan,boilerplate.detail-karyawan',
+            'route' => 'boilerplate.karyawan',
         ]);
     }
 }

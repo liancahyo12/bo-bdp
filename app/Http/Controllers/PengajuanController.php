@@ -254,19 +254,11 @@ class PengajuanController extends Controller
             $input['send_time'] = Carbon::now()->toDateTimeString();
             $input['reviewdep_status'] = 0;
             $pengajuann = pengajuan::create($input);
-            // $link = route('boilerplate.detail-reviewdep-pengajuan', $idf);
-            // $isisuratkeluar = Isi_surat::create($isisurat);
-
-            // $mailto = DB::select('select email from permission_role left join role_user  on permission_role.role_id=role_user.role_id left join users on role_user.user_id=users.id where permission_id=12');
-            //     $details = [
-            //         'title' => '',
-            //         'body' => 'Pengajuan '.$request->pengajuan,
-            //         'body2' => 'Untuk review pengajuan silahkan klik link ini '.$link,
-            //     ];
             
-            // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
-            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->first();
-            $user->notify(new RdepPengajuan($idf));
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->get();
+            foreach ($user as $user) {
+                $user->notify(new RdepPengajuan($idf));
+            }
 
             return redirect()->route('boilerplate.saya-pengajuan')
                             ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);
@@ -540,20 +532,11 @@ class PengajuanController extends Controller
                 
                 $input['send_time'] = Carbon::now()->toDateTimeString();
                 $pengajuann = $input->save();
-                // $link = route('boilerplate.detail-reviewdep-pengajuan', $id);
-
-                // $mailto = DB::select('select email from permission_role left join role_user  on permission_role.role_id=role_user.role_id left join users on role_user.user_id=users.id where permission_id=12');
-                //     $details = [
-                //         'title' => '',
-                //         'body' => 'Pengajuan '.$request->pengajuan,
-                //         'body2' => 'Untuk review pengajuan silahkan klik link ini '.$link,
-                //     ];
                 
-                // \Mail::to($mailto)->send(new \App\Mail\Buatsuratkeluar($details));
-                // $data = pengajuan::where('id', $id)->first();
-                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->first();
-                $user->notify(new RdepPengajuan($id));
-                // Notification::send($user, new RdepPengajuan($data));
+                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->get();
+                foreach ($user as $user) {
+                    $user->notify(new RdepPengajuan($idf));
+                }
 
                 return redirect()->route('boilerplate.saya-pengajuan')
                                 ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);
