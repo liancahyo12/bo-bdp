@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ApproveaSuratkeluar extends Notification
+class Suratmasuka extends Notification
 {
     use Queueable;
 
@@ -44,14 +44,14 @@ class ApproveaSuratkeluar extends Notification
         return (new MailMessage())
             ->from('it@bdpay.co.id', '[BDPay E-Office] No-reply')
             ->markdown('boilerplate::notifications.email')
-            ->subject(__('Notifikasi Surat Keluar', ['name' => 'BDPay E-Office']))
-            ->line(__('Surat keluar butuh Approval', [
+            ->subject(__('Notifikasi Surat Masuk', ['name' => 'BDPay E-Office']))
+            ->line(__('Surat masuk baru', [
             ]))
             ->action(
-                __('Approve Surat Keluar'),
-                route('boilerplate.surat-keluar-approve.edit', $this->id)
+                __('Lihat Surat'),
+                route('boilerplate.surat-masuk-detail', $this->id)
             )
-            ->line(__('Silahkan tekan tombol di atas untuk approve surat keluar'));
+            ->line(__('Silahkan tekan tombol di atas untuk lihat surat masuk'));
     }
 
     /**

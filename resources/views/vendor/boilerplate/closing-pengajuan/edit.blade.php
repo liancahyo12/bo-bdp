@@ -65,6 +65,8 @@
                 </div>
                 <div class="row">
                     &nbsp; &nbsp;
+                    {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}
+                    &nbsp;
                     {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
                 </div>
             </x-boilerplate::card>
