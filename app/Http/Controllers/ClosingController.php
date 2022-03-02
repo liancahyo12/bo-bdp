@@ -227,7 +227,7 @@ class ClosingController extends Controller
                 $input['reviewdep_status'] = 0;
                 $pengajuann = closing::create($input);
             
-                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->get();
+                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->leftJoin('departemens', 'departemen.reviewerdep_id', 'users.id')->where('permission_id', 12)->orWhere('departemens.id', Auth::user()->departemen_id)->get();
                 foreach ($user as $user) {
                     $user->notify(new ReviewdepaClosing($idf));
                 }
@@ -327,7 +327,7 @@ class ClosingController extends Controller
                 $pengajuann = $input->save();
                 $link = route('boilerplate.detail-reviewdep-closing-pengajuan', $id);
 
-                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->get();
+                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->leftJoin('departemens', 'departemen.reviewerdep_id', 'users.id')->where('permission_id', 12)->orWhere('departemens.id', Auth::user()->departemen_id)->get();
                 foreach ($user as $user) {
                     $user->notify(new ReviewdepaClosing($id));
                 }
@@ -339,7 +339,7 @@ class ClosingController extends Controller
 
             case 'Simpan Draft':
                 // save to draft
-                $pengajuann = closing::create($input);
+                $pengajuann = $input->save();
 
                 return redirect()->route('boilerplate.saya-closing-pengajuan')
                                 ->with('growl', [__('Closing pengajuan berhasil disimpan'), 'success']);

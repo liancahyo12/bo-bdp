@@ -16,10 +16,11 @@ class Departemen extends Migration
         //
         Schema::create('departemens', function (Blueprint $table) {
             $table->id();
+            $table->timestamps();
             $table->string('kode');
             $table->string('departemen');
+            $table->unsignedBigInteger('reviewer_id')->nullable();
             $table->tinyInteger('status')->default(1)->comment('0 = not valid, 1= valid');
-
         });
     }
 
