@@ -108,7 +108,7 @@ class SuratkeluarsayaDatatable extends Datatable
                     }
                     return join([
                         Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),    
-                        Button::delete('boilerplate.surat-keluar-saya.destroy', $suratkeluar->id),           
+                        Button::delete('boilerplate.surat-keluar-delete', $suratkeluar->id),           
                     ]);
                     
                 }),

@@ -16,7 +16,7 @@ class Settings
         $item->add('Departemen', [
             'route' => 'boilerplate.departemen',
             'active' => 'boilerplate.departemen,boilerplate.buat-departemen,boilerplate.edit-departemen',
-            'permission' => 'lihat_departemen,buat_departemen,edit_departemen,delete_departemen',
+            'permission' => 'lihat_departemen,buat_departemen,edit_departemen,hapus_departemen',
             'order' => 100,
         ]);
     }

@@ -369,6 +369,9 @@ Route::group([
         Route::put('/surat-keluar-edit/{id}', [SuratkeluarController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-edit');
+        Route::delete('/surat-keluar-delete/{id}', [SuratkeluarController::class, 'destroy'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
+            ->name('surat-keluar-delete');
 
         // surat keluar review
         Route::group(['middleware' => ['ability:admin,review_surat']], function () {
@@ -500,7 +503,7 @@ Route::group([
         Route::put('/edit-departemen/{id}', [DepartemenController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,edit_departemen'])
             ->name('update-departemen');
-        Route::put('/delete-departemen/{id}', [DepartemenController::class, 'destroy'])
+        Route::delete('/delete-departemen/{id}', [DepartemenController::class, 'destroy'])
             ->middleware(['boilerplateauth', 'ability:admin,hapus_departemen'])
             ->name('delete-departemen');
     });
