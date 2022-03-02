@@ -28,6 +28,7 @@ use App\Http\Controllers\ApproveclosingController;
 use App\Http\Controllers\Rek_userController;
 use App\Http\Controllers\LogReportController;
 use App\Http\Controllers\KaryawanController;
+use App\Http\Controllers\DepartemenController;
 
 Route::group([
     'prefix'     => config('boilerplate.app.prefix', ''),
@@ -482,5 +483,26 @@ Route::group([
         Route::get('/log-report-closing', [LogReportController::class, 'lr_closing'])
             ->middleware(['boilerplateauth', 'ability:admin,log_report_closing'])
             ->name('log-report-closing');
+
+        //departemen
+        Route::get('/departemen', [DepartemenController::class, 'index'])
+            ->middleware(['boilerplateauth', 'ability:admin,lihat_departemen'])
+            ->name('departemen');
+        Route::get('/buat-departemen', [DepartemenController::class, 'create'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_departemen'])
+            ->name('buat-departemen');
+        Route::post('/buat-departemen', [DepartemenController::class, 'store'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_departemen'])
+            ->name('store-departemen');
+        Route::get('/edit-departemen/{id}', [DepartemenController::class, 'edit'])
+            ->middleware(['boilerplateauth', 'ability:admin,edit_departemen'])
+            ->name('edit-departemen');
+        Route::put('/edit-departemen/{id}', [DepartemenController::class, 'update'])
+            ->middleware(['boilerplateauth', 'ability:admin,edit_departemen'])
+            ->name('update-departemen');
+        Route::put('/delete-departemen/{id}', [DepartemenController::class, 'destroy'])
+            ->middleware(['boilerplateauth', 'ability:admin,hapus_departemen'])
+            ->name('delete-departemen');
     });
 });
+    
