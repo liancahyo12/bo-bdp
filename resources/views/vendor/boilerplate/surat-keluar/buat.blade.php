@@ -25,6 +25,7 @@
             <div class="form-group">
                 <div class="input-group" id="unduh-format">
                 </div>
+                <div id="ket"></div>
             </div>
             <x-boilerplate::input name="file_surat" type="file" label="Unggah Surat Keluar* (Word DOCX Maks 20MB)" />
             <x-boilerplate::input name="file_lampiran" type="file" label="Unggah Lampiran (PDF Maks 20MB)" />

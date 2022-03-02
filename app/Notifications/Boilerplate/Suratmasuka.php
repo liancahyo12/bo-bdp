@@ -11,7 +11,7 @@ class Suratmasuka extends Notification
     use Queueable;
 
     /**
-     * Get the notification's delivery channels.
+     * Get the notification's delivery <channels class=""></channels>
      *
      * @param  mixed  $notifiable
      * @return string[]

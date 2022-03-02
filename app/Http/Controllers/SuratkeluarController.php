@@ -549,9 +549,15 @@ class SuratkeluarController extends Controller
 
     public function unduh_format($id)
     {
-        $file= Storage::disk('local')->get(Jenis_surat::where('id', $id)->value('format'));
+        $file = 'a';
+        if (Storage::disk('local')->exists(Jenis_surat::where('id', $id)->value('format'))) {
+            $file= Storage::disk('local')->get(Jenis_surat::where('id', $id)->value('format'));
+        }else {
+            $file= Storage::disk('local')->get('format/surat-keluar.docx');
+        }
         return (new Response($file, 200))
-              ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+            ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        
     }
 
     public function unduh_lampiran($id)
