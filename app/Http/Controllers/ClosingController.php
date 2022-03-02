@@ -77,7 +77,7 @@ class ClosingController extends Controller
         $reviewclosing = reviewclosing::leftJoin('users', 'users.id', 'reviewclosings.reviewer_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('reviewclosings.created_at as waktu_komentar', 'review_status as statuss', 'komentar', 'first_name', 'last_name', 'kode', 'users.id as uid')->where([['closing_id', '=', $id], ['reviewclosings.status', '=', 1]]);
         $approveclosing = approveclosing::leftJoin('users', 'users.id', 'approveclosings.approver_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('approveclosings.created_at as waktu_komentar',  'approve_status as statuss','komentar', 'first_name', 'last_name', 'kode', 'users.id as uid')->where([['closing_id', '=', $id], ['approveclosings.status', '=', 1]])->union($reviewdepclosing)->union($reviewclosing)->get();
         
-        if ($closing->revisi_status == 1) {
+        if ($closing->revisi_status == 1 || $closing->send_status == 0) {
             return view('boilerplate::closing-pengajuan.edit', compact('closing'), 
             // compact('isisurat'), compact('approver'),compact('reviewer'), compact('jenis_surat'),compact('departemens'),
             [
@@ -219,19 +219,34 @@ class ClosingController extends Controller
                 }
             }
             
-            $input['send_status'] = 1;
-            $input['send_time'] = Carbon::now()->toDateTimeString();
-            $input['reviewdep_status'] = 0;
-            $pengajuann = closing::create($input);
-           
-            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->get();
-            foreach ($user as $user) {
-                $user->notify(new ReviewdepaClosing($idf));
+            switch ($request->submitbutton) {
+            case 'Kirim':
+                // send
+                $input['send_status'] = 1;
+                $input['send_time'] = Carbon::now()->toDateTimeString();
+                $input['reviewdep_status'] = 0;
+                $pengajuann = closing::create($input);
+            
+                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 12)->get();
+                foreach ($user as $user) {
+                    $user->notify(new ReviewdepaClosing($idf));
+                }
+                
+
+                return redirect()->route('boilerplate.saya-closing-pengajuan')
+                                ->with('growl', [__('Closing pengajuan berhasil dikirim'), 'success']);
+
+                break;
+
+            case 'Simpan Draft':
+                // save to draft
+                $pengajuann = closing::create($input);
+
+                return redirect()->route('boilerplate.saya-closing-pengajuan')
+                                ->with('growl', [__('Closing pengajuan berhasil disimpan'), 'success']);
+                break;
             }
             
-
-            return redirect()->route('boilerplate.saya-closing-pengajuan')
-                            ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);
         }else {
             return redirect()->route('boilerplate.saya-pengajuan')
                 ->with('growl', [__('Pengajuan belum diapprove atau tidak perlu closing'), 'danger']);
@@ -295,7 +310,10 @@ class ClosingController extends Controller
                 }
             }
             
-            if ($input->send_status == 1 && $input->revisi_status==1) {
+            switch ($request->submitbutton) {
+            case 'Kirim':
+                // send
+                if ($input->send_status == 1 && $input->revisi_status==1) {
                     $input['reviewdep_status'] = 5;
                     $input['revisi_status'] = 2;
                 }elseif ($input->send_status == 0) {
@@ -316,6 +334,17 @@ class ClosingController extends Controller
 
                 return redirect()->route('boilerplate.saya-closing-pengajuan')
                                 ->with('growl', [__('Closing pengajuan berhasil dikirim'), 'success']);
+
+                break;
+
+            case 'Simpan Draft':
+                // save to draft
+                $pengajuann = closing::create($input);
+
+                return redirect()->route('boilerplate.saya-closing-pengajuan')
+                                ->with('growl', [__('Closing pengajuan berhasil disimpan'), 'success']);
+                break;
+            }
         }
     }
     public function unduh_lampiran($id)

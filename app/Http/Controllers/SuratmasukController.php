@@ -20,7 +20,7 @@ use App\Models\Boilerplate\User;
 use Carbon\Carbon;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Storage;
-use App\Notifications\Boilerplate\ApproveaSuratkeluar;
+use App\Notifications\Boilerplate\Suratmasuka;
 use Auth;
 use DB;
 
@@ -66,6 +66,12 @@ class SuratmasukController extends Controller
         $input['no_surat'] = $request->no_surat;
         $input['pengirim'] = $request->pengirim;
         $suratmasuk = Suratmasuk::create($input);
+
+        $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where([['permission_id', '=', 20], ['users.departemen_id', '=', $request->departemen]])->get();
+        foreach ($user as $user) {
+            $user->notify(new Suratmasuka($ssr));
+        }
+
         return redirect()->route('boilerplate.surat-masuk-saya')
                 ->with('growl', [__('Surat berhasil dikirim'), 'success']);
     }
