@@ -124,6 +124,8 @@ class DepartemenController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $input = departemen::where('id', $id)->first();
+        $input['status'] = 0;
+        $depart = $input->save();
     }
 }

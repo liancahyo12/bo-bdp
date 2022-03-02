@@ -532,9 +532,10 @@ class SuratkeluarController extends Controller
      public function destroy($id)
     {
         //
-        $send = Suratkeluar::where('id', $id)->select('send_status')->value('send_status');
-        if ($send==0) {
-            $suratkeluar = DB::update('update suratkeluars set status = 0 where id = ?', [$id]);
+        $send = Suratkeluar::where('id', $id)->first();
+        if ($send->send_status==0) {
+            $send['status'] = 0;
+            $dele = $send->save();
         }else {
             return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Tidak dapat dihapus'), 'danger']);

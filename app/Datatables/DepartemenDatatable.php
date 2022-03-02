@@ -7,6 +7,7 @@ use Sebastienheyd\Boilerplate\Datatables\Column;
 use Sebastienheyd\Boilerplate\Datatables\Datatable;
 use App\Models\departemen;
 use DB;
+use Auth;
 
 class DepartemenDatatable extends Datatable
 {
@@ -40,9 +41,15 @@ class DepartemenDatatable extends Datatable
                 
             Column::add()
                 ->actions(function(departemen $departemen) {
-                        return join([
-                        Button::edit('boilerplate.edit-departemen', $departemen->id),          
-                    ]);
+
+                    $currentUser = Auth::user();
+                    $buttons = Button::edit('boilerplate.edit-departemen', $departemen->id);
+
+                    if ($currentUser->hasPermission('hapus_departemen')) {
+                        $buttons .= Button::delete('boilerplate.delete-departemen', $departemen->id);
+                    }
+                        
+                    return $buttons;
                     
                 }),
         ];
