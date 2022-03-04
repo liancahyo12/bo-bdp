@@ -108,10 +108,8 @@ class ReviewdeppengajuanController extends Controller
             $user=User::leftJoin('pengajuans', 'users.id', 'pengajuans.user_id')->where('pengajuans.id', $id)->first();
             $user->notify(new RevieweddepPengajuan($id));
 
-            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 13)->get();
-            foreach ($user as $user) {
-                $user->notify(new ReviewPengajuan($id));
-            }
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 13)->first();
+            $user->notify(new ReviewPengajuan($id));
             
             return redirect()->route('boilerplate.reviewdep-pengajuan')
                             ->with('growl', [__('pengajuan berhasil disetujui'), 'success']);

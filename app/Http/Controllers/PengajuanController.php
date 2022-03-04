@@ -255,10 +255,8 @@ class PengajuanController extends Controller
             $input['reviewdep_status'] = 0;
             $pengajuann = pengajuan::create($input);
             
-            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->leftJoin('departemens', 'departemens.reviewerdep_id', 'users.id')->where('permission_id', 12)->orWhere('departemens.id', Auth::user()->departemen_id)->get();
-            foreach ($user as $user) {
-                $user->notify(new RdepPengajuan($idf));
-            }
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->leftJoin('departemens', 'departemens.reviewerdep_id', 'users.id')->where('permission_id', 12)->orWhere('departemens.id', Auth::user()->departemen_id)->first();
+            $user->notify(new RdepPengajuan($idf));
 
             return redirect()->route('boilerplate.saya-pengajuan')
                             ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);
@@ -533,10 +531,8 @@ class PengajuanController extends Controller
                 $input['send_time'] = Carbon::now()->toDateTimeString();
                 $pengajuann = $input->save();
                 
-                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->leftJoin('departemens', 'departemens.reviewerdep_id', 'users.id')->where('permission_id', 12)->orWhere('departemens.id', Auth::user()->departemen_id)->get();
-                foreach ($user as $user) {
-                    $user->notify(new RdepPengajuan($id));
-                }
+                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->leftJoin('departemens', 'departemens.reviewerdep_id', 'users.id')->where('permission_id', 12)->orWhere('departemens.id', Auth::user()->departemen_id)->first();
+                $user->notify(new RdepPengajuan($id));
 
                 return redirect()->route('boilerplate.saya-pengajuan')
                                 ->with('growl', [__('Pengajuan berhasil dikirim'), 'success']);

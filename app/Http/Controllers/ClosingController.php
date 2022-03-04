@@ -227,10 +227,8 @@ class ClosingController extends Controller
                 $input['reviewdep_status'] = 0;
                 $pengajuann = closing::create($input);
             
-                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->leftJoin('departemens', 'departemen.reviewerdep_id', 'users.id')->where('permission_id', 12)->orWhere('departemens.id', Auth::user()->departemen_id)->get();
-                foreach ($user as $user) {
-                    $user->notify(new ReviewdepaClosing($idf));
-                }
+                $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->leftJoin('departemens', 'departemen.reviewerdep_id', 'users.id')->where('permission_id', 12)->orWhere('departemens.id', Auth::user()->departemen_id)->first();
+                $user->notify(new ReviewdepaClosing($idf));
                 
 
                 return redirect()->route('boilerplate.saya-closing-pengajuan')

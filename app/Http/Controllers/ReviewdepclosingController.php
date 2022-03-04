@@ -127,10 +127,8 @@ class ReviewdepclosingController extends Controller
             $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
             $user->notify(new RevieweddepClosing($id));
 
-            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 13)->get();
-            foreach ($user as $user) {
-                $user->notify(new ReviewaClosing($id));
-            }
+            $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 13)->first();
+            $user->notify(new ReviewaClosing($id));
             
 
             return redirect()->route('boilerplate.reviewdep-closing-pengajuan')
