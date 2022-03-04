@@ -131,10 +131,8 @@ class ReviewclosingController extends Controller
                     $user=User::leftJoin('closings', 'users.id', 'closings.user_id')->where('closings.id', $id)->first();
                     $user->notify(new ReviewedClosing($id));
 
-                    $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 15)->get();
-                    foreach ($user as $user) {
-                        $user->notify(new ApproveaClosing($id));
-                    }
+                    $user=User::leftJoin('role_user', 'role_user.user_id', 'users.id')->leftJoin('permission_role', 'permission_role.role_id', 'role_user.role_id')->where('permission_id', 15)->first();
+                    $user->notify(new ApproveaClosing($id));
 
                     return redirect()->route('boilerplate.review-closing-pengajuan')
                                     ->with('growl', [__('closing berhasil disetujui'), 'success']);
