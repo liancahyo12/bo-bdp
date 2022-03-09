@@ -8,7 +8,7 @@
 
 @section('content')
 
-    <x-boilerplate::form :route="['boilerplate.store-departemen']" method="post">
+    <x-boilerplate::form :route="['boilerplate.update-departemen', $depart->id]" method="put">
     @csrf
         <x-boilerplate::card>
             <x-boilerplate::input name="kode" type="text" label="Kode Departemen*" value="{{ $depart->kode }}"/>
