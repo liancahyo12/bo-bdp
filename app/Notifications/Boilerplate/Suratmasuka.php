@@ -5,11 +5,12 @@ namespace App\Notifications\Boilerplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Models\Suratmasuk;
 
 class Suratmasuka extends Notification
 {
     use Queueable;
-
+    public $id;
     /**
      * Get the notification's delivery <channels class=""></channels>
      *
@@ -40,12 +41,13 @@ class Suratmasuka extends Notification
     public function toMail($notifiable)
     {
         $currentUser = \Auth::user();
+        $isi = Suratmasuk::where('suratmasuks.id', $this->id)->first();
 
         return (new MailMessage())
             ->from('it@bdpay.co.id', '[BDPay E-Office] No-reply')
             ->markdown('boilerplate::notifications.email')
             ->subject(__('Notifikasi Surat Masuk', ['name' => 'BDPay E-Office']))
-            ->line(__('Surat masuk baru', [
+            ->line(__('Surat masuk baru '.$isi->ringkasan.' dari '.$isi->pengirim, [
             ]))
             ->action(
                 __('Lihat Surat'),

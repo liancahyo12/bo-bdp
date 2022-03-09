@@ -408,7 +408,6 @@ class SuratkeluarController extends Controller
                 'perihal' => 'required',
                 'file_surat' => 'mimes:docx|max:20480',
                 'file_lampiran' => 'mimes:pdf|max:20480',
-                'lampiran_radio' => 'required',
             ]);
             
             $reqlampiran = Request_surat_keluar::select('lampiran')->where('id', $input->request_surat_keluar_id)->value('lampiran');

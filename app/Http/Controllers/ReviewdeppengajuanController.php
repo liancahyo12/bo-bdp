@@ -40,7 +40,7 @@ class ReviewdeppengajuanController extends Controller
     }
     public function create($id)
     {
-        if (departemen::where('reviewerdep_id', Auth::user()->id)->first()->id == pengajuan::where('id', $id)->first()->departemen_id || Auth::user()->departemen_id == pengajuan::where('id', $id)->first()->departemen_id) {
+        if (departemen::where('id', pengajuan::where('id', $id)->first()->departemen_id)->first()->reviewerdep_id == Auth::user()->id || Auth::user()->departemen_id == pengajuan::where('id', $id)->first()->departemen_id) {
             $pengajuan = pengajuan::leftJoin('isi_pengajuans', 'pengajuan_id', 'pengajuans.id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'pengajuans.jenis_pengajuan_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->leftJoin('users', 'users.id', 'pengajuans.user_id')->select('first_name', 'last_name', 'pengajuans.id as ida', 'pengajuans.user_id as suser_id', 'pengajuans.status as sstatus', 'isi_pengajuans.*', 'pengajuans.*', 'jenis_pengajuans.*', 'departemen')->where([['pengajuans.id', '=', $id], ['pengajuans.status', '=', 1]])->first();
             if ($pengajuan->send_status==1) {
                 if( $pengajuan->reviewdep_status == 0 || $pengajuan->reviewdep_status == 5){
@@ -65,7 +65,7 @@ class ReviewdeppengajuanController extends Controller
     }
     public function update(Request $request, $id)
     {
-        if (departemen::where('reviewerdep_id', Auth::user()->id)->first()->id == pengajuan::where('id', $id)->first()->departemen_id || Auth::user()->departemen_id == pengajuan::where('id', $id)->first()->departemen_id) {
+        if (departemen::where('id', pengajuan::where('id', $id)->first()->departemen_id)->first()->reviewerdep_id == Auth::user()->id || Auth::user()->departemen_id == pengajuan::where('id', $id)->first()->departemen_id) {
             $pengajuan = pengajuan::where([['id', '=', $id],['status', '=', 1]])->first();
             $pengajuan['reviewerdep_id'] = Auth::user()->id;
             $pengajuan['reviewdep_time'] = Carbon::now()->toDateTimeString();

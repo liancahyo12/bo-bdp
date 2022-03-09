@@ -5,11 +5,12 @@ namespace App\Notifications\Boilerplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Models\closing;
 
 class ReviewpengemClosing extends Notification
 {
     use Queueable;
-
+    public $id;
     /**
      * Get the notification's delivery channels.
      *
@@ -40,12 +41,13 @@ class ReviewpengemClosing extends Notification
     public function toMail($notifiable)
     {
         $currentUser = \Auth::user();
+        $isi = closing::leftJoin('isi_closings', 'isi_closings.pengajuan_id', 'closings.id')->leftJoin('jenis_pengajuans', 'closings.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('users', 'users.id', 'closings.user_id')->where('closings.id', $this->id)->first();
 
         return (new MailMessage())
             ->from('it@bdpay.co.id', '[BDPay E-Office] No-reply')
             ->markdown('boilerplate::notifications.email')
             ->subject(__('Notifikasi Closing Pengajuan', ['name' => 'BDPay E-Office']))
-            ->line(__('Bukti pengembalian telah dikirimkan oleh '.$currentUser->first_name.' '.$currentUser->last_name, [
+            ->line(__('Bukti pengembalian '.$isi->jenis_pengajuan.' '.$isi->transaksi.$isi->jenis_transaksi.'...... oleh '.$isi->first_name.' perlu direview', [
             ]))
             ->action(
                 __('Review Bukti Pengembalian'),

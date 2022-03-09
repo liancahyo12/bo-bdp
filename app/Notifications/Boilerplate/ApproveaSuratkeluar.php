@@ -5,11 +5,12 @@ namespace App\Notifications\Boilerplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Models\Suratkeluar;
 
 class ApproveaSuratkeluar extends Notification
 {
     use Queueable;
-
+    public $id;
     /**
      * Get the notification's delivery channels.
      *
@@ -40,12 +41,13 @@ class ApproveaSuratkeluar extends Notification
     public function toMail($notifiable)
     {
         $currentUser = \Auth::user();
+        $isi = Suratkeluar::leftJoin('users', 'users.id', 'suratkeluars.user_id')->where('suratkeluars.id', $this->id)->first();
 
         return (new MailMessage())
             ->from('it@bdpay.co.id', '[BDPay E-Office] No-reply')
             ->markdown('boilerplate::notifications.email')
             ->subject(__('Notifikasi Surat Keluar', ['name' => 'BDPay E-Office']))
-            ->line(__('Surat keluar butuh Approval', [
+            ->line(__('Surat keluar '.$isi->perihal.' oleh '.$isi->first_name.' butuh Approval', [
             ]))
             ->action(
                 __('Approve Surat Keluar'),

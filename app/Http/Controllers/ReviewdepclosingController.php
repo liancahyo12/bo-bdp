@@ -43,7 +43,7 @@ class ReviewdepclosingController extends Controller
     }
     public function create($id)
     {
-        if (departemen::where('reviewerdep_id', Auth::user()->id)->first()->id == closing::where('id', $id)->first()->departemen_id || Auth::user()->departemen_id == closing::where('id', $id)->first()->departemen_id) {
+        if (departemen::where('id', closing::where('id', $id)->first()->departemen_id)->first()->reviewerdep_id == Auth::user()->id || Auth::user()->departemen_id == closing::where('id', $id)->first()->departemen_id) {
             $closing = closing::leftJoin('isi_closings', 'closing_id', 'closings.id')->select('closings.id as ida', 'closings.user_id as suser_id', 'closings.status as sstatus', 'isi_closings.*', 'closings.*', )->where('closings.id', $id)->first();
             $pengajuan = pengajuan::leftJoin('isi_pengajuans', 'pengajuan_id', 'pengajuans.id')->leftJoin('jenis_pengajuans', 'jenis_pengajuans.id', 'pengajuans.jenis_pengajuan_id')->leftJoin('departemens', 'departemen_id', 'departemens.id')->select('pengajuans.id as ida', 'pengajuans.user_id as suser_id', 'pengajuans.status as sstatus', 'isi_pengajuans.*', 'pengajuans.*', 'jenis_pengajuans.*', 'departemen')->where('pengajuans.id', $closing->pengajuan_id)->first();
             if ($closing->send_status==1) {
@@ -82,7 +82,7 @@ class ReviewdepclosingController extends Controller
     }
     public function update(Request $request, $id)
     {
-        if (departemen::where('reviewerdep_id', Auth::user()->id)->first()->id == closing::where('id', $id)->first()->departemen_id || Auth::user()->departemen_id == closing::where('id', $id)->first()->departemen_id) {
+        if (departemen::where('id', closing::where('id', $id)->first()->departemen_id)->first()->reviewerdep_id == Auth::user()->id || Auth::user()->departemen_id == closing::where('id', $id)->first()->departemen_id) {
             $closing = closing::where([['id', '=', $id],['status', '=', 1]])->first();
             $closing['reviewerdep_id'] = Auth::user()->id;
             $closing['reviewdep_time'] = Carbon::now()->toDateTimeString();
