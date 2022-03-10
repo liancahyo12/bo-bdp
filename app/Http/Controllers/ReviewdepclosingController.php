@@ -177,7 +177,7 @@ class ReviewdepclosingController extends Controller
     }
     public function unduh_lampiran($id)
     {
-        if (departemen::where('reviewerdep_id', Auth::user()->id)->first()->id == closing::where('id', $id)->first()->departemen_id || Auth::user()->departemen_id == closing::where('id', $id)->first()->departemen_id) {
+        if (departemen::where('id', closing::where('id', $id)->first()->departemen_id)->first()->reviewerdep_id == Auth::user()->id || Auth::user()->departemen_id == closing::where('id', $id)->first()->departemen_id) {
             $file= Storage::disk('local')->get(closing::where([['id', '=', $id], ['status', '=', 1]])->value('lampiran'));
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
