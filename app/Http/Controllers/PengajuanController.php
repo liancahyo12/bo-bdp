@@ -542,7 +542,7 @@ class PengajuanController extends Controller
             case 'Simpan Draft':
                 // save to draft
                 $isipengajuan = Isi_pengajuan::create($inpengajuan);
-                $pengajuann = pengajuan::create($input);
+                $pengajuann = $input->save();
 
                 return redirect()->route('boilerplate.saya-pengajuan')
                                 ->with('growl', [__('Pengajuan berhasil disimpan'), 'success']);
