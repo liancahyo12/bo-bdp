@@ -46,8 +46,6 @@
                 
             </div>
             <div>
-                <a target="_blank" href="/surat-keluar-approve-preview/{{ $surat->ida }}" ><button class="btn btn-secondary" form="a">Lihat Surat</button></a>
-                &nbsp;
                 <input class="btn btn-warning" name="submitbutton" type="submit" value="Revisi" @if ($surat->approve_status==2 || $surat->approve_status==3 || $surat->approve_status==4)
                 style='display:none;'
                 @endif>
@@ -67,6 +65,15 @@
             <x-boilerplate::input name="departemen" label="Departemen" value="{{ $surat->departemen }}" disabled/>
             <x-boilerplate::input name="perihal" label="Perihal" value="{{ $surat->perihal }}" disabled/>
             <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat' disabled/>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><span class="fas fa-file"></span></span>
+                        </div>
+                        <a target="_blank" href="/surat-keluar-approve-preview/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Surat</button></a>
+                    </div>
+                </div>
+
                 <div class="form-group" @if ($surat->lampiran!=null) @else style='display:none;' @endif>
                     <div class="input-group">
                         <div class="input-group-prepend">
@@ -75,6 +82,7 @@
                         <a target="_blank" href="/surat-keluar-approve-lampiran/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Lampiran</button></a>
                     </div>
                 </div>
+                
         </x-boilerplate::card>
     </x-boilerplate::form>
 @endsection
