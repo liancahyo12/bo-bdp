@@ -138,6 +138,7 @@
                     var nom = document.getElementsByName('nominala[]');
                     var sald = document.getElementsByName('saldoa[]');
                     var totb=0;
+                    var tot=0;
                     for(var i=0;i<nom.length;i++){
                         a=i-1;
                         if(i==0){

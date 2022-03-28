@@ -212,6 +212,7 @@
                     var nom = document.getElementsByName('nominala[]');
                     var sald = document.getElementsByName('saldoa[]');
                     var totb=0;
+                    var tot=0;
                     for(var i=0;i<nom.length;i++){
                         a=i-1;
                         if(i==0){
@@ -220,6 +221,10 @@
                             totb = parseFloat(sald[a].value)-parseFloat(nom[i].value);
                             sald[i].value = totb;
                         }
+                    }
+                    for(var i=0;i<nom.length;i++){
+                        if(parseFloat(nom[i].value))
+                            tot += parseFloat(nom[i].value);
                     }
                     document.getElementById("totalclosing").value = tot;
                     document.getElementById("selisih").value = totb;
