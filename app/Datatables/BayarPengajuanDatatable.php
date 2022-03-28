@@ -15,7 +15,7 @@ class BayarPengajuanDatatable extends Datatable
 
     public function datasource()
     {
-        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('isi_pengajuans', 'isi_pengajuans.pengajuan_id', 'pengajuans.id')->whereRaw('any_value(pengajuans.status) = 1 and any_value(review_status)=2 and any_value(reviewdep_status)=2 and any_value(approve_status)=2')->groupBy('isi_pengajuans.pengajuan_id')->orderByRaw('any_value(pengajuans.updated_at) desc')->get([DB::raw('any_value(pengajuans.id) as  id'),
+        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('isi_pengajuans', 'isi_pengajuans.pengajuan_id', 'pengajuans.id')->whereRaw('any_value(pengajuans.status) = 1 and any_value(review_status)=2 and any_value(reviewdep_status)=2 and any_value(approve_status)=2 and any_value(isi_pengajuans.status) = 1')->groupBy('isi_pengajuans.pengajuan_id')->orderByRaw('any_value(pengajuans.updated_at) desc')->get([DB::raw('any_value(pengajuans.id) as  id'),
         DB::raw('any_value(tgl_pengajuan) as tgl_pengajuan'),
         DB::raw('any_value(jenis_pengajuan) as jenis_pengajuan'),
         DB::raw('any_value(pengajuans.jenis_pengajuan_id) as jenis_pengajuan_id'),
