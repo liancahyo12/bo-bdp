@@ -7,6 +7,7 @@ use Sebastienheyd\Boilerplate\Datatables\Column;
 use Sebastienheyd\Boilerplate\Datatables\Datatable;
 use App\Models\closing;
 use Auth;
+use DB;
 
 class ClosingDatatable extends Datatable
 {
@@ -14,19 +15,19 @@ class ClosingDatatable extends Datatable
 
     public function datasource()
     {
-        return closing::leftJoin('jenis_pengajuans', 'closings.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['user_id', '=', Auth::user()->id], ['closings.status', '=', '1']])->orderByDesc('closings.updated_at')->get(['closings.id',
-        'closing',
-        'no_pengajuan',
-        'tgl_closing',
-        'jenis_pengajuan',
-        'review_status',
-        'review_time',
-        'reviewdep_status',
-        'reviewdep_time',
-        'approve_status',
-        'approve_time',
-        'send_time',
-        'send_status',]);
+        return closing::leftJoin('jenis_pengajuans', 'closings.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('isi_closings', 'isi_closings.closing_id', 'closings.id')->whereRaw('user_id = ? and closings.status = 1', Auth::user()->id)->groupBy('isi_closings.closing_id')->orderByRaw('any_value(closings.updated_at) desc')->get([DB::raw('any_value(closings.id) as  id'),
+        DB::raw('any_value(tgl_closing) as tgl_closing'),
+        DB::raw('any_value(jenis_pengajuan) as jenis_pengajuan'),
+        DB::raw('any_value(no_pengajuan) as no_pengajuan'),
+        DB::raw('any_value(review_status) as review_status'),
+        DB::raw('any_value(review_time) as review_time'),
+        DB::raw('any_value(reviewdep_status) as reviewdep_status'),
+        DB::raw('any_value(reviewdep_time) as reviewdep_time'),
+        DB::raw('any_value(approve_status) as approve_status'),
+        DB::raw('any_value(approve_time) as approve_time'),
+        DB::raw('any_value(send_time) as send_time'),
+        DB::raw('any_value(send_status) as send_status'),
+        DB::raw('any_value(transaksi) as transaksi')]);
     }
 
     public function setUp()
@@ -63,7 +64,7 @@ class ClosingDatatable extends Datatable
 
             Column::add('Closing')
                 ->width('160px')
-                ->data('closing'),
+                ->data('transaksi'),
 
             Column::add('Tgl Closing')
                 ->data('tgl_closing'),
