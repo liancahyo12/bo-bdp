@@ -15,7 +15,7 @@ class ReviewdeppengajuanDatatable extends Datatable
 
     public function datasource()
     {
-        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('isi_pengajuans', 'isi_pengajuans.pengajuan_id', 'pengajuans.id')->leftJoin('departemens', 'departemens.id', 'departemen_id')->whereRaw('any_value(departemen_id) = ? and any_value(send_status) = 1 and any_value(pengajuans.status) = 1', Auth::user()->departemen_id)->orwhereRaw('any_value(departemens.reviewerdep_id) = ? and any_value(send_status) = 1 and any_value(pengajuans.status) = 1', Auth::user()->id)->groupBy('isi_pengajuans.pengajuan_id')->orderByRaw('any_value(pengajuans.updated_at) desc')->get([DB::raw('any_value(pengajuans.id) as  id'),
+        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('isi_pengajuans', 'isi_pengajuans.pengajuan_id', 'pengajuans.id')->leftJoin('departemens', 'departemens.id', 'departemen_id')->whereRaw('any_value(departemen_id) = ? and any_value(send_status) = 1 and any_value(pengajuans.status) = 1 and any_value(isi_pengajuans.status) = 1', Auth::user()->departemen_id)->orwhereRaw('any_value(departemens.reviewerdep_id) = ? and any_value(send_status) = 1 and any_value(pengajuans.status) = 1 and any_value(isi_pengajuans.status) = 1', Auth::user()->id)->groupBy('isi_pengajuans.pengajuan_id')->orderByRaw('any_value(pengajuans.updated_at) desc')->get([DB::raw('any_value(pengajuans.id) as  id'),
         DB::raw('any_value(tgl_pengajuan) as tgl_pengajuan'),
         DB::raw('any_value(jenis_pengajuan) as jenis_pengajuan'),
         DB::raw('any_value(no_pengajuan) as no_pengajuan'),

@@ -15,7 +15,7 @@ class ApproveClosingDatatable extends Datatable
 
     public function datasource()
     {
-        return closing::leftJoin('jenis_pengajuans', 'closings.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('isi_closings', 'isi_closings.closing_id', 'closings.id')->whereRaw('any_value(closings.status) = 1 and ( any_value(review_status)=2 or any_value(approver_id) =?)', Auth::user()->id)->groupBy('isi_closings.closing_id')->orderByRaw('any_value(closings.updated_at) desc')->get([DB::raw('any_value(closings.id) as  id'),
+        return closing::leftJoin('jenis_pengajuans', 'closings.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('isi_closings', 'isi_closings.closing_id', 'closings.id')->whereRaw('any_value(closings.status) = 1 and ( any_value(review_status)=2 or any_value(approver_id) =?) and any_value(isi_closings.status) = 1', Auth::user()->id)->groupBy('isi_closings.closing_id')->orderByRaw('any_value(closings.updated_at) desc')->get([DB::raw('any_value(closings.id) as  id'),
         DB::raw('any_value(tgl_closing) as tgl_closing'),
         DB::raw('any_value(jenis_pengajuan) as jenis_pengajuan'),
         DB::raw('any_value(no_pengajuan) as no_pengajuan'),
