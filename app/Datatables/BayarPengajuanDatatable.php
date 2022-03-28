@@ -62,9 +62,11 @@ class BayarPengajuanDatatable extends Datatable
                 ->data('no_pengajuan'),
 
             Column::add('Jenis Pengajuan')
+                ->width('160px')
                 ->data('jenis_pengajuan'),
             
             Column::add('Pengajuan')
+                ->width('160px')
                 ->data('transaksi'),
 
             Column::add('Tgl Pengajuan')
