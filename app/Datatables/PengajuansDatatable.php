@@ -7,6 +7,7 @@ use Sebastienheyd\Boilerplate\Datatables\Column;
 use Sebastienheyd\Boilerplate\Datatables\Datatable;
 use App\Models\pengajuan;
 use Auth;
+use DB;
 
 class PengajuansDatatable extends Datatable
 {
@@ -15,21 +16,20 @@ class PengajuansDatatable extends Datatable
     public function datasource()
     {
         // return User::query();
-        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->where([['user_id', '=', Auth::user()->id], ['pengajuans.status', '=', '1']])->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
-        'pengajuan',
-        'no_pengajuan',
-        'tgl_pengajuan',
-        'jenis_pengajuan_id',
-        'jenis_pengajuan',
-        'review_status',
-        'review_time',
-        'reviewdep_status',
-        'reviewdep_time',
-        'approve_status',
-        'bayar_status',
-        'approve_time',
-        'send_time',
-        'send_status',]);
+        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('isi_pengajuans', 'isi_pengajuans.pengajuan_id', 'pengajuans.id')->whereRaw('any_value(user_id) = ? and any_value(pengajuans.status) = 1', Auth::user()->id)->groupBy('isi_pengajuans.pengajuan_id')->orderByRaw('any_value(pengajuans.updated_at) desc')->get([DB::raw('any_value(pengajuans.id) as  id'),
+        DB::raw('any_value(tgl_pengajuan) as tgl_pengajuan'),
+        DB::raw('any_value(jenis_pengajuan) as jenis_pengajuan'),
+        DB::raw('any_value(no_pengajuan) as no_pengajuan'),
+        DB::raw('any_value(review_status) as review_status'),
+        DB::raw('any_value(review_time) as review_time'),
+        DB::raw('any_value(reviewdep_status) as reviewdep_status'),
+        DB::raw('any_value(reviewdep_time) as reviewdep_time'),
+        DB::raw('any_value(approve_status) as approve_status'),
+        DB::raw('any_value(approve_time) as approve_time'),
+        DB::raw('any_value(send_time) as send_time'),
+        DB::raw('any_value(send_status) as send_status'),
+        DB::raw('any_value(bayar_status) as bayar_status'),
+        DB::raw('ifnull(any_value(transaksi), any_value(jenis_transaksi)) as transaksi')]);
     }
 
     public function setUp()
@@ -66,7 +66,7 @@ class PengajuansDatatable extends Datatable
 
             Column::add('Pengajuan')
                 ->width('160px')
-                ->data('pengajuan'),
+                ->data('transaksi'),
 
             Column::add('Tgl Pengajuan')
                 ->data('tgl_pengajuan'),

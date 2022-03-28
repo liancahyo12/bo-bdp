@@ -7,6 +7,7 @@ use Sebastienheyd\Boilerplate\Datatables\Column;
 use Sebastienheyd\Boilerplate\Datatables\Datatable;
 use App\Models\pengajuan;
 use Auth;
+use DB;
 
 class ReviewdeppengajuanDatatable extends Datatable
 {
@@ -14,18 +15,19 @@ class ReviewdeppengajuanDatatable extends Datatable
 
     public function datasource()
     {
-        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('departemens', 'departemens.id', 'departemen_id')->where([['departemen_id', '=', Auth::user()->departemen_id], ['send_status', '=', '1'], ['pengajuans.status', '=', '1']])->orWhere([['departemens.reviewerdep_id', '=',Auth::user()->id], ['send_status', '=', '1'], ['pengajuans.status', '=', '1']])->orderByDesc('pengajuans.updated_at')->get(['pengajuans.id',
-        'pengajuan',
-        'tgl_pengajuan',
-        'jenis_pengajuan',
-        'review_status',
-        'review_time',
-        'reviewdep_status',
-        'reviewdep_time',
-        'approve_status',
-        'approve_time',
-        'send_time',
-        'send_status',]);
+        return pengajuan::leftJoin('jenis_pengajuans', 'pengajuans.jenis_pengajuan_id', 'jenis_pengajuans.id')->leftJoin('isi_pengajuans', 'isi_pengajuans.pengajuan_id', 'pengajuans.id')->leftJoin('departemens', 'departemens.id', 'departemen_id')->whereRaw('any_value(departemen_id) = ? and any_value(send_status) = 1 and any_value(pengajuans.status) = 1', Auth::user()->departemen_id)->orwhereRaw('any_value(departemens.reviewerdep_id) = ? and any_value(send_status) = 1 and any_value(pengajuans.status) = 1', Auth::user()->id)->groupBy('isi_pengajuans.pengajuan_id')->orderByRaw('any_value(pengajuans.updated_at) desc')->get([DB::raw('any_value(pengajuans.id) as  id'),
+        DB::raw('any_value(tgl_pengajuan) as tgl_pengajuan'),
+        DB::raw('any_value(jenis_pengajuan) as jenis_pengajuan'),
+        DB::raw('any_value(no_pengajuan) as no_pengajuan'),
+        DB::raw('any_value(review_status) as review_status'),
+        DB::raw('any_value(review_time) as review_time'),
+        DB::raw('any_value(reviewdep_status) as reviewdep_status'),
+        DB::raw('any_value(reviewdep_time) as reviewdep_time'),
+        DB::raw('any_value(approve_status) as approve_status'),
+        DB::raw('any_value(approve_time) as approve_time'),
+        DB::raw('any_value(send_time) as send_time'),
+        DB::raw('any_value(send_status) as send_status'),
+        DB::raw('ifnull(any_value(transaksi), any_value(jenis_transaksi)) as transaksi')]);
     }
 
     public function setUp()
@@ -35,34 +37,7 @@ class ReviewdeppengajuanDatatable extends Datatable
     public function columns(): array
     {
         return [
-            Column::add()
-                ->width('40px')
-                ->data('send_status', function (pengajuan $pengajuan) {
-                    $badge = '<span class="badge badge-pill badge-%s">%s</span>';
-                    if ($pengajuan->send_status == 1) {
-                        return sprintf($badge, 'success', __('Terkirim'));
-                    }
-
-                    return sprintf($badge, 'info', __('Draft'));
-                })
-                ->notSortable(),
-            
-            Column::add('Waktu Kirim')
-                ->data('send_time'),
-
-            Column::add('Id')
-                ->data('id'),
-            
-            Column::add('Jenis Pengajuan')
-                ->data('jenis_pengajuan'),
-
-            Column::add('Pengajuan')
-                ->data('pengajuan'),
-
-            Column::add('Tgl Pengajuan')
-                ->data('tgl_pengajuan'),
-
-                Column::add('Status Pengajuan')
+            Column::add('Status Pengajuan')
                 ->width('40px')
                 ->data('pengajuan_status', function (pengajuan $pengajuan) {
                     $badge1 = '<span class="badge badge-pill badge-%s">Review Dep %s</span>';
@@ -113,19 +88,27 @@ class ReviewdeppengajuanDatatable extends Datatable
                     return join([$a, $b, $c]);
                 })
                 ->notSortable(),
+            
+            Column::add('Waktu Review')
+                ->data('reviewdep_time'),
 
-            Column::add('Waktu Perubahan Status')
-                ->data('status_time', function (pengajuan $pengajuan) {
-                    if ($pengajuan->approve_time>$pengajuan->review_time) {
-                        return $pengajuan->approve_time;
-                    }else if ($pengajuan->review_time>$pengajuan->reviewdep_time) {
-                        return $pengajuan->review_time;
-                    }else if ($pengajuan->review_time<$pengajuan->reviewdep_time) {
-                        return $pengajuan->reviewdep_time;
-                    }
-                }),
+            Column::add('Id')
+                ->data('id'),
+            
+            Column::add('No Pengajuan')
+                ->data('no_pengajuan'),
 
-            Column::add()
+            Column::add('Jenis Pengajuan')
+                ->data('jenis_pengajuan'),
+
+            Column::add('Pengajuan')
+                ->width('160px')
+                ->data('transaksi'),
+
+            Column::add('Tgl Pengajuan')
+                ->data('tgl_pengajuan'),
+
+            Column::add('Lihat')
                 ->actions(function(pengajuan $pengajuan) {
                         return join([
                         Button::show('boilerplate.detail-reviewdep-pengajuan', $pengajuan->id),           
