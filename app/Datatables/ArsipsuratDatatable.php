@@ -28,6 +28,7 @@ class ArsipsuratDatatable extends Datatable
         'approve_time',
         'send_time',
         'no_surat',
+        'surat_scan',
         'request_surat_keluar_id',
         'send_status',]);
     }

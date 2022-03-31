@@ -28,6 +28,7 @@ class PengajuansDatatable extends Datatable
         DB::raw('any_value(approve_time) as approve_time'),
         DB::raw('any_value(send_time) as send_time'),
         DB::raw('any_value(send_status) as send_status'),
+        DB::raw('any_value(revisi_status) as revisi_status'),
         DB::raw('any_value(bayar_status) as bayar_status'),
         DB::raw('ifnull(any_value(transaksi), any_value(jenis_transaksi)) as transaksi')]);
     }

@@ -40,22 +40,22 @@
     <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files>
         @csrf
         <x-boilerplate::card>
-            <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat*" id='jenis_surat'>
+            <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat*" id='jenis_surat' required>
                 @foreach ($jenis_surat as $position)
                     <option value="{{ $position->id }}" @if ( $surat->jenis_surat_id==$position->id)
                         selected
                     @endif>{{ $position->jenis_surat }}</option>
                 @endforeach
             </x-boilerplate::select2>
-            <x-boilerplate::select2 name="departemen" label="Pilih Departemen*">
+            <x-boilerplate::select2 name="departemen" label="Pilih Departemen*" required>
                 @foreach ($departemens as $position)
                     <option value="{{ $position->id }}" @if ( $surat->departemen_id==$position->id)
                         selected
                     @endif>{{ $position->departemen }}</option>
                 @endforeach
             </x-boilerplate::select2>
-            <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat*'/>
-            <x-boilerplate::input name="perihal" label="Perihal*" value="{{ $surat->perihal }}" />
+            <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat*' required/>
+            <x-boilerplate::input name="perihal" label="Perihal*" value="{{ $surat->perihal }}" required/>
             <div class="form-group" @if ($surat->approve_status!=2)
                 
                 @else

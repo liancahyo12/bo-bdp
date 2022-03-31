@@ -134,6 +134,7 @@ class PengajuanController extends Controller
         }elseif ($request->jenis_pengajuan == 4) {
             $this->validate($request, [
                 'noinvoice' => 'required',
+                'jatuhtempo' => 'required',
                 'namarek' => 'required',
                 'norek' => 'required',
                 'bank' => 'required',
@@ -154,6 +155,7 @@ class PengajuanController extends Controller
                 }
                 $input['total_nominal'] = $total;
                 $input['no_invoice'] = $request->noinvoice;
+                $input['jatuhtempo'] = $request->jatuhtempo;
                 $input['nama_rek'] = $request->namarek;
                 $input['no_rek'] = $request->norek;
                 $input['bank'] = $request->bank;
@@ -266,7 +268,7 @@ class PengajuanController extends Controller
         case 'Simpan Draft':
             // save to draft
             $input['send_status'] = 0;
-            $isipengajuan = Isi_pengajuan::create($inpengajuan);
+            // $isipengajuan = Isi_pengajuan::create($inpengajuan);
             $pengajuann = pengajuan::create($input);
 
             return redirect()->route('boilerplate.saya-pengajuan')
@@ -398,6 +400,7 @@ class PengajuanController extends Controller
             }elseif ($input->jenis_pengajuan_id == 4) {
                 $this->validate($request, [
                     'noinvoice' => 'required',
+                    'jatuhtempo' => 'required',
                     'namarek' => 'required',
                     'norek' => 'required',
                     'bank' => 'required',
@@ -419,6 +422,7 @@ class PengajuanController extends Controller
                     }
                     $input['total_nominal'] = $total;
                     $input['no_invoice'] = $request->noinvoice;
+                    $input['jatuhtempo'] = $request->jatuhtempo;
                     $input['nama_rek'] = $request->namarek;
                     $input['no_rek'] = $request->norek;
                     $input['bank'] = $request->bank;
@@ -541,7 +545,7 @@ class PengajuanController extends Controller
 
             case 'Simpan Draft':
                 // save to draft
-                $isipengajuan = Isi_pengajuan::create($inpengajuan);
+                // $isipengajuan = Isi_pengajuan::create($inpengajuan);
                 $pengajuann = $input->save();
 
                 return redirect()->route('boilerplate.saya-pengajuan')

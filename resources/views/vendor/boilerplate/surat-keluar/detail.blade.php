@@ -86,12 +86,13 @@
                     <a target="_blank" href="/surat-keluar-surat-jadi/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Surat Approved</button></a>
                 </div>
             </div>
-            <label for="">Lampiran</label>
+            
             <div class="form-group" @if ($surat->lampiran!=null)
                 
                 @else
                 style='display:none;'
                 @endif id="unduh-lamiran-lama">
+                <label for="">Lampiran</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><span class="fas fa-file"></span></span>
