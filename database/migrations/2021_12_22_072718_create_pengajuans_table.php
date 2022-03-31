@@ -24,6 +24,7 @@ class CreatePengajuansTable extends Migration
             $table->string('pengajuan')->nullable();
             $table->date('tgl_pengajuan')->nullable();
             $table->string('no_invoice')->nullable();
+            $table->dateTime('jatuhtempo')->nullable();
             $table->string('perusahaan')->nullable();
             $table->string('alamat')->nullable();
             $table->string('phone')->nullable();

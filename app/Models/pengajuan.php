@@ -37,6 +37,7 @@ class pengajuan extends Model
         'pengajuan',
         'tgl_pengajuan',
         'no_invoice',
+        'jatuhtempo',
         'perusahaan',
         'alamat',
         'phone',
