@@ -356,4 +356,12 @@ class ApprovesuratkeluarController extends Controller
                 ->header('Content-Type', 'application/pdf'); 
         }    
     }
+
+    public function unduh_scan($id)
+    {
+        $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('surat_scan'));
+        return (new Response($file, 200))
+            ->header('Content-Type', 'application/pdf');
+        
+    }
 }

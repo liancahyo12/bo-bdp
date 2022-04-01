@@ -369,6 +369,12 @@ Route::group([
         Route::put('/surat-keluar-edit/{id}', [SuratkeluarController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-edit');
+        Route::put('/surat-keluar-scan/{id}', [SuratkeluarController::class, 'unggah_scan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
+            ->name('surat-keluar-unggah-scan');
+        Route::get('/surat-keluar-scan/{id}', [SuratkeluarController::class, 'unduh_scan'])
+            ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
+            ->name('surat-keluar-unduh-scan');
         Route::delete('/surat-keluar-delete/{id}', [SuratkeluarController::class, 'destroy'])
             ->middleware(['boilerplateauth', 'ability:admin,buat_surat_keluar'])
             ->name('surat-keluar-delete');
@@ -408,8 +414,11 @@ Route::group([
         Route::put('/surat-keluar-approve/{id}', [ApprovesuratkeluarController::class, 'update'])
             ->middleware(['boilerplateauth', 'ability:admin,approve_surat'])
             ->name('surat-keluar-approve.approve');
+        Route::get('/surat-keluar-approve-scan/{id}', [ApprovesuratkeluarController::class, 'unduh_scan'])
+            ->middleware(['boilerplateauth', 'ability:admin,approve_surat'])
+            ->name('surat-keluar-approve-scan');
 
-        
+        // surat keluar arsip
         Route::get('/surat-keluar-arsip', [ArsipSuratKeluarController::class, 'index'])
             ->middleware(['boilerplateauth', 'ability:admin,arsip_surat'])
             ->name('surat-keluar-arsip');
