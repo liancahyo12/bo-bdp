@@ -20,6 +20,7 @@
             <div id="postpaid" style='display:none;'>
                 <x-boilerplate::input name="noinvoice" id="noinvoice" type="text" label="Nomor Invoice*" />
                 <x-boilerplate::datetimepicker name="jatuhtempo" id="jatuhtempo" format="DD/MM/YYYY HH:mm" label='Tanggal Jatuh Tempo*'/>
+                <p>Note: Jika tidak ada jatuh tempo pada invoice maka masukan tanggal jatuh tempo 30 hari setelah tanggal invoice</p>
             </div>            
             <div id="form-pengajuan">
             </div>
