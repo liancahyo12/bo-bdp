@@ -53,7 +53,7 @@ class ApprovedSuratkeluar extends Notification
                 __('Lihat Detail'),
                 route('boilerplate.surat-keluar-saya.edit', $this->id)
             )
-            ->line(__('Silahkan tekan tombol di atas untuk lihat detail'));
+            ->line(__('Silahkan tekan tombol di atas untuk lihat detail, setelah surat ditandatangani jangan lupa untuk scan dan unggah pada halaman detail surat untuk arsip surat'));
     }
 
     /**

@@ -37,7 +37,7 @@
                 </div>
             @endforeach            
         </x-boilerplate::card>
-    <x-boilerplate::form :route="['boilerplate.surat-keluar-edit', $surat->ida]" method="put" files>
+    <x-boilerplate::form :route="['boilerplate.surat-keluar-unggah-scan', $surat->ida]" method="put" files>
         @csrf
         <x-boilerplate::card>
             <x-boilerplate::select2 name="jenis_surat" label="Pilih Jenis Surat*" id='jenis_surat' disabled>
@@ -54,6 +54,13 @@
                     @endif>{{ $position->departemen }}</option>
                 @endforeach
             </x-boilerplate::select2>
+            <div @if ($surat->no_surat!=null)
+                
+                @else
+                style='display:none;'
+                @endif>
+                <x-boilerplate::input name="nosurat" label="Nomor Surat*" value="{{ $surat->no_surat }}" disabled/>
+            </div>
             <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat*' disabled/>
             <x-boilerplate::input name="perihal" label="Perihal*" value="{{ $surat->perihal }}" disabled/>
             <label for="">File Surat Keluar</label>
@@ -86,7 +93,17 @@
                     <a target="_blank" href="/surat-keluar-surat-jadi/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Surat Approved</button></a>
                 </div>
             </div>
-            
+            <div @if ($surat->surat_scan==null) @else style='display:none;' @endif>
+                <x-boilerplate::input type="file" name="filescan" label="Unggah Surat Scan" />
+            </div>
+            <div class="form-group" @if ($surat->surat_scan!=null) @else style='display:none;' @endif>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><span class="fas fa-file"></span></span>
+                    </div>
+                    <a target="_blank" href="/surat-keluar-scan/{{ $surat->ida }}"><button class="btn btn-secondary" form="c">Lihat Surat Keluar Scan</button></a>
+                </div>
+            </div>
             <div class="form-group" @if ($surat->lampiran!=null)
                 
                 @else
@@ -103,16 +120,12 @@
                    
 
         </x-boilerplate::card>
-        <div class="row" @if ($surat->send_status==0 || $surat->approve_status==3)
+        <div class="row" @if ($surat->surat_scan==null)
         @else
             style='display:none;'
         @endif>
-            &nbsp; 
-            {{ Form::submit('Simpan Draft', array('class' => 'btn btn-secondary', 'name' => 'submitbutton')) }}
             &nbsp;
-            <input formtarget="_blank" class="btn btn-warning" name="submitbutton" type="submit" value="Preview Surat" >
-            &nbsp;
-            {{ Form::submit('Kirim', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
+            {{ Form::submit('Unggah Surat Scan', array('class' => 'btn btn-primary', 'name' => 'submitbutton')) }}
         </div>
     </x-boilerplate::form>
     <script> $(document).keypress(

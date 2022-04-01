@@ -559,6 +559,29 @@ class SuratkeluarController extends Controller
             ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         
     }
+    public function unggah_scan(Request $request, $id)
+    {
+        if(Suratkeluar::where('id', $id)->value('user_id') == Auth::user()->id){
+            $input = Suratkeluar::where('id', $id)->first();
+            if ($input->surat_scan==null) {
+                $this->validate($request, [
+                    'filescan' => 'required|mimes:pdf|max:20480',
+                ]);
+                $filename = $id.Str::random(16).'.pdf';
+                $path = $request->file('filescan')->storeAs('suratkeluarscan', $filename);
+                $input['surat_scan'] = $path;
+                $input['scan_time'] = Carbon::now()->toDateTimeString();
+                $suratkeluar = $input->save();
+                return redirect()->route('boilerplate.surat-keluar-saya')
+                    ->with('growl', [__('Unggah Surat Scan Berhasil'), 'success']);
+            }
+            return redirect()->route('boilerplate.surat-keluar-saya')
+                ->with('growl', [__('Surat scan sudah diuanggah'), 'danger']);
+        }else {
+            return redirect()->route('boilerplate.surat-keluar-saya')
+                            ->with('growl', [__('Anda tidak memiliki akses ini'), 'warning']);
+        }
+    }
 
     public function unduh_lampiran($id)
     {
@@ -567,7 +590,7 @@ class SuratkeluarController extends Controller
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {
-            return redirect()->route('boilerplate.surat-keluar-request-buat')
+            return redirect()->route('boilerplate.surat-keluar-saya')
                             ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
         }
         
@@ -580,7 +603,7 @@ class SuratkeluarController extends Controller
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {
-            return redirect()->route('boilerplate.surat-keluar-request-buat')
+            return redirect()->route('boilerplate.surat-keluar-saya')
                             ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
         }
         
@@ -592,7 +615,20 @@ class SuratkeluarController extends Controller
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {
-            return redirect()->route('boilerplate.surat-keluar-request-buat')
+            return redirect()->route('boilerplate.surat-keluar-saya')
+                            ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
+        }
+        
+    }
+
+    public function unduh_scan($id)
+    {
+        if(Suratkeluar::where('id', $id)->value('user_id') == Auth::user()->id){
+            $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('surat_scan'));
+            return (new Response($file, 200))
+                ->header('Content-Type', 'application/pdf');
+        }else {
+            return redirect()->route('boilerplate.surat-keluar-saya')
                             ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
         }
         

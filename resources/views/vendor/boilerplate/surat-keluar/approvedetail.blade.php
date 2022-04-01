@@ -63,8 +63,16 @@
         <x-boilerplate::card>
             <x-boilerplate::input name="jenis_surat" label="Jenis Surat" value="{{ $surat->jenis_surat }}" disabled/>
             <x-boilerplate::input name="departemen" label="Departemen" value="{{ $surat->departemen }}" disabled/>
+            <div @if ($surat->no_surat!=null)
+            
+                @else
+                style='display:none;'
+                @endif>
+                <x-boilerplate::input name="nosurat" label="Nomor Surat*" value="{{ $surat->no_surat }}" disabled/>
+            </div>
             <x-boilerplate::input name="perihal" label="Perihal" value="{{ $surat->perihal }}" disabled/>
             <x-boilerplate::datetimepicker value="{{ $surat->tgl_surat }}" name="tgl_surat" label='Tanggal Surat' disabled/>
+            <label for="">File Surat Keluar</label>
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-prepend">
@@ -73,7 +81,14 @@
                         <a target="_blank" href="/surat-keluar-approve-preview/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Surat</button></a>
                     </div>
                 </div>
-
+                <div class="form-group" @if ($surat->surat_scan!=null) @else style='display:none;' @endif>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><span class="fas fa-file"></span></span>
+                        </div>
+                        <a target="_blank" href="/surat-keluar-approve-scan/{{ $surat->ida }}"><button class="btn btn-secondary" form="c">Lihat Surat Keluar Scan</button></a>
+                    </div>
+                </div>
                 <div class="form-group" @if ($surat->lampiran!=null) @else style='display:none;' @endif>
                     <div class="input-group">
                         <div class="input-group-prepend">

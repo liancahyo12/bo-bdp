@@ -61,7 +61,7 @@ class ArsipsuratDatatable extends Datatable
             Column::add('Tgl Surat')
                 ->data('tgl_surat'),
             
-            Column::add()
+            Column::add('Aksi')
                 ->actions(function(Suratkeluar $suratkeluar) {
                     if ($suratkeluar->surat_scan == null) {
                         return join([

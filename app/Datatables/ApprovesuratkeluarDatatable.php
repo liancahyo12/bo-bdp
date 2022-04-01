@@ -20,6 +20,7 @@ class ApprovesuratkeluarDatatable extends Datatable
         'perihal',
         'users.first_name',
         'tgl_surat',
+        'no_surat',
         'jenis_surat',
         'review_status',
         'approve_status',
@@ -56,9 +57,6 @@ class ApprovesuratkeluarDatatable extends Datatable
                     return sprintf($badge1, 'secondary', __('draft'));
                 })
                 ->notSortable(),
-
-            Column::add('Waktu Kirim')
-                ->data('send_time'),
             
             Column::add('Waktu Approve')
                 ->data('approve_time'),
@@ -66,14 +64,14 @@ class ApprovesuratkeluarDatatable extends Datatable
             Column::add('Id')
                 ->data('id'),
                 
+            Column::add('No Surat')
+                ->data('no_surat'),
+            
             Column::add('Jenis Surat')
                 ->data('jenis_surat'),
 
             Column::add('Perihal Surat')
                 ->data('perihal'),
-            
-            Column::add('Pembuat')
-                ->data('first_name'),
 
             Column::add('Tgl Surat')
                 ->data('tgl_surat'),
@@ -82,7 +80,7 @@ class ApprovesuratkeluarDatatable extends Datatable
             // Column::add('Status Pengajuan')
             //     ->data(''),
                 
-            Column::add()
+            Column::add('Aksi')
                 ->actions(function(Suratkeluar $suratkeluar) {
                         return join([
                         Button::show('boilerplate.surat-keluar-approve.edit', $suratkeluar->id),           

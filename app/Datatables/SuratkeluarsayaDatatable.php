@@ -21,6 +21,8 @@ class SuratkeluarsayaDatatable extends Datatable
         return Suratkeluar::leftJoin('jenis_surats', 'suratkeluars.jenis_surat_id', 'jenis_surats.id')->where([['user_id', '=', Auth::user()->id], ['suratkeluars.status', '=', '1']])->orderByDesc('suratkeluars.updated_at')->get(['suratkeluars.id',
         'perihal',
         'tgl_surat',
+        'no_surat',
+        'surat_scan',
         'jenis_surat',
         'review_status',
         'approve_status',
@@ -57,8 +59,8 @@ class SuratkeluarsayaDatatable extends Datatable
             Column::add('Id')
                 ->data('id'),
 
-            Column::add('Id Permintaan')
-                ->data('request_surat_keluar_id'),
+            Column::add('No Surat')
+                ->data('no_surat'),
             
             Column::add('Jenis Surat')
                 ->data('jenis_surat'),
@@ -95,16 +97,21 @@ class SuratkeluarsayaDatatable extends Datatable
             // Column::add('Status Pengajuan')
             //     ->data(''),
                 
-            Column::add()
+            Column::add('Aksi')
                 ->actions(function(Suratkeluar $suratkeluar) {
                     if ($suratkeluar->send_status == 1 && ($suratkeluar->review_status == 3 ||  $suratkeluar->approve_status == 3)) {
                         return join([
-                        Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),          
-                    ]);
+                            Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),          
+                        ]);
                     }else if($suratkeluar->send_status == 1){
+                        if ($suratkeluar->surat_scan == null && $suratkeluar->approve_status == 2) {
+                            return join([
+                                Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),          
+                            ]); 
+                        }
                         return join([
-                        Button::show('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),           
-                    ]);  
+                            Button::show('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),           
+                        ]);  
                     }
                     return join([
                         Button::edit('boilerplate.surat-keluar-saya.edit', $suratkeluar->id),    
