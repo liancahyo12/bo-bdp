@@ -549,14 +549,18 @@ class SuratkeluarController extends Controller
 
     public function unduh_format($id)
     {
+        $format=Jenis_surat::where('id', $id)->value('format');
         $file = 'a';
-        if (Storage::disk('local')->exists(Jenis_surat::where('id', $id)->value('format'))) {
-            $file= Storage::disk('local')->get(Jenis_surat::where('id', $id)->value('format'));
+        $namafile = Str::after($format, 'format/');
+        if (Storage::disk('local')->exists($format)) {
+            $file= Storage::disk('local')->get($format);
         }else {
             $file= Storage::disk('local')->get('format/surat-keluar.docx');
+            $namafile = 'surat.docx';
         }
         return (new Response($file, 200))
-            ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+            ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+            ->header('Content-disposition','attachment; filename="format-'.$namafile.'"');
         
     }
     public function unggah_scan(Request $request, $id)
@@ -598,10 +602,13 @@ class SuratkeluarController extends Controller
 
     public function unduh_surat_lama($id)
     {
+        $surat=Suratkeluar::where('id', $id)->value('isi_surat');
+        $namafile=Str::after($surat, 'suratkeluar/');
         if(Suratkeluar::where('id', $id)->value('user_id') == Auth::user()->id){
-            $file= Storage::disk('local')->get(Suratkeluar::where('id', $id)->value('isi_surat').'.pdf');
+            $file= Storage::disk('local')->get($surat.'.pdf');
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
+                // ->header('Content-disposition','attachment; filename="'.$namafile.'.pdf"');
         }else {
             return redirect()->route('boilerplate.surat-keluar-saya')
                             ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);

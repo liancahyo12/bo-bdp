@@ -34,7 +34,6 @@ class jenis_pengajuan extends Seeder
             [
                 'kode' => 'PC',
                 'jenis_pengajuan' => 'PETTY CASH',
-                'status' = > 0,
             ],
             [
                 'kode' => 'PCC',
