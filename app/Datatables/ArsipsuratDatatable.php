@@ -26,6 +26,7 @@ class ArsipsuratDatatable extends Datatable
         'review_status',
         'approve_status',
         'approve_time',
+        'jenis_surat',
         'send_time',
         'no_surat',
         'surat_scan',
@@ -40,20 +41,15 @@ class ArsipsuratDatatable extends Datatable
     public function columns(): array
     {
         return [
-            Column::add('Waktu Approve')
-                ->data('approve_time'),
-
-            Column::add('Kode')
-                ->data('kodes'),
-
-            Column::add('No')
-                ->data('no_urut'),
 
             Column::add('No Surat')
                 ->data('no_surat'),
 
             Column::add('Departemen')
                 ->data('departemen'),
+
+            Column::add('Jenis Surat')
+                ->data('jenis_surat'),
 
             Column::add('Perihal Surat')
                 ->data('perihal'),
