@@ -434,7 +434,7 @@ class SuratkeluarController extends Controller
             // get date from request
 
             $last_surat_keluar = DB::table('suratkeluars')->select('id')->orderBy('id', 'DESC')->limit(1)->value('id');
-            $tgl_surat_t = Carbon::createFromFormat('Y-m-d H:i:s', $request->tgl_surat)->isoFormat('D MMMM Y');
+            // $tgl_surat_t = Carbon::createFromFormat('Y-m-d H:i:s', $request->tgl_surat)->isoFormat('D MMMM Y');
             
             // $isisurat = Isi_surat::where('surat_keluar_id', $id)->first();
 
