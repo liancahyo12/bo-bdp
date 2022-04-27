@@ -93,10 +93,10 @@
                     <a target="_blank" href="/surat-keluar-surat-jadi/{{ $surat->ida }}"><button class="btn btn-secondary" form="a">Lihat Surat Approved</button></a>
                 </div>
             </div>
-            <div @if ($surat->surat_scan==null) @else style='display:none;' @endif>
+            <div @if ($surat->surat_scan==null && $surat->approve_status==2) @else style='display:none;' @endif>
                 <x-boilerplate::input type="file" name="filescan" label="Unggah Surat Scan" />
             </div>
-            <div class="form-group" @if ($surat->surat_scan!=null) @else style='display:none;' @endif>
+            <div class="form-group" @if ($surat->surat_scan!=null && $surat->approve_status==2) @else style='display:none;' @endif>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><span class="fas fa-file"></span></span>
@@ -120,7 +120,7 @@
                    
 
         </x-boilerplate::card>
-        <div class="row" @if ($surat->surat_scan==null)
+        <div class="row" @if ($surat->surat_scan==null && $surat->approve_status==2)
         @else
             style='display:none;'
         @endif>
