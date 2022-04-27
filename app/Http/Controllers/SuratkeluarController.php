@@ -409,27 +409,45 @@ class SuratkeluarController extends Controller
                 'file_surat' => 'mimes:docx|max:20480',
                 'file_lampiran' => 'mimes:pdf|max:20480',
             ]);
-            
-            $reqlampiran = Request_surat_keluar::select('lampiran')->where('id', $input->request_surat_keluar_id)->value('lampiran');
+            $filenameS = Str::substr($input->isi_surat, 12);
+            $pathS ='';
+            if ($request->file_surat!=null) {
+                $pathS = $request->file('file_surat')->storeAs('suratkeluar', $filenameS.'.docx');
+                $converter = new OfficeConverter(Storage::path('suratkeluar/'.$filenameS.'.docx'));
+                $converter->convertTo($filenameS.'.pdf'); 
+            }
+
+            $filenameL = $id.Str::random(16).'.pdf';
+            $pathL = '';
+            if ($request->file_lampiran!=0) {
+                if ($input->lampiran==null) {
+                    $pathL = $request->file('file_lampiran')->storeAs('lampiran', $filenameL);
+                }else{
+                    $lpr = Str::substr($input->lampiran, 9);
+                    $pathL = $request->file('file_lampiran')->storeAs('lampiran', $lpr);
+                }
+                $input['lampiran'] = $pathL;
+            }
+            // $reqlampiran = Request_surat_keluar::select('lampiran')->where('id', $input->request_surat_keluar_id)->value('lampiran');
 
             
-            if ($request->lampiran_radio == 1) {
-                $input['lampiran'] = $reqlampiran;
-            }elseif ($request->lampiran_radio == 2){
-                $filenameL = $id.Str::random(16).'.pdf';
-                $pathL = '';
-                if ($request->file_lampiran!=0) {
-                    if ($input->lampiran==$reqlampiran || $input->lampiran==null) {
-                        $pathL = $request->file('file_lampiran')->storeAs('lampiran', $filenameL);
-                    }else{
-                        $lpr = Str::substr($input->lampiran, 9);
-                        $pathL = $request->file('file_lampiran')->storeAs('lampiran', $lpr);
-                    }
-                    $input['lampiran'] = $pathL;
-                }
-            }else {
-                $input['lampiran'] = '';
-            }
+            // if ($request->lampiran_radio == 1) {
+            //     $input['lampiran'] = $reqlampiran;
+            // }elseif ($request->lampiran_radio == 2){
+            //     $filenameL = $id.Str::random(16).'.pdf';
+            //     $pathL = '';
+            //     if ($request->file_lampiran!=0) {
+            //         if ($input->lampiran==$reqlampiran || $input->lampiran==null) {
+            //             $pathL = $request->file('file_lampiran')->storeAs('lampiran', $filenameL);
+            //         }else{
+            //             $lpr = Str::substr($input->lampiran, 9);
+            //             $pathL = $request->file('file_lampiran')->storeAs('lampiran', $lpr);
+            //         }
+            //         $input['lampiran'] = $pathL;
+            //     }
+            // }else {
+            //     $input['lampiran'] = '';
+            // }
 
             // get date from request
 
@@ -565,7 +583,8 @@ class SuratkeluarController extends Controller
     }
     public function unggah_scan(Request $request, $id)
     {
-        if(Suratkeluar::where('id', $id)->value('user_id') == Auth::user()->id){
+        $surat = Suratkeluar::where('id', $id)->first();
+        if($surat->user_id == Auth::user()->id && $surat->approve_status == 2){
             $input = Suratkeluar::where('id', $id)->first();
             if ($input->surat_scan==null) {
                 $this->validate($request, [
