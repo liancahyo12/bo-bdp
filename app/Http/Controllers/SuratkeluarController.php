@@ -576,13 +576,13 @@ class SuratkeluarController extends Controller
                 $input['surat_scan'] = $path;
                 $input['scan_time'] = Carbon::now()->toDateTimeString();
                 $suratkeluar = $input->save();
-                return redirect()->route('boilerplate.surat-keluar-saya')
+                return redirect()->route('boilerplate.surat-keluar-saya.index')
                     ->with('growl', [__('Unggah Surat Scan Berhasil'), 'success']);
             }
-            return redirect()->route('boilerplate.surat-keluar-saya')
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                 ->with('growl', [__('Surat scan sudah diuanggah'), 'danger']);
         }else {
-            return redirect()->route('boilerplate.surat-keluar-saya')
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Anda tidak memiliki akses ini'), 'warning']);
         }
     }
@@ -594,7 +594,7 @@ class SuratkeluarController extends Controller
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {
-            return redirect()->route('boilerplate.surat-keluar-saya')
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
         }
         
@@ -610,7 +610,7 @@ class SuratkeluarController extends Controller
                 ->header('Content-Type', 'application/pdf');
                 // ->header('Content-disposition','attachment; filename="'.$namafile.'.pdf"');
         }else {
-            return redirect()->route('boilerplate.surat-keluar-saya')
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
         }
         
@@ -622,7 +622,7 @@ class SuratkeluarController extends Controller
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {
-            return redirect()->route('boilerplate.surat-keluar-saya')
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
         }
         
@@ -635,7 +635,7 @@ class SuratkeluarController extends Controller
             return (new Response($file, 200))
                 ->header('Content-Type', 'application/pdf');
         }else {
-            return redirect()->route('boilerplate.surat-keluar-saya')
+            return redirect()->route('boilerplate.surat-keluar-saya.index')
                             ->with('growl', [__('Anda tidak memiliki akses file ini'), 'warning']);
         }
         
